@@ -89,12 +89,12 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 #reader.mode-scroll #content{height:auto; column-width:auto; columns:auto;
   transform:none !important; padding-bottom:15vh;}
 
-/* subtle book edge shading */
-#pages::before,#pages::after{content:""; position:absolute; top:0; bottom:0; width:26px;
-  z-index:2; pointer-events:none; opacity:.5;}
-#pages::before{left:-1px; background:linear-gradient(90deg,var(--bg),transparent);}
-#pages::after{right:-1px; background:linear-gradient(-90deg,var(--bg),transparent);}
-#reader.mode-scroll #pages::before,#reader.mode-scroll #pages::after{display:none;}
+/* subtle book edge shading — lives in the padding gutter, never over the text */
+#pageArea::before,#pageArea::after{content:""; position:absolute; top:0; bottom:0;
+  width:var(--pad,24px); z-index:2; pointer-events:none; opacity:.5;}
+#pageArea::before{left:0; background:linear-gradient(90deg,var(--bg),transparent);}
+#pageArea::after{right:0; background:linear-gradient(-90deg,var(--bg),transparent);}
+#reader.mode-scroll #pageArea::before,#reader.mode-scroll #pageArea::after{display:none;}
 
 /* ---------- markdown ---------- */
 .md{text-rendering:optimizeLegibility;}
@@ -451,13 +451,17 @@ function updateStatus(){
   const c=BOOK[cur];if(!c)return;
   const pct=curPct();
   const minsLeft=Math.max(0,Math.ceil(c.words*(1-pct)/230));
+  const chapInfo=`${c.section} — chapter ${c.num} of ${BOOK.filter(x=>x.section===c.section).length}`;
   if(S.mode==="scroll"){
     $("stInfo").textContent=`${Math.round(pct*100)}% · ${minsLeft} min left`;
+    $("sliderLbl").textContent=chapInfo;
   }else{
     $("stInfo").textContent=`Page ${page+1} of ${pageCount} · ${Math.round(pct*100)}% · ${minsLeft} min left`;
     $("slider").value=page+1;
+    // statusBot sits behind the bottom bar once it's visible, so the slider needs
+    // its own live page readout here or scrubbing looks like it's doing nothing.
+    $("sliderLbl").textContent=`Page ${page+1} of ${pageCount} · ${Math.round(pct*100)}% — ${chapInfo}`;
   }
-  $("sliderLbl").textContent=`${c.section} — chapter ${c.num} of ${BOOK.filter(x=>x.section===c.section).length}`;
 }
 function next(){
   if(S.mode==="scroll"){pages.scrollBy({top:pages.clientHeight*.9,behavior:"smooth"});return;}
