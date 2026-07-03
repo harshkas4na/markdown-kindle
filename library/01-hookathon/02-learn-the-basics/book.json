@@ -1,0 +1,5 @@
+{
+  "title": "Learn the Basics",
+  "author": "Hookathon study notes",
+  "description": "From zero to Uniswap v4 hooks in 25 chapters: AMMs, liquidity, MEV, oracles, the hook system, dev environment, common hook patterns, and security pitfalls."
+}

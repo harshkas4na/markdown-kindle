@@ -1,0 +1,4 @@
+{
+  "title": "The Scaling Arc",
+  "description": "How Shadow's one server stops being enough, and what to do about it: capacity estimation, vertical vs horizontal scaling, statelessness, load balancers, autoscaling, and the actual trigger for microservices. Personal study notes, not a script — deep enough that 10% of it can become a video."
+}

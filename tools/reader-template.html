@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#fafaf7">
-<title>Hookathon Reader</title>
+<title>Library</title>
 <style>
 /* ---------- themes ---------- */
 :root{
@@ -38,16 +38,16 @@ body{
 }
 button{font:inherit; color:inherit; background:none; border:none; cursor:pointer; padding:0;}
 .hidden{display:none !important;}
-
-/* ---------- library ---------- */
-#library{min-height:100dvh; padding:max(20px,env(safe-area-inset-top)) 18px 60px;
-  max-width:720px; margin:0 auto;}
-#library h1{font-size:26px; margin:18px 4px 4px; letter-spacing:-.02em;}
-#library .sub{color:var(--muted); font-size:14px; margin:0 4px 22px;}
-.lib-top{display:flex; justify-content:space-between; align-items:center;}
+.view{min-height:100dvh; padding:max(20px,env(safe-area-inset-top)) 18px 60px;
+  max-width:860px; margin:0 auto;}
 .icon-btn{width:42px; height:42px; border-radius:12px; display:flex; align-items:center;
-  justify-content:center; font-size:19px; border:1px solid var(--line);}
+  justify-content:center; font-size:19px; border:1px solid var(--line); flex-shrink:0;}
 .icon-btn:active{transform:scale(.94);}
+
+/* ---------- home (shelves) ---------- */
+.lib-top{display:flex; justify-content:space-between; align-items:center; gap:10px;}
+#home h1{font-size:26px; margin:18px 4px 4px; letter-spacing:-.02em;}
+#home .sub{color:var(--muted); font-size:14px; margin:0 4px 22px;}
 .continue{display:block; width:100%; text-align:left; background:var(--card);
   border:1px solid var(--card-line); border-radius:16px; padding:16px 18px; margin-bottom:26px;
   box-shadow:0 4px 18px var(--shadow);}
@@ -55,7 +55,38 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .continue .t{font-size:17px; font-weight:600; margin:6px 0 4px;}
 .continue .p{font-size:13px; color:var(--muted);}
 .section-h{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.09em;
-  color:var(--muted); margin:26px 4px 10px;}
+  color:var(--muted); margin:26px 4px 12px;}
+.shelf{display:grid; grid-template-columns:repeat(auto-fill,minmax(138px,1fr)); gap:16px 14px;}
+.bookcard{text-align:left; display:flex; flex-direction:column; gap:7px;}
+.bookcard:active .cover{transform:scale(.97);}
+.cover{position:relative; aspect-ratio:2/3; border-radius:10px; padding:14px 12px 18px 16px;
+  display:flex; flex-direction:column; overflow:hidden; color:#f5f1e8;
+  box-shadow:0 5px 16px var(--shadow); transition:transform .15s ease;}
+.cover::before{content:""; position:absolute; top:0; bottom:0; left:0; width:7px;
+  background:rgba(255,255,255,.16); border-right:1px solid rgba(0,0,0,.15);}
+.cover .bt{font-size:14.5px; font-weight:700; line-height:1.3; letter-spacing:-.01em;
+  display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
+  text-shadow:0 1px 2px rgba(0,0,0,.25);}
+.cover .ba{margin-top:auto; font-size:11px; opacity:.85; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap;}
+.cover .bar{position:absolute; left:0; right:0; bottom:0; height:4px; background:rgba(0,0,0,.25);}
+.cover .bar i{display:block; height:100%; background:#fff; opacity:.9;}
+.bookcard .cap{font-size:11.5px; color:var(--muted); padding:0 2px;}
+.bookcard .cap.done{color:var(--accent);}
+
+/* ---------- book TOC ---------- */
+#toc .hero{display:flex; gap:18px; margin:18px 0 6px;}
+#toc .hero .cover{width:104px; flex-shrink:0;}
+#toc .hero .bt{font-size:11px; -webkit-line-clamp:6;}
+#toc .hero .ba{font-size:8.5px;}
+#toc .hero h1{font-size:22px; margin:2px 0 4px; letter-spacing:-.02em; line-height:1.25;}
+#toc .hero .author{font-size:14px; color:var(--muted); margin:0 0 8px;}
+#toc .hero .meta{font-size:12.5px; color:var(--muted);}
+#toc .desc{font-size:14px; line-height:1.55; color:var(--muted); margin:14px 4px 18px;}
+.primary{display:block; width:100%; text-align:center; background:var(--accent); color:#fff;
+  border-radius:14px; padding:14px; font-size:15px; font-weight:600; margin-bottom:24px;
+  box-shadow:0 4px 14px var(--shadow);}
+.primary:active{transform:scale(.985);}
 .chap{display:flex; align-items:center; gap:14px; width:100%; text-align:left;
   background:var(--card); border:1px solid var(--card-line); border-radius:14px;
   padding:13px 16px; margin-bottom:8px;}
@@ -162,9 +193,10 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 
 /* ---------- desktop niceties ---------- */
 @media (min-width:900px){
-  #library{padding-top:48px;}
+  .view{padding-top:48px;}
   .chap:hover{border-color:var(--accent);}
   .continue:hover{border-color:var(--accent);}
+  .bookcard:hover .cover{transform:translateY(-3px);}
   .seg button:hover,.icon-btn:hover{color:var(--fg);}
 }
 .pagehint{position:fixed; top:50%; transform:translateY(-50%); z-index:3; font-size:22px;
@@ -175,7 +207,8 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 </head>
 <body>
 
-<div id="library"></div>
+<div id="home" class="view"></div>
+<div id="toc" class="view hidden"></div>
 
 <div id="reader" class="hidden mode-page">
   <div id="statusTop" class="status"><span id="stTitle"></span></div>
@@ -187,7 +220,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   <div id="statusBot" class="status"><span id="stInfo"></span></div>
 
   <header id="topbar" class="bar off">
-    <button class="icon-btn" id="btnLib" title="Library (Esc)">☰</button>
+    <button class="icon-btn" id="btnToc" title="Contents (Esc)">☰</button>
     <div class="title" id="barTitle"></div>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)">◑</button>
     <button class="icon-btn" id="btnAa" title="Display settings">Aa</button>
@@ -226,22 +259,34 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 
 <script>
 "use strict";
-/* ================= data ================= */
-const BOOK = __BOOK_DATA__;
-BOOK.forEach(c => { c.words = c.md.split(/\s+/).length; });
+/* ================= data =================
+   LIB      = [{id, title, books:[{id, title, author, description, chapters:[chIdx…]}]}]
+   CHAPTERS = [{id, file, book, part, num, title, md}]  (flat, global indices)   */
+const LIB = __LIB_DATA__;
+const CHAPTERS = __CHAPTER_DATA__;
+const BOOKS = {};
+LIB.forEach(s => s.books.forEach(b => {
+  BOOKS[b.id] = b;
+  b.section = s.title;
+  b.words = 0;
+}));
+CHAPTERS.forEach(c => {
+  c.words = c.md.split(/\s+/).length;
+  BOOKS[c.book].words += c.words;
+});
 
 /* ================= tiny markdown renderer ================= */
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function inline(s){
   const codes=[];
   s=esc(s);
-  s=s.replace(/`([^`]+)`/g,(m,c)=>{codes.push(c);return "\uE000"+(codes.length-1)+"\uE001";});
+  s=s.replace(/`([^`]+)`/g,(m,c)=>{codes.push(c);return ""+(codes.length-1)+"";});
   s=s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,(m,t,u)=>{
     if(/^https?:/i.test(u)) return `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
     return `<a href="${u}" data-int="1">${t}</a>`;});
   s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
   s=s.replace(/(^|[\s(])\*([^*\n]+)\*/g,"$1<em>$2</em>");
-  s=s.replace(/\uE000(\d+)\uE001/g,(m,i)=>`<code>${codes[+i]}</code>`);
+  s=s.replace(/(\d+)/g,(m,i)=>`<code>${codes[+i]}</code>`);
   return s;
 }
 function mdToHtml(md){
@@ -319,12 +364,13 @@ const store={
 const prefersDark=matchMedia("(prefers-color-scheme: dark)").matches;
 let S=Object.assign({theme:prefersDark?"dark":"light",font:"serif",fs:18,lh:"1.7",
   margin:"m",anim:"slide",mode:"page"},store.get("settings",{}));
-let progress=store.get("progress",{});   // {chapterId:{pct,done}}
-let last=store.get("last",null);         // {id}
+let progress=store.get("progress",{});   // {chapterId:{pct}}
+let last=store.get("last",null);         // {id: chapterId}
 let cur=-1, page=0, pageCount=1;
 const htmlCache={};
 
-const content=$("content"),pages=$("pages"),reader=$("reader"),library=$("library");
+const content=$("content"),pages=$("pages"),reader=$("reader"),
+      home=$("home"),toc=$("toc");
 
 /* ================= settings application ================= */
 const MARGINS={s:{pad:16,maxw:920},m:{pad:26,maxw:760},l:{pad:40,maxw:620}};
@@ -352,45 +398,144 @@ function syncPanel(){
   sync("segAnim",S.anim);sync("segMode",S.mode);sync("themeChips",S.theme);
 }
 
-/* ================= library ================= */
-function pctOf(id){const p=progress[id];return p?Math.round(p.pct*100):0;}
-function renderLibrary(){
-  let h=`<div class="lib-top"><div><h1>Hookathon Library</h1>
-    <p class="sub">${BOOK.length} chapters · tap page center for controls · swipe or tap edges to turn pages (←/→ on laptop)</p></div>
-    <button class="icon-btn" id="libTheme" title="Cycle theme">◑</button></div>`;
-  if(last&&BOOK.some(c=>c.id===last.id)){
-    const c=BOOK.find(x=>x.id===last.id);
-    h+=`<button class="continue" data-open="${c.id}"><span class="lbl">Continue reading</span>
-      <div class="t">${esc(c.title)}</div><div class="p">${pctOf(c.id)}% read · ${c.section}</div></button>`;
+/* ================= routing =================
+   ""            -> home (shelves)
+   #b/<bookId>   -> book table of contents
+   #c/<chapterId>-> reader                                                    */
+function nav(h){ if(location.hash===h){route();} else {location.hash=h;} }
+function chapterHash(c){return "#c/"+encodeURIComponent(c.id);}
+function bookHash(b){return "#b/"+encodeURIComponent(b.id);}
+function route(){
+  const h=decodeURIComponent(location.hash);
+  if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
+  hideBars();hidePanel();
+  if(h.startsWith("#c/")){
+    const i=CHAPTERS.findIndex(c=>c.id===h.slice(3));
+    if(i>=0){showView("reader");renderChapter(i);return;}
   }
-  let sec="";
-  BOOK.forEach((c,idx)=>{
-    if(c.section!==sec){sec=c.section;h+=`<div class="section-h">${esc(sec)}</div>`;}
-    const p=pctOf(c.id);
-    h+=`<button class="chap" data-open="${c.id}"><span class="n">${String(c.num).padStart(2,"0")}</span>
-      <span class="t">${esc(c.title)}</span>
-      <span class="pct ${p>=95?"done":""}">${p>=95?"✓":(p>0?p+"%":"")}</span></button>`;
+  if(h.startsWith("#b/")){
+    const b=BOOKS[h.slice(3)];
+    if(b){showView("toc");renderToc(b);window.scrollTo(0,0);return;}
+  }
+  showView("home");renderHome();window.scrollTo(0,0);
+}
+function showView(v){
+  home.classList.toggle("hidden",v!=="home");
+  toc.classList.toggle("hidden",v!=="toc");
+  reader.classList.toggle("hidden",v!=="reader");
+  if(v!=="reader")cur=-1;
+}
+
+/* ================= progress helpers ================= */
+function chPct(id){const p=progress[id];return p?p.pct:0;}
+function bookPct(b){
+  if(!b.chapters.length)return 0;
+  return b.chapters.reduce((a,i)=>a+chPct(CHAPTERS[i].id),0)/b.chapters.length;
+}
+function pctLabel(p){return p>=.95?"✓":(p>0?Math.round(p*100)+"%":"");}
+
+/* ================= covers ================= */
+function coverStyle(title){
+  let h=0;for(const ch of title)h=(h*31+ch.codePointAt(0))>>>0;
+  const hue=h%360, hue2=(hue+46)%360;
+  return `background:linear-gradient(148deg,hsl(${hue},44%,40%),hsl(${hue2},52%,24%))`;
+}
+function coverHtml(b){
+  const p=bookPct(b);
+  return `<div class="cover" style="${coverStyle(b.title)}">
+    <span class="bt">${esc(b.title)}</span>
+    <span class="ba">${esc(b.author||"")}</span>
+    <span class="bar"><i style="width:${Math.round(p*100)}%"></i></span></div>`;
+}
+
+/* ================= home (shelves) ================= */
+function renderHome(){
+  const nBooks=Object.keys(BOOKS).length;
+  let h=`<div class="lib-top"><div><h1>Library</h1>
+    <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
+    <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div>`;
+  if(last){
+    const c=CHAPTERS.find(x=>x.id===last.id);
+    if(c){const b=BOOKS[c.book];
+      h+=`<button class="continue" data-ch="${esc(c.id)}"><span class="lbl">Continue reading</span>
+        <div class="t">${esc(c.title)}</div>
+        <div class="p">${esc(b.title)} · ${Math.round(chPct(c.id)*100)}% of chapter</div></button>`;}
+  }
+  LIB.forEach(s=>{
+    h+=`<div class="section-h">${esc(s.title)}</div><div class="shelf">`;
+    s.books.forEach(b=>{
+      const p=bookPct(b);
+      const cap=p>=.95?"✓ Finished":(p>0?Math.round(p*100)+"% read":b.chapters.length+" chapters");
+      h+=`<button class="bookcard" data-book="${esc(b.id)}">${coverHtml(b)}
+        <span class="cap ${p>=.95?"done":""}">${cap}</span></button>`;
+    });
+    h+=`</div>`;
   });
-  library.innerHTML=h;
-  library.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",
-    ()=>openChapter(BOOK.findIndex(c=>c.id===b.dataset.open))));
-  $("libTheme").addEventListener("click",cycleTheme);
+  home.innerHTML=h;
+  home.querySelectorAll("[data-book]").forEach(el=>el.addEventListener("click",
+    ()=>nav(bookHash(BOOKS[el.dataset.book]))));
+  home.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
+    ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+  $("homeTheme").addEventListener("click",()=>{cycleTheme();});
+}
+
+/* ================= book TOC ================= */
+function renderToc(b){
+  const p=bookPct(b);
+  const mins=Math.ceil(b.words/230);
+  const time=mins>=60?`${Math.round(mins/60*10)/10} h`:`${mins} min`;
+  // resume target: first chapter that isn't finished, or the last-read one in this book
+  let resume=null;
+  if(last){const c=CHAPTERS.find(x=>x.id===last.id);if(c&&c.book===b.id)resume=c;}
+  if(!resume)resume=b.chapters.map(i=>CHAPTERS[i]).find(c=>chPct(c.id)<.95)||CHAPTERS[b.chapters[0]];
+  let h=`<div class="lib-top"><button class="icon-btn" id="tocBack" title="Library">‹</button>
+    <button class="icon-btn" id="tocTheme" title="Cycle theme">◑</button></div>
+  <div class="hero">${coverHtml(b)}<div>
+    <h1>${esc(b.title)}</h1>
+    ${b.author?`<p class="author">${esc(b.author)}</p>`:""}
+    <p class="meta">${esc(b.section)} · ${b.chapters.length} chapters · ~${time}
+      ${p>0?` · ${Math.round(p*100)}% read`:""}</p></div></div>`;
+  if(b.description)h+=`<p class="desc">${esc(b.description)}</p>`;
+  h+=`<button class="primary" data-ch="${esc(resume.id)}">${p>0?"Continue reading":"Start reading"} — ${esc(resume.title)}</button>`;
+  let part=null;
+  b.chapters.forEach(i=>{
+    const c=CHAPTERS[i];
+    if(c.part!==part){part=c.part;
+      if(part)h+=`<div class="section-h">${esc(part)}</div>`;}
+    const cp=chPct(c.id);
+    h+=`<button class="chap" data-ch="${esc(c.id)}"><span class="n">${String(c.num).padStart(2,"0")}</span>
+      <span class="t">${esc(c.title)}</span>
+      <span class="pct ${cp>=.95?"done":""}">${pctLabel(cp)}</span></button>`;
+  });
+  toc.innerHTML=h;
+  toc.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
+    ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+  $("tocBack").addEventListener("click",()=>nav(""));
+  $("tocTheme").addEventListener("click",()=>{cycleTheme();});
 }
 
 /* ================= reader core ================= */
-function openChapter(i,fromEnd){
-  if(i<0||i>=BOOK.length)return;
-  cur=i;const c=BOOK[i];
-  library.classList.add("hidden");reader.classList.remove("hidden");
+function bookOf(c){return BOOKS[c.book];}
+function siblingChapter(offset){
+  // next/prev chapter within the current book only; null at the edges
+  const c=CHAPTERS[cur],b=bookOf(c);
+  const pos=b.chapters.indexOf(cur)+offset;
+  return (pos>=0&&pos<b.chapters.length)?b.chapters[pos]:null;
+}
+function renderChapter(i,fromEnd){
+  if(i<0||i>=CHAPTERS.length)return;
+  cur=i;const c=CHAPTERS[i],b=bookOf(c);
   if(!htmlCache[c.id])htmlCache[c.id]=mdToHtml(c.md);
   content.style.transition="none";content.innerHTML=htmlCache[c.id];
   content.querySelectorAll("a[data-int]").forEach(a=>a.addEventListener("click",e=>{
     e.preventDefault();
     const f=a.getAttribute("href").split("/").pop();
-    const j=BOOK.findIndex(x=>x.file===f);
-    if(j>=0)openChapter(j);
+    // resolve within the same book first, then anywhere in the library
+    let j=b.chapters.find(k=>CHAPTERS[k].file===f);
+    if(j===undefined)j=CHAPTERS.findIndex(x=>x.file===f);
+    if(j>=0)nav(chapterHash(CHAPTERS[j]));
   }));
-  $("stTitle").textContent=c.title;
+  $("stTitle").textContent=`${b.title} — ${c.title}`;
   $("barTitle").textContent=c.title;
   last={id:c.id};store.set("last",last);
   requestAnimationFrame(()=>{
@@ -444,11 +589,12 @@ function curPct(){
 }
 function saveProgress(){
   if(cur<0)return;
-  progress[BOOK[cur].id]={pct:curPct()};
+  progress[CHAPTERS[cur].id]={pct:curPct()};
   store.set("progress",progress);
 }
 function updateStatus(){
-  const c=BOOK[cur];if(!c)return;
+  const c=CHAPTERS[cur];if(!c)return;
+  const b=bookOf(c);
   const pct=curPct();
   const minsLeft=Math.max(0,Math.ceil(c.words*(1-pct)/230));
   if(S.mode==="scroll"){
@@ -457,21 +603,28 @@ function updateStatus(){
     $("stInfo").textContent=`Page ${page+1} of ${pageCount} · ${Math.round(pct*100)}% · ${minsLeft} min left`;
     $("slider").value=page+1;
   }
-  $("sliderLbl").textContent=`${c.section} — chapter ${c.num} of ${BOOK.filter(x=>x.section===c.section).length}`;
+  $("sliderLbl").textContent=`${b.title} — chapter ${c.num} of ${b.chapters.length}`;
+}
+function openSibling(offset,fromEnd){
+  const j=siblingChapter(offset);
+  if(j!==null)nav(chapterHash(CHAPTERS[j]));
+  else if(fromEnd===undefined)backToToc();  // past the last chapter -> book TOC
 }
 function next(){
   if(S.mode==="scroll"){pages.scrollBy({top:pages.clientHeight*.9,behavior:"smooth"});return;}
   if(page<pageCount-1)goTo(page+1);
-  else if(cur<BOOK.length-1)openChapter(cur+1);
+  else{const j=siblingChapter(1);if(j!==null)nav(chapterHash(CHAPTERS[j]));}
 }
 function prev(){
   if(S.mode==="scroll"){pages.scrollBy({top:-pages.clientHeight*.9,behavior:"smooth"});return;}
   if(page>0)goTo(page-1);
-  else if(cur>0)openChapter(cur-1,true);
+  else{const j=siblingChapter(-1);
+    if(j!==null){pendingFromEnd=true;nav(chapterHash(CHAPTERS[j]));}}
 }
-function backToLibrary(){
-  saveProgress();reader.classList.add("hidden");library.classList.remove("hidden");
-  hideBars();hidePanel();renderLibrary();window.scrollTo(0,0);
+let pendingFromEnd=false;
+function backToToc(){
+  const c=CHAPTERS[cur];
+  nav(c?bookHash(bookOf(c)):"");
 }
 
 /* ================= chrome (bars / panel / theme) ================= */
@@ -492,12 +645,12 @@ function reflowKeepingPct(fn){
 }
 
 /* ================= events ================= */
-$("btnLib").addEventListener("click",backToLibrary);
+$("btnToc").addEventListener("click",backToToc);
 $("btnAa").addEventListener("click",showPanel);
 $("btnTheme").addEventListener("click",cycleTheme);
 $("scrim").addEventListener("click",hidePanel);
-$("btnPrevCh").addEventListener("click",()=>openChapter(cur-1));
-$("btnNextCh").addEventListener("click",()=>openChapter(cur+1));
+$("btnPrevCh").addEventListener("click",()=>openSibling(-1,false));
+$("btnNextCh").addEventListener("click",()=>openSibling(1,false));
 $("slider").addEventListener("input",e=>goTo(e.target.value-1,false));
 
 $("fsUp").addEventListener("click",()=>{if(S.fs<26){S.fs++;reflowKeepingPct(applySettings);}});
@@ -545,8 +698,11 @@ $("pageArea").addEventListener("touchend",e=>{
 
 /* keyboard */
 document.addEventListener("keydown",e=>{
-  if(reader.classList.contains("hidden"))return;
   if(e.target.tagName==="INPUT")return;
+  if(reader.classList.contains("hidden")){
+    if(e.key==="Escape"&&!toc.classList.contains("hidden"))nav("");
+    return;
+  }
   switch(e.key){
     case "ArrowRight":case "PageDown":next();break;
     case "ArrowLeft":case "PageUp":prev();break;
@@ -560,7 +716,7 @@ document.addEventListener("keydown",e=>{
     case "Escape":
       if(!$("aaPanel").classList.contains("hidden"))hidePanel();
       else if(barsOn)hideBars();
-      else backToLibrary();
+      else backToToc();
       break;
   }
 });
@@ -592,8 +748,18 @@ window.addEventListener("resize",()=>{
 });
 
 /* ================= boot ================= */
+window.addEventListener("hashchange",()=>{
+  const fe=pendingFromEnd;pendingFromEnd=false;
+  const h=decodeURIComponent(location.hash);
+  if(fe&&h.startsWith("#c/")){
+    const i=CHAPTERS.findIndex(c=>c.id===h.slice(3));
+    if(i>=0){if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
+      hideBars();hidePanel();showView("reader");renderChapter(i,true);return;}
+  }
+  route();
+});
 applySettings();
-renderLibrary();
+route();
 </script>
 </body>
 </html>
