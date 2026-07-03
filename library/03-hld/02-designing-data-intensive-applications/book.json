@@ -1,0 +1,5 @@
+{
+  "title": "Designing Data-Intensive Applications",
+  "author": "Martin Kleppmann",
+  "description": "The engineering discipline behind reliable, scalable, and maintainable data systems — how databases, caches, queues, and stream processors actually work under the hood, and the real tradeoffs behind replication, partitioning, transactions, and consistency in distributed systems."
+}
