@@ -3,7 +3,9 @@
 This repo is a personal, Kindle-style e-reader. All content lives as plain markdown
 files under `library/`, and a build script compiles everything into **one
 self-contained `index.html`** (no server, no dependencies) that works offline, on
-phones, and via GitHub Pages.
+phones, and via GitHub Pages. The build also emits two small PWA companions
+(`sw.js` + `manifest.webmanifest`) so the live link can be **saved for offline
+reading and installed to a home screen** — see "Offline mode" below.
 
 **The core idea (Next.js-style folder routing):** the folder structure *is* the
 library structure. You never configure anything — you drop folders and `.md` files
@@ -120,6 +122,34 @@ Top-to-bottom map:
 - In the reader: tap center = toolbars, tap/swipe edges = turn page,
   `←/→`/space = pages, `T` = theme, `+/-` = font size, `Esc`/☰ = back to TOC.
 - "Continue reading" card on Home jumps to the last-read chapter across all books.
+
+## Offline mode (PWA)
+
+The whole library is embedded inside `index.html`, so once the page has loaded it
+already reads with no connection. The only thing that needs the network is
+*opening the live-link URL itself* — so the build turns the site into a small PWA
+that fixes exactly that:
+
+- **`sw.js`** — a service worker (network-first, cache fallback). Online you always
+  get fresh content; offline it serves the cached page. It's regenerated on every
+  build and only runs over http(s) — a harmless no-op when you open `index.html`
+  as a `file://`.
+- **`manifest.webmanifest`** — makes the app installable ("Add to Home Screen")
+  with an icon; also regenerated each build.
+
+**How to use it:** open the live link once with internet. On the Home screen tap
+**"Save whole library for offline"** — it caches the app and the pill flips to
+**"✓ Available offline"**. After that the same URL opens and every book reads with
+no connection (e.g. on a plane). Tap the pill again any time to refresh the cached
+copy. On phones you can also "Add to Home Screen" to launch it like a native app.
+
+When you rebuild after changing content, online visitors get the fresh page
+automatically (network-first). If you ever change `sw.js` itself, bump
+`OFFLINE_CACHE` in `tools/build-reader.py` so stale caches are discarded on the
+next visit.
+
+All three files (`index.html`, `sw.js`, `manifest.webmanifest`) must be deployed
+together at the same path (GitHub Pages serves the repo root, so this is automatic).
 
 ## Note on book content & copyright
 

@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#fafaf7">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iI2IzNzYyZiIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjU2IDE1MiBDMjEwIDEyMiAxNTAgMTIyIDEyMCAxNDAgTDEyMCAzNzIgQzE1MCAzNTQgMjEwIDM1NCAyNTYgMzg0Ii8+PHBhdGggZD0iTTI1NiAxNTIgQzMwMiAxMjIgMzYyIDEyMiAzOTIgMTQwIEwzOTIgMzcyIEMzNjIgMzU0IDMwMiAzNTQgMjU2IDM4NCIvPjxsaW5lIHgxPSIyNTYiIHkxPSIxNTIiIHgyPSIyNTYiIHkyPSIzODQiLz48L2c+PC9zdmc+">
 <title>Library</title>
 <style>
 /* ---------- themes ---------- */
@@ -48,6 +50,17 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .lib-top{display:flex; justify-content:space-between; align-items:center; gap:10px;}
 #home h1{font-size:26px; margin:18px 4px 4px; letter-spacing:-.02em;}
 #home .sub{color:var(--muted); font-size:14px; margin:0 4px 22px;}
+.offbar{display:inline-flex; align-items:center; gap:8px; margin:0 4px 24px; padding:9px 14px;
+  border-radius:11px; border:1px solid var(--card-line); background:var(--card); color:var(--muted);
+  font:500 13px inherit; font-family:inherit; cursor:pointer; -webkit-appearance:none;
+  transition:border-color .15s, color .15s;}
+.offbar:active{transform:scale(.98);}
+.offbar .dot{font-size:14px; line-height:1;}
+.offbar.ready{color:var(--accent); border-color:var(--accent);}
+.offbar.busy{cursor:default;}
+.offbar .spin{width:13px; height:13px; border-radius:50%; border:2px solid var(--card-line);
+  border-top-color:var(--accent); display:inline-block; animation:offspin .7s linear infinite;}
+@keyframes offspin{to{transform:rotate(360deg);}}
 .continue{display:block; width:100%; text-align:left; background:var(--card);
   border:1px solid var(--card-line); border-radius:16px; padding:16px 18px; margin-bottom:26px;
   box-shadow:0 4px 18px var(--shadow);}
@@ -453,7 +466,8 @@ function renderHome(){
   const nBooks=Object.keys(BOOKS).length;
   let h=`<div class="lib-top"><div><h1>Library</h1>
     <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
-    <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div>`;
+    <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div>
+    <div id="offlineBar"></div>`;
   if(last){
     const c=CHAPTERS.find(x=>x.id===last.id);
     if(c){const b=BOOKS[c.book];
@@ -477,6 +491,7 @@ function renderHome(){
   home.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
   $("homeTheme").addEventListener("click",()=>{cycleTheme();});
+  paintOffline();
 }
 
 /* ================= book TOC ================= */
@@ -747,6 +762,54 @@ window.addEventListener("resize",()=>{
   rz=setTimeout(()=>{reflowKeepingPct(()=>{});},160);
 });
 
+/* ================= offline (PWA) =================
+   The whole library is embedded in this one document, so caching it makes every
+   book readable with no connection. Only meaningful when served over http(s);
+   on file:// there's no service worker / Cache API, so the UI stays hidden. */
+const OFFLINE_CACHE="library-offline-v3";
+const OFFLINE_OK=("serviceWorker" in navigator)&&("caches" in window)&&
+  (location.protocol==="https:"||location.protocol==="http:");
+let offlineReady=false, offlineBusy=false;
+
+async function offlineCheck(){
+  if(!OFFLINE_OK)return false;
+  try{
+    const c=await caches.open(OFFLINE_CACHE);
+    offlineReady=!!(await c.match("./index.html")||await c.match("./")||await c.match(location.href));
+  }catch(e){offlineReady=false;}
+  return offlineReady;
+}
+async function offlineSave(){
+  if(!OFFLINE_OK||offlineBusy)return;
+  offlineBusy=true; paintOffline();
+  try{
+    const c=await caches.open(OFFLINE_CACHE);
+    // {cache:"reload"} bypasses the HTTP cache so we store a fresh copy.
+    await Promise.allSettled(["./","./index.html","./manifest.webmanifest"]
+      .map(u=>c.add(new Request(u,{cache:"reload"}))));
+    offlineReady=true;
+  }catch(e){offlineReady=false;}
+  offlineBusy=false; paintOffline();
+}
+function offlineBarHtml(){
+  if(!OFFLINE_OK)return "";
+  if(offlineBusy)return `<div class="offbar busy"><span class="spin"></span>Saving library for offline…</div>`;
+  if(offlineReady)return `<button class="offbar ready" id="offBtn" title="Refresh the offline copy"><span class="dot">✓</span>Available offline · tap to update</button>`;
+  return `<button class="offbar" id="offBtn"><span class="dot">⬇</span>Save whole library for offline</button>`;
+}
+function paintOffline(){
+  const el=document.getElementById("offlineBar");
+  if(!el)return;
+  el.innerHTML=offlineBarHtml();
+  const b=document.getElementById("offBtn");
+  if(b)b.addEventListener("click",offlineSave);
+}
+function registerServiceWorker(){
+  if(!OFFLINE_OK)return;
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  offlineCheck().then(paintOffline);
+}
+
 /* ================= boot ================= */
 window.addEventListener("hashchange",()=>{
   const fe=pendingFromEnd;pendingFromEnd=false;
@@ -760,6 +823,7 @@ window.addEventListener("hashchange",()=>{
 });
 applySettings();
 route();
+registerServiceWorker();
 </script>
 </body>
 </html>
