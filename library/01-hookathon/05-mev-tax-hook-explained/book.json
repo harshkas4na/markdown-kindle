@@ -1,0 +1,5 @@
+{
+  "title": "MEV Tax Hook — The Codebase Explained",
+  "author": "UHI10 build notes",
+  "description": "The deep-dive into the second UHI10 build: the LP-first MEV tax on Unichain. Why an arbitrageur's priority fee is a truthful confession of its profit, how beforeSwapReturnDelta charges the swapper and donate pays in-range LPs with the two cancelling inside the flash-accounting lock (the hook never touches a token), the whole contract line by line, the tests that simulate a gas-market arms race, and the priority-fee-slider demo."
+}

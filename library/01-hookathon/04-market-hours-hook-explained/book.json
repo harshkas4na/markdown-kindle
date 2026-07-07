@@ -1,0 +1,5 @@
+{
+  "title": "Market Hours Hook — The Codebase Explained",
+  "author": "UHI10 build notes",
+  "description": "The complete deep-dive into the first UHI10 build: an AMM that knows when Wall Street is closed. The problem (weekend LVR, no circuit breakers, the Monday-open massacre), every concept it uses (dynamic fees, Q96 price math, flash accounting, on-chain DST-correct date math), then NYSECalendar.sol and MarketHoursHook.sol line by line — including the internal-crossing reopening auction — plus what every test proves and how the deployment and demo UI work."
+}

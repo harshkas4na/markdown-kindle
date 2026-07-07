@@ -1,0 +1,5 @@
+{
+  "title": "Guard Hook — The Codebase Explained",
+  "author": "UHI10 build notes",
+  "description": "The deep-dive into the third UHI10 build: a circuit breaker for other hooks, built after Bunni proved audits don't bound blast radius. The all-14-flags wrapper pattern, raw-call forwarding with a fail-open/fail-closed dial, the six invariants (fee firewall, delta firewall, outflow caps with automatic cooldown, price band, pause switch, and LP exits that nothing can block), GuardHook.sol and the GuardedHook base line by line, the four adversary mocks, the tests, and the rogue-hook demo."
+}
