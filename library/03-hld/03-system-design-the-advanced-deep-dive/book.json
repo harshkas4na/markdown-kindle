@@ -1,0 +1,5 @@
+{
+  "title": "System Design — The Advanced Deep Dive",
+  "author": "Study notes, researched & compiled 2026",
+  "description": "The story of how one server becomes a planet-scale system, told so each idea creates the need for the next: the life of a request, the scaling arc, storage engines (B-trees vs LSM), replication and its anomalies, partitioning, transactions and isolation, time and consensus (Raft), caching, logs and streams (Kafka), derived data and search, the traffic layer (load balancing, rate limiting, idempotency), observability and graceful failure — ending with full worked case studies and the back-of-envelope toolkit. Fast overview first in every chapter, then the deep dive, always connecting dots backward."
+}

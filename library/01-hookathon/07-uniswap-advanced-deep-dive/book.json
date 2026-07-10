@@ -1,0 +1,5 @@
+{
+  "title": "Uniswap & Hooks — The Advanced Deep Dive",
+  "author": "Study notes, researched & compiled 2026",
+  "description": "The full story of automated market making, told from first principles to the 2026 frontier: the math of x·y=k, v2's architecture, v3's concentrated liquidity and tick machinery, the hidden taxes of MEV and LVR, v4's singleton and flash accounting, the complete hook system (permissions, deltas, custom curves), building and testing hooks with Foundry, how hooks get hacked, and where AMM research is heading. Each chapter starts with a fast overview, then goes deep — and every chapter connects back to the ones before it."
+}

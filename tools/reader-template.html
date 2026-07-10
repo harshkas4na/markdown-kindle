@@ -87,6 +87,47 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .bookcard .cap{font-size:11.5px; color:var(--muted); padding:0 2px;}
 .bookcard .cap.done{color:var(--accent);}
 
+/* ---------- search ---------- */
+.searchbox{width:100%; padding:11px 14px; border-radius:12px; border:1px solid var(--card-line);
+  background:var(--card); color:var(--fg); font:inherit; font-size:14px; outline:none;
+  -webkit-appearance:none; transition:border-color .15s;}
+.searchbox:focus{border-color:var(--accent);}
+.searchwrap{margin:0 4px 20px;}
+.sres{display:block; width:100%; text-align:left; background:var(--card);
+  border:1px solid var(--card-line); border-radius:12px; padding:12px 14px; margin-bottom:8px;}
+.sres:active{transform:scale(.99);}
+.sres .b{font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; font-weight:600;}
+.sres .t{font-size:15px; font-weight:600; margin:3px 0 4px;}
+.sres .s{font-size:13px; color:var(--muted); line-height:1.5;}
+.sres mark,.md mark{background:color-mix(in srgb,var(--accent) 30%,transparent);
+  color:inherit; border-radius:3px; padding:0 1px;}
+.md mark.hl.noted{border-bottom:2px dotted var(--accent); cursor:pointer;}
+.md mark.hl{cursor:pointer;}
+.snone{color:var(--muted); font-size:14px; margin:8px 4px;}
+
+/* ---------- home tools row (export / import) ---------- */
+.tools-row{display:flex; gap:8px; margin:34px 4px 0; flex-wrap:wrap;}
+.tools-row button{font-size:12px; color:var(--muted); border:1px solid var(--card-line);
+  border-radius:9px; padding:6px 10px; background:var(--card);}
+.tools-row button:active{transform:scale(.97);}
+
+/* ---------- highlight popup ---------- */
+#hlPop{position:fixed; z-index:40; background:var(--card); border:1px solid var(--card-line);
+  border-radius:12px; box-shadow:0 8px 30px var(--shadow); display:flex; gap:2px; padding:4px;}
+#hlPop button{padding:8px 12px; font-size:13px; border-radius:9px; white-space:nowrap;}
+#hlPop button:active{background:var(--code-bg);}
+
+/* ---------- highlights & bookmarks lists ---------- */
+.hlcard{display:block; width:100%; text-align:left; background:var(--card); border:1px solid var(--card-line);
+  border-radius:12px; padding:12px 14px; margin-bottom:8px;}
+.hlcard .q{font-size:14px; line-height:1.55; border-left:3px solid var(--accent); padding-left:10px;}
+.hlcard .note{font-size:13px; color:var(--muted); margin-top:6px; font-style:italic;}
+.hlcard .meta{display:flex; justify-content:space-between; align-items:center; margin-top:8px;
+  font-size:12px; color:var(--muted);}
+.hlcard .del{color:var(--muted); font-size:12px; padding:4px 8px; border-radius:7px; border:1px solid var(--card-line);}
+.linkrow{display:block; width:100%; text-align:left; font-size:13.5px; color:var(--accent);
+  padding:4px; margin:-10px 0 18px;}
+
 /* ---------- book TOC ---------- */
 #toc .hero{display:flex; gap:18px; margin:18px 0 6px;}
 #toc .hero .cover{width:104px; flex-shrink:0;}
@@ -235,9 +276,12 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   <header id="topbar" class="bar off">
     <button class="icon-btn" id="btnToc" title="Contents (Esc)">☰</button>
     <div class="title" id="barTitle"></div>
+    <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)">⚐</button>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)">◑</button>
     <button class="icon-btn" id="btnAa" title="Display settings">Aa</button>
   </header>
+
+  <div id="hlPop" class="hidden"></div>
 
   <footer id="botbar" class="bar off">
     <div class="slider-row">
@@ -379,7 +423,10 @@ let S=Object.assign({theme:prefersDark?"dark":"light",font:"serif",fs:18,lh:"1.7
   margin:"m",anim:"slide",mode:"page"},store.get("settings",{}));
 let progress=store.get("progress",{});   // {chapterId:{pct}}
 let last=store.get("last",null);         // {id: chapterId}
-let cur=-1, page=0, pageCount=1;
+let lastByBook=store.get("lastBook",{}); // {bookId: chapterId} — per-book resume point
+let highlights=store.get("highlights",{});// {chapterId:[{text, note?}]}
+let bookmarks=store.get("bookmarks",[]); // [{ch: chapterId, pct}]
+let cur=-1, page=0, pageCount=1, pendingPct=null;
 const htmlCache={};
 
 const content=$("content"),pages=$("pages"),reader=$("reader"),
@@ -421,7 +468,7 @@ function bookHash(b){return "#b/"+encodeURIComponent(b.id);}
 function route(){
   const h=decodeURIComponent(location.hash);
   if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
-  hideBars();hidePanel();
+  hideBars();hidePanel();hideHlPop();
   if(h.startsWith("#c/")){
     const i=CHAPTERS.findIndex(c=>c.id===h.slice(3));
     if(i>=0){showView("reader");renderChapter(i);return;}
@@ -429,6 +476,10 @@ function route(){
   if(h.startsWith("#b/")){
     const b=BOOKS[h.slice(3)];
     if(b){showView("toc");renderToc(b);window.scrollTo(0,0);return;}
+  }
+  if(h.startsWith("#h/")){
+    const b=BOOKS[h.slice(3)];
+    if(b){showView("toc");renderHighlightsPage(b);window.scrollTo(0,0);return;}
   }
   showView("home");renderHome();window.scrollTo(0,0);
 }
@@ -467,6 +518,10 @@ function renderHome(){
   let h=`<div class="lib-top"><div><h1>Library</h1>
     <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
     <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div>
+    <div class="searchwrap"><input type="search" class="searchbox" id="searchBox"
+      placeholder="Search every book…  ( / )" autocomplete="off"></div>
+    <div id="sresults" class="hidden"></div>
+    <div id="shelves">
     <div id="offlineBar"></div>`;
   if(last){
     const c=CHAPTERS.find(x=>x.id===last.id);
@@ -485,23 +540,107 @@ function renderHome(){
     });
     h+=`</div>`;
   });
+  h+=`<div class="tools-row">
+    <button id="btnExport" title="Download progress, highlights & bookmarks as JSON">⬇ Back up my data</button>
+    <button id="btnImport" title="Restore a previously downloaded backup">⬆ Restore backup</button>
+    <input type="file" id="importFile" accept="application/json" class="hidden">
+  </div></div>`;
   home.innerHTML=h;
   home.querySelectorAll("[data-book]").forEach(el=>el.addEventListener("click",
     ()=>nav(bookHash(BOOKS[el.dataset.book]))));
   home.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
   $("homeTheme").addEventListener("click",()=>{cycleTheme();});
+  $("btnExport").addEventListener("click",exportData);
+  $("btnImport").addEventListener("click",()=>$("importFile").click());
+  $("importFile").addEventListener("change",importData);
+  const sb=$("searchBox");
+  let sT;
+  sb.addEventListener("input",()=>{clearTimeout(sT);sT=setTimeout(()=>renderSearch(sb.value),120);});
   paintOffline();
 }
 
+/* ================= full-text search ================= */
+function stripMd(s){
+  return s.replace(/```[\s\S]*?```/g," ").replace(/[#>*_`|-]+/g," ")
+          .replace(/\[([^\]]*)\]\([^)]*\)/g,"$1").replace(/\s+/g," ").trim();
+}
+function renderSearch(q){
+  const box=$("sresults"),shelves=$("shelves");
+  q=q.trim();
+  if(q.length<2){box.classList.add("hidden");shelves.classList.remove("hidden");box.innerHTML="";return;}
+  const ql=q.toLowerCase(),results=[];
+  for(const c of CHAPTERS){
+    const inTitle=c.title.toLowerCase().includes(ql);
+    const body=stripMd(c.md),idx=body.toLowerCase().indexOf(ql);
+    if(!inTitle&&idx<0)continue;
+    let snip="";
+    if(idx>=0){
+      const s=Math.max(0,idx-60),e=Math.min(body.length,idx+q.length+90);
+      snip=(s>0?"…":"")+body.slice(s,e)+(e<body.length?"…":"");
+    }
+    results.push({c,snip,rank:inTitle?0:1});
+    if(results.length>=60)break;
+  }
+  results.sort((a,b)=>a.rank-b.rank);
+  const hi=s=>esc(s).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),m=>`<mark>${m}</mark>`);
+  let h=`<p class="snone">${results.length?results.length+" matching chapter"+(results.length>1?"s":""):"No matches for “"+esc(q)+"”"}</p>`;
+  results.slice(0,50).forEach(r=>{
+    const b=BOOKS[r.c.book];
+    h+=`<button class="sres" data-ch="${esc(r.c.id)}">
+      <div class="b">${esc(b.title)}</div>
+      <div class="t">${hi(r.c.title)}</div>
+      ${r.snip?`<div class="s">${hi(r.snip)}</div>`:""}</button>`;
+  });
+  box.innerHTML=h;
+  box.classList.remove("hidden");shelves.classList.add("hidden");
+  box.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
+    ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+}
+
+/* ================= backup / restore (item 5) ================= */
+const DATA_KEYS=["settings","progress","last","lastBook","highlights","bookmarks"];
+function exportData(){
+  const data={};DATA_KEYS.forEach(k=>data[k]=store.get(k,null));
+  const blob=new Blob([JSON.stringify({app:"hkr",exported:new Date().toISOString(),data},null,2)],
+    {type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download="library-backup.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const obj=JSON.parse(r.result);
+      if(!obj||obj.app!=="hkr"||!obj.data)throw new Error("bad format");
+      if(!confirm("Restore this backup? It replaces your current progress, highlights and bookmarks."))return;
+      DATA_KEYS.forEach(k=>{if(obj.data[k]!=null)store.set(k,obj.data[k]);});
+      S=Object.assign(S,obj.data.settings||{});
+      progress=store.get("progress",{});last=store.get("last",null);
+      lastByBook=store.get("lastBook",{});highlights=store.get("highlights",{});
+      bookmarks=store.get("bookmarks",[]);
+      applySettings();renderHome();
+    }catch(err){alert("Could not read that backup file.");}
+  };
+  r.readAsText(f);
+  e.target.value="";
+}
+
 /* ================= book TOC ================= */
+function bookHighlightCount(b){
+  return b.chapters.reduce((a,i)=>a+((highlights[CHAPTERS[i].id]||[]).length),0);
+}
 function renderToc(b){
   const p=bookPct(b);
   const mins=Math.ceil(b.words/230);
   const time=mins>=60?`${Math.round(mins/60*10)/10} h`:`${mins} min`;
-  // resume target: first chapter that isn't finished, or the last-read one in this book
+  // resume target: this book's own last-read chapter, else first unfinished chapter
   let resume=null;
-  if(last){const c=CHAPTERS.find(x=>x.id===last.id);if(c&&c.book===b.id)resume=c;}
+  const lb=lastByBook[b.id];
+  if(lb){const c=CHAPTERS.find(x=>x.id===lb);if(c&&c.book===b.id)resume=c;}
+  if(!resume&&last){const c=CHAPTERS.find(x=>x.id===last.id);if(c&&c.book===b.id)resume=c;}
   if(!resume)resume=b.chapters.map(i=>CHAPTERS[i]).find(c=>chPct(c.id)<.95)||CHAPTERS[b.chapters[0]];
   let h=`<div class="lib-top"><button class="icon-btn" id="tocBack" title="Library">‹</button>
     <button class="icon-btn" id="tocTheme" title="Cycle theme">◑</button></div>
@@ -512,11 +651,26 @@ function renderToc(b){
       ${p>0?` · ${Math.round(p*100)}% read`:""}</p></div></div>`;
   if(b.description)h+=`<p class="desc">${esc(b.description)}</p>`;
   h+=`<button class="primary" data-ch="${esc(resume.id)}">${p>0?"Continue reading":"Start reading"} — ${esc(resume.title)}</button>`;
+  const nHl=bookHighlightCount(b);
+  if(nHl)h+=`<button class="linkrow" id="tocHl">✎ ${nHl} highlight${nHl>1?"s":""} & notes in this book →</button>`;
+  const marks=bookmarks.filter(m=>{const c=CHAPTERS.find(x=>x.id===m.ch);return c&&c.book===b.id;});
+  if(marks.length){
+    h+=`<div class="section-h">Bookmarks</div>`;
+    marks.forEach((m,i)=>{
+      const c=CHAPTERS.find(x=>x.id===m.ch);
+      h+=`<button class="chap" data-bkm="${i}"><span class="n">⚑</span>
+        <span class="t">${esc(c.title)} — ${Math.round(m.pct*100)}%</span>
+        <span class="pct" data-delbkm="${i}">✕</span></button>`;
+    });
+  }
+  if(b.chapters.length>=10)
+    h+=`<div class="searchwrap" style="margin-top:18px"><input type="search" class="searchbox" id="tocFilter"
+      placeholder="Filter ${b.chapters.length} chapters…" autocomplete="off"></div>`;
   let part=null;
   b.chapters.forEach(i=>{
     const c=CHAPTERS[i];
     if(c.part!==part){part=c.part;
-      if(part)h+=`<div class="section-h">${esc(part)}</div>`;}
+      if(part)h+=`<div class="section-h chap-part">${esc(part)}</div>`;}
     const cp=chPct(c.id);
     h+=`<button class="chap" data-ch="${esc(c.id)}"><span class="n">${String(c.num).padStart(2,"0")}</span>
       <span class="t">${esc(c.title)}</span>
@@ -525,8 +679,68 @@ function renderToc(b){
   toc.innerHTML=h;
   toc.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+  toc.querySelectorAll("[data-bkm]").forEach(el=>el.addEventListener("click",e=>{
+    const del=e.target.closest("[data-delbkm]");
+    const m=marks[+el.dataset.bkm];
+    if(del){
+      bookmarks=bookmarks.filter(x=>x!==m);store.set("bookmarks",bookmarks);
+      renderToc(b);return;
+    }
+    pendingPct=m.pct;nav("#c/"+encodeURIComponent(m.ch));
+  }));
+  const tf=$("tocFilter");
+  if(tf)tf.addEventListener("input",()=>{
+    const q=tf.value.trim().toLowerCase();
+    toc.querySelectorAll(".chap[data-ch]").forEach(el=>{
+      el.style.display=!q||el.querySelector(".t").textContent.toLowerCase().includes(q)?"":"none";});
+    toc.querySelectorAll(".chap-part").forEach(el=>{
+      let n=el.nextElementSibling,any=false;
+      while(n&&!n.classList.contains("chap-part")){
+        if(n.classList.contains("chap")&&n.style.display!=="none")any=true;
+        n=n.nextElementSibling;}
+      el.style.display=any?"":"none";});
+  });
+  const hlBtn=$("tocHl");
+  if(hlBtn)hlBtn.addEventListener("click",()=>nav("#h/"+encodeURIComponent(b.id)));
   $("tocBack").addEventListener("click",()=>nav(""));
   $("tocTheme").addEventListener("click",()=>{cycleTheme();});
+}
+
+/* ================= per-book highlights & notes page ================= */
+function renderHighlightsPage(b){
+  let h=`<div class="lib-top"><button class="icon-btn" id="hlBack" title="Back">‹</button>
+    <button class="icon-btn" id="hlTheme" title="Cycle theme">◑</button></div>
+    <h1 style="font-size:22px;margin:18px 4px 4px">Highlights — ${esc(b.title)}</h1>
+    <p class="sub" style="color:var(--muted);font-size:13px;margin:0 4px 20px">Tap a highlight to open it in its chapter.</p>`;
+  let any=false;
+  b.chapters.forEach(i=>{
+    const c=CHAPTERS[i],hls=highlights[c.id]||[];
+    if(!hls.length)return;
+    any=true;
+    h+=`<div class="section-h">${esc(c.title)}</div>`;
+    hls.forEach((hl,j)=>{
+      h+=`<button class="hlcard" data-ch="${esc(c.id)}" data-j="${j}">
+        <div class="q">${esc(hl.text)}</div>
+        ${hl.note?`<div class="note">✎ ${esc(hl.note)}</div>`:""}
+        <div class="meta"><span>Chapter ${c.num}</span><span class="del" data-del="1">Delete</span></div>
+      </button>`;
+    });
+  });
+  if(!any)h+=`<p class="snone">No highlights in this book yet. Select text while reading to add one.</p>`;
+  toc.innerHTML=h;
+  toc.querySelectorAll(".hlcard").forEach(el=>el.addEventListener("click",e=>{
+    const ch=el.dataset.ch,j=+el.dataset.j;
+    if(e.target.closest("[data-del]")){
+      if(!confirm("Delete this highlight?"))return;
+      highlights[ch].splice(j,1);
+      if(!highlights[ch].length)delete highlights[ch];
+      store.set("highlights",highlights);
+      renderHighlightsPage(b);return;
+    }
+    nav("#c/"+encodeURIComponent(ch));
+  }));
+  $("hlBack").addEventListener("click",()=>nav(bookHash(b)));
+  $("hlTheme").addEventListener("click",()=>{cycleTheme();});
 }
 
 /* ================= reader core ================= */
@@ -550,16 +764,132 @@ function renderChapter(i,fromEnd){
     if(j===undefined)j=CHAPTERS.findIndex(x=>x.file===f);
     if(j>=0)nav(chapterHash(CHAPTERS[j]));
   }));
+  applyHighlights(c.id);
   $("stTitle").textContent=`${b.title} — ${c.title}`;
   $("barTitle").textContent=c.title;
   last={id:c.id};store.set("last",last);
+  lastByBook[c.book]=c.id;store.set("lastBook",lastByBook);
   requestAnimationFrame(()=>{
     const saved=progress[c.id];
-    const pct=fromEnd?1:(saved?saved.pct:0);
+    let pct=fromEnd?1:(saved?saved.pct:0);
+    if(pendingPct!=null){pct=pendingPct;pendingPct=null;}
     paginate();
     goToPct(pct,false);
     restoreAnim();
   });
+}
+
+/* ================= highlights (marking + popup) ================= */
+function normWithMap(s){
+  // whitespace-collapsed copy of s plus a map from collapsed index -> raw index
+  let out="",map=[],ws=false;
+  for(let i=0;i<s.length;i++){
+    const c=s[i];
+    if(/\s/.test(c)){if(!ws&&out){out+=" ";map.push(i);}ws=true;}
+    else{out+=c;map.push(i);ws=false;}
+  }
+  return {out,map};
+}
+function markText(root,text,attrs){
+  // wrap the first occurrence of `text` (whitespace-tolerant) in <mark class=hl>
+  if(!text)return false;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null);
+  const recs=[];let full="",n;
+  while(n=walker.nextNode()){recs.push({node:n,start:full.length});full+=n.nodeValue;}
+  let idx=full.indexOf(text),len=text.length;
+  if(idx<0){
+    const nf=normWithMap(full),nt=text.trim().replace(/\s+/g," ");
+    const ni=nf.out.indexOf(nt);
+    if(ni<0)return false;
+    idx=nf.map[ni];len=nf.map[ni+nt.length-1]+1-idx;
+  }
+  const end=idx+len;
+  // collect target slices first: surroundContents splits nodes as we go
+  const slices=[];
+  for(const rec of recs){
+    const ns=rec.start,ne=ns+rec.node.nodeValue.length;
+    if(ne<=idx||ns>=end)continue;
+    slices.push({node:rec.node,s:Math.max(idx,ns)-ns,e:Math.min(end,ne)-ns});
+  }
+  for(const sl of slices){
+    if(sl.e<=sl.s)continue;
+    const range=document.createRange();
+    range.setStart(sl.node,sl.s);range.setEnd(sl.node,sl.e);
+    const mark=document.createElement("mark");
+    mark.className="hl"+(attrs.note?" noted":"");
+    mark.dataset.hl=attrs.i;
+    if(attrs.note)mark.title=attrs.note;
+    try{range.surroundContents(mark);}catch(e){}
+  }
+  return true;
+}
+function applyHighlights(chId){
+  (highlights[chId]||[]).forEach((hl,i)=>markText(content,hl.text,{i,note:hl.note}));
+}
+const hlPop=$("hlPop");
+function hideHlPop(){hlPop.classList.add("hidden");hlPop.innerHTML="";}
+function showHlPop(x,y,buttons){
+  hlPop.innerHTML="";
+  buttons.forEach(([label,fn])=>{
+    const b=document.createElement("button");
+    b.textContent=label;
+    b.addEventListener("click",e=>{e.stopPropagation();hideHlPop();fn();});
+    hlPop.appendChild(b);
+  });
+  hlPop.classList.remove("hidden");
+  const r=hlPop.getBoundingClientRect();
+  hlPop.style.left=Math.max(8,Math.min(innerWidth-r.width-8,x-r.width/2))+"px";
+  hlPop.style.top=Math.max(8,(y-r.height-12<8?y+18:y-r.height-12))+"px";
+}
+function saveHighlight(text,note){
+  const c=CHAPTERS[cur];if(!c)return;
+  (highlights[c.id]=highlights[c.id]||[]).push(note?{text,note}:{text});
+  store.set("highlights",highlights);
+  markText(content,text,{i:highlights[c.id].length-1,note});
+  const sel=window.getSelection();if(sel)sel.removeAllRanges();
+}
+function selectionInContent(){
+  const sel=window.getSelection();
+  if(!sel||sel.isCollapsed)return null;
+  const t=sel.toString().trim();
+  if(t.length<2||t.length>1200)return null;
+  const node=sel.anchorNode;
+  if(!node||!content.contains(node.nodeType===3?node.parentNode:node))return null;
+  return {sel,text:t};
+}
+function maybeShowSelectionPop(){
+  if(reader.classList.contains("hidden"))return;
+  const s=selectionInContent();
+  if(!s){return;}
+  const rect=s.sel.getRangeAt(0).getBoundingClientRect();
+  showHlPop(rect.left+rect.width/2,rect.top,[
+    ["✎ Highlight",()=>saveHighlight(s.text)],
+    ["＋ Note",()=>{
+      const note=prompt("Note for this highlight:");
+      if(note!=null)saveHighlight(s.text,note.trim()||undefined);
+    }],
+  ]);
+}
+function openMarkPop(markEl,x,y){
+  const c=CHAPTERS[cur];if(!c)return;
+  const i=+markEl.dataset.hl,hl=(highlights[c.id]||[])[i];
+  if(!hl)return;
+  const btns=[];
+  if(hl.note)btns.push(["View note",()=>alert(hl.note)]);
+  btns.push([hl.note?"Edit note":"＋ Note",()=>{
+    const note=prompt("Note for this highlight:",hl.note||"");
+    if(note==null)return;
+    if(note.trim())hl.note=note.trim();else delete hl.note;
+    store.set("highlights",highlights);
+    renderChapter(cur);
+  }]);
+  btns.push(["Remove",()=>{
+    highlights[c.id].splice(i,1);
+    if(!highlights[c.id].length)delete highlights[c.id];
+    store.set("highlights",highlights);
+    renderChapter(cur);
+  }]);
+  showHlPop(x,y,btns);
 }
 function restoreAnim(){requestAnimationFrame(()=>{content.style.transition="";});}
 function paginate(){
@@ -619,6 +949,7 @@ function updateStatus(){
     $("slider").value=page+1;
   }
   $("sliderLbl").textContent=`${b.title} — chapter ${c.num} of ${b.chapters.length}`;
+  paintBookmark();
 }
 function openSibling(offset,fromEnd){
   const j=siblingChapter(offset);
@@ -692,6 +1023,9 @@ function guardClick(e){
   return true;
 }
 $("pageArea").addEventListener("click",e=>{
+  const mk=e.target.closest("mark.hl");
+  if(mk){openMarkPop(mk,e.clientX,e.clientY);return;}
+  if(!hlPop.classList.contains("hidden")){hideHlPop();return;}
   if(!guardClick(e))return;
   if(!$("aaPanel").classList.contains("hidden")){hidePanel();return;}
   const r=$("pageArea").getBoundingClientRect();
@@ -700,6 +1034,39 @@ $("pageArea").addEventListener("click",e=>{
   else if(S.mode!=="scroll"&&x>0.7){if(barsOn){hideBars();return;}next();}
   else toggleBars();
 });
+
+/* selection -> highlight popup */
+document.addEventListener("pointerup",e=>{
+  if(reader.classList.contains("hidden"))return;
+  if(e.target.closest("#hlPop"))return;
+  setTimeout(maybeShowSelectionPop,10);
+});
+document.addEventListener("selectionchange",()=>{
+  // hide the popup when the selection collapses (e.g. tap elsewhere on phone)
+  const sel=window.getSelection();
+  if((!sel||sel.isCollapsed)&&!hlPop.classList.contains("hidden")&&!hlPop.matches(":hover"))hideHlPop();
+});
+
+/* bookmarks */
+function bookmarkHere(){
+  const c=CHAPTERS[cur];if(!c)return null;
+  const pct=curPct();
+  return bookmarks.find(m=>m.ch===c.id&&Math.abs(m.pct-pct)<0.03)||null;
+}
+function toggleBookmark(){
+  const c=CHAPTERS[cur];if(!c)return;
+  const ex=bookmarkHere();
+  if(ex)bookmarks=bookmarks.filter(m=>m!==ex);
+  else bookmarks.push({ch:c.id,pct:curPct()});
+  store.set("bookmarks",bookmarks);
+  paintBookmark();
+}
+function paintBookmark(){
+  const on=!!bookmarkHere();
+  $("btnBkm").textContent=on?"⚑":"⚐";
+  $("btnBkm").style.color=on?"var(--accent)":"";
+}
+$("btnBkm").addEventListener("click",toggleBookmark);
 
 /* swipe */
 let tx=0,ty=0,tt=0;
@@ -716,9 +1083,13 @@ document.addEventListener("keydown",e=>{
   if(e.target.tagName==="INPUT")return;
   if(reader.classList.contains("hidden")){
     if(e.key==="Escape"&&!toc.classList.contains("hidden"))nav("");
+    if(e.key==="/"&&!home.classList.contains("hidden")){
+      const sb=$("searchBox");if(sb){e.preventDefault();sb.focus();}
+    }
     return;
   }
   switch(e.key){
+    case "b":case "B":toggleBookmark();break;
     case "ArrowRight":case "PageDown":next();break;
     case "ArrowLeft":case "PageUp":prev();break;
     case " ":e.preventDefault();e.shiftKey?prev():next();break;
@@ -817,7 +1188,7 @@ window.addEventListener("hashchange",()=>{
   if(fe&&h.startsWith("#c/")){
     const i=CHAPTERS.findIndex(c=>c.id===h.slice(3));
     if(i>=0){if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
-      hideBars();hidePanel();showView("reader");renderChapter(i,true);return;}
+      hideBars();hidePanel();hideHlPop();showView("reader");renderChapter(i,true);return;}
   }
   route();
 });

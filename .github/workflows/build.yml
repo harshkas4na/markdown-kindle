@@ -1,0 +1,47 @@
+name: Rebuild reader
+
+# Whenever content or the reader source changes on main, regenerate index.html
+# (+ sw.js / manifest) and commit it back if it drifted from what was pushed.
+# This keeps GitHub Pages (serving the repo root) always in sync with library/.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "library/**"
+      - "tools/**"
+      - ".github/workflows/build.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rebuild-reader
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # skip the loop: don't re-run on the commit this job itself pushes
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        run: python3 tools/build-reader.py
+
+      - name: Commit regenerated output if it changed
+        run: |
+          git add index.html sw.js manifest.webmanifest
+          if git diff --cached --quiet; then
+            echo "index.html is up to date — nothing to commit."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "ci: rebuild reader from library/"
+            git push
+          fi

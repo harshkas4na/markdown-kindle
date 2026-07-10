@@ -117,6 +117,42 @@ def title_of(md, fallback):
     return fallback
 
 
+WARNINGS = []
+
+
+def warn(msg):
+    WARNINGS.append(msg)
+    print(f"  ! {msg}")
+
+
+def lint_chapter(relpath, md):
+    """Warn about content the reader can't display well (items 7 & 9)."""
+    if not re.search(r"^#\s+\S", md, re.M):
+        warn(f"{relpath}: no '# Title' H1 — TOC will show the prettified filename")
+    body = re.sub(r"```[\s\S]*?```", "", md)  # ignore code blocks
+    if re.search(r"!\[[^\]]*\]\(", body):
+        warn(f"{relpath}: contains images (![...]) — the reader does not render images")
+    if re.search(r"\[\^", body):
+        warn(f"{relpath}: contains footnotes ([^...]) — not supported by the reader")
+    if re.search(r"^ {4,}([-*+]|\d+[.)])\s", body, re.M):
+        warn(f"{relpath}: list nested deeper than one level — deeper levels render flattened")
+
+
+def lint_prefixes(dirpath, names):
+    """Two '03-...' entries in one folder sort by the rest of the name — usually a mistake."""
+    seen = {}
+    for name in names:
+        m = re.match(r"^(\d+)[-_. ]", name)
+        if not m:
+            continue
+        key = int(m.group(1))
+        if key in seen:
+            rel = os.path.relpath(dirpath, ROOT)
+            warn(f"{rel}: duplicate numeric prefix {m.group(1)!r} on {seen[key]!r} and {name!r}")
+        else:
+            seen[key] = name
+
+
 def read_json(path):
     if os.path.isfile(path):
         with open(path, encoding="utf-8") as fh:
@@ -146,6 +182,7 @@ def collect_book_chapters(book_dir, book_id, chapters):
 
     def walk(dirpath, part_label):
         entries = sorted(os.listdir(dirpath), key=natural_key)
+        lint_prefixes(dirpath, [e for e in entries if not e.startswith(".")])
         for name in entries:
             if name.startswith("."):
                 continue
@@ -156,6 +193,7 @@ def collect_book_chapters(book_dir, book_id, chapters):
             elif name.endswith(".md"):
                 with open(full, encoding="utf-8") as fh:
                     md = fh.read()
+                lint_chapter(os.path.relpath(full, ROOT), md)
                 indices.append(len(chapters))
                 chapters.append({
                     "id": os.path.relpath(full, ROOT).replace(os.sep, "/"),
@@ -195,6 +233,7 @@ def build():
                 continue
             with open(os.path.join(sec_dir, fname), encoding="utf-8") as fh:
                 md = fh.read()
+            lint_chapter(f"library/{sec_name}/{fname}", md)
             stem = os.path.splitext(fname)[0]
             book_id = f"{sec_name}/{stem}"
             idx = len(chapters)
@@ -270,10 +309,71 @@ def build():
         json.dump(manifest, fh, ensure_ascii=False, indent=2)
 
     n_books = sum(len(s["books"]) for s in sections)
+    size_kb = len(html.encode("utf-8")) // 1024
     print(f"Wrote {OUT}: {len(sections)} sections, {n_books} books, "
-          f"{len(chapters)} chapters, {len(html) // 1024} KB")
+          f"{len(chapters)} chapters, {size_kb} KB")
     print(f"Wrote {SW_OUT} and {MANIFEST_OUT} (offline PWA, cache {OFFLINE_CACHE})")
+    if size_kb > 5 * 1024:
+        warn(f"index.html is {size_kb // 1024} MB — page load/parse will start to feel it; "
+             "consider splitting rarely-read sections into a second library")
+    if WARNINGS:
+        print(f"\n{len(WARNINGS)} warning(s) — see '!' lines above.")
+
+
+def snapshot():
+    """mtime fingerprint of everything that feeds the build."""
+    stamp = 0.0
+    paths = [os.path.join(TOOLS, "reader-template.html"), os.path.abspath(__file__)]
+    for dirpath, dirnames, filenames in os.walk(LIBRARY):
+        dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+        paths.extend(os.path.join(dirpath, f) for f in filenames if not f.startswith("."))
+        paths.append(dirpath)
+    for p in paths:
+        try:
+            stamp = max(stamp, os.stat(p).st_mtime)
+        except OSError:
+            pass
+    return (stamp, len(paths))
+
+
+def serve(port):
+    """--serve: build, serve the repo over http, rebuild whenever library/ changes."""
+    import http.server
+    import threading
+    import time
+
+    class Quiet(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *a, **kw):
+            super().__init__(*a, directory=ROOT, **kw)
+
+        def log_message(self, *a):
+            pass
+
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), Quiet)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    print(f"\nServing http://127.0.0.1:{port}  (Ctrl-C to stop)")
+    print("Watching library/ and the template — rebuilding on change…")
+    state = snapshot()
+    try:
+        while True:
+            time.sleep(1)
+            now = snapshot()
+            if now != state:
+                state = now
+                print("\nChange detected — rebuilding…")
+                del WARNINGS[:]
+                try:
+                    build()
+                except SystemExit as e:
+                    print(f"  build failed: {e}")
+    except KeyboardInterrupt:
+        print("\nStopped.")
 
 
 if __name__ == "__main__":
+    args = sys.argv[1:]
     build()
+    if "--serve" in args:
+        i = args.index("--serve")
+        port = int(args[i + 1]) if i + 1 < len(args) and args[i + 1].isdigit() else 8080
+        serve(port)
