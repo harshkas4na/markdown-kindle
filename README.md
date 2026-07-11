@@ -116,7 +116,7 @@ Top-to-bottom map:
 | `#home`, `#toc`, `#reader` divs | The three views; exactly one visible at a time (`showView`) |
 | `mdToHtml` + helpers | Tiny built-in markdown renderer (headings, bold/italic, code, tables, lists, quotes). No external libs — keep it that way |
 | `store` / `S` / `progress` / `last` | localStorage state under `hkr.*` keys: settings, per-chapter `{pct}` progress, last-read chapter |
-| **Routing** (`nav`, `route`, `showView`) | Hash-based: `""` = shelves, `#b/<bookId>` = book TOC, `#c/<chapterId>` = reader. Browser/phone back button works between views |
+| **Routing** (`nav`, `route`, `showView`) | Hash-based: `""` = shelves, `#b/<bookId>` = book TOC, `#c/<chapterId>` = reader. Browser/phone back button works between views. Share routes: `#s/b/<bookId>` (book only), `#s/bc/<chapterId>` (chapter inside a shared book), `#s/c/<chapterId>` (single chapter only) — these lock the UI to that scope for recipients |
 | `renderHome` / `coverHtml` | Shelf view; covers are deterministic gradients hashed from the book title |
 | `renderToc` | Book page: hero, description, Start/Continue button, chapter list grouped by parts, per-chapter % |
 | Reader core (`renderChapter`, `paginate`, `goTo…`, `next/prev`) | CSS-columns pagination, swipe/tap/keys/wheel, scroll mode, progress save/restore. Chapter prev/next is **constrained to the current book** |
@@ -145,6 +145,15 @@ Top-to-bottom map:
 - **Bookmarks**: the ⚑ button (or `B`) marks the current page; bookmarks are
   listed on the book's TOC and jump back to the exact spot.
 - **TOC filter**: books with 10+ chapters get a filter box on their TOC page.
+- **Sharing**: the ⤴ button on a book's TOC page copies a link that opens *just
+  that book* (`#s/b/<bookId>`) — the recipient sees the book's TOC and chapters
+  with no back button, no search, and no way to browse the rest of the library.
+  The ⤴ button in the reader toolbar copies a link to *just that chapter*
+  (`#s/c/<chapterId>`) — a single locked chapter with no TOC and no prev/next.
+  Links only work from the live (GitHub Pages) URL, not a local `file://` open.
+  Note this is a *view*, not access control: the shared page is the same public
+  `index.html`, so the rest of the library is still in its source for anyone who
+  looks — fine for sharing notes, not for secrets.
 - **Backup**: "⬇ Back up my data" at the bottom of Home downloads progress,
   highlights, bookmarks and settings as JSON; "⬆ Restore backup" imports it —
   use this before clearing site data or when switching devices.

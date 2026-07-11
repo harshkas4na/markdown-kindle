@@ -277,6 +277,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
     <button class="icon-btn" id="btnToc" title="Contents (Esc)">☰</button>
     <div class="title" id="barTitle"></div>
     <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)">⚐</button>
+    <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter">⤴</button>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)">◑</button>
     <button class="icon-btn" id="btnAa" title="Display settings">Aa</button>
   </header>
@@ -459,29 +460,73 @@ function syncPanel(){
 }
 
 /* ================= routing =================
-   ""            -> home (shelves)
-   #b/<bookId>   -> book table of contents
-   #c/<chapterId>-> reader                                                    */
+   ""              -> home (shelves)
+   #b/<bookId>     -> book table of contents
+   #c/<chapterId>  -> reader
+   share links (locked-down views for sending to other people):
+   #s/b/<bookId>   -> shared book: its TOC + chapters only, no way out
+   #s/bc/<chapterId> -> a chapter inside a shared book (book derived from chapter)
+   #s/c/<chapterId>  -> shared single chapter: reader only, no TOC/siblings     */
+let share=null; // null | {type:"book"|"chapter", id}
+function parseShare(h){
+  if(h.startsWith("#s/c/"))share={type:"chapter",id:h.slice(5)};
+  else if(h.startsWith("#s/bc/")){
+    const c=CHAPTERS.find(x=>x.id===h.slice(6));
+    share=c?{type:"book",id:c.book}:null;
+  }
+  else if(h.startsWith("#s/b/"))share={type:"book",id:h.slice(5)};
+  else share=null;
+}
+function chapterIdFromHash(h){
+  if(h.startsWith("#c/"))return h.slice(3);
+  if(h.startsWith("#s/bc/"))return h.slice(6);
+  if(h.startsWith("#s/c/"))return h.slice(5);
+  return null;
+}
 function nav(h){ if(location.hash===h){route();} else {location.hash=h;} }
-function chapterHash(c){return "#c/"+encodeURIComponent(c.id);}
-function bookHash(b){return "#b/"+encodeURIComponent(b.id);}
+function chHash(id){
+  return share?(share.type==="book"?"#s/bc/":"#s/c/")+encodeURIComponent(id)
+              :"#c/"+encodeURIComponent(id);
+}
+function chapterHash(c){return chHash(c.id);}
+function bookHash(b){return (share&&share.type==="book"?"#s/b/":"#b/")+encodeURIComponent(b.id);}
 function route(){
   const h=decodeURIComponent(location.hash);
   if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
   hideBars();hidePanel();hideHlPop();
-  if(h.startsWith("#c/")){
-    const i=CHAPTERS.findIndex(c=>c.id===h.slice(3));
+  parseShare(h);
+  const chId=chapterIdFromHash(h);
+  if(chId!=null){
+    const i=CHAPTERS.findIndex(c=>c.id===chId);
     if(i>=0){showView("reader");renderChapter(i);return;}
   }
-  if(h.startsWith("#b/")){
-    const b=BOOKS[h.slice(3)];
+  if(h.startsWith("#b/")||h.startsWith("#s/b/")){
+    const b=BOOKS[h.startsWith("#s/")?h.slice(5):h.slice(3)];
     if(b){showView("toc");renderToc(b);window.scrollTo(0,0);return;}
   }
   if(h.startsWith("#h/")){
     const b=BOOKS[h.slice(3)];
     if(b){showView("toc");renderHighlightsPage(b);window.scrollTo(0,0);return;}
   }
+  share=null; // a broken/unknown share link falls back to the full library
   showView("home");renderHome();window.scrollTo(0,0);
+}
+/* copy a share link to the clipboard, with a brief ✓ on the button */
+function copyShare(hash,btn){
+  const url=location.href.split("#")[0]+hash;
+  if(location.protocol==="file:"){
+    prompt("You're viewing a local file, so this link only works on this computer. "+
+      "Open your live (GitHub Pages) URL and copy the share link from there:",url);
+    return;
+  }
+  const done=()=>{
+    if(!btn)return;
+    const t=btn.textContent;btn.textContent="✓";
+    setTimeout(()=>{btn.textContent=t;},1200);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(url).then(done,()=>prompt("Copy this link:",url));
+  else prompt("Copy this link:",url);
 }
 function showView(v){
   home.classList.toggle("hidden",v!=="home");
@@ -642,8 +687,12 @@ function renderToc(b){
   if(lb){const c=CHAPTERS.find(x=>x.id===lb);if(c&&c.book===b.id)resume=c;}
   if(!resume&&last){const c=CHAPTERS.find(x=>x.id===last.id);if(c&&c.book===b.id)resume=c;}
   if(!resume)resume=b.chapters.map(i=>CHAPTERS[i]).find(c=>chPct(c.id)<.95)||CHAPTERS[b.chapters[0]];
-  let h=`<div class="lib-top"><button class="icon-btn" id="tocBack" title="Library">‹</button>
-    <button class="icon-btn" id="tocTheme" title="Cycle theme">◑</button></div>
+  let h=`<div class="lib-top">${share
+      ?`<span class="sub" style="color:var(--muted);font-size:12px">Shared from a library</span>`
+      :`<button class="icon-btn" id="tocBack" title="Library">‹</button>`}
+    <div style="display:flex;gap:8px">
+      <button class="icon-btn" id="tocShare" title="Copy a link that shares just this book">⤴</button>
+      <button class="icon-btn" id="tocTheme" title="Cycle theme">◑</button></div></div>
   <div class="hero">${coverHtml(b)}<div>
     <h1>${esc(b.title)}</h1>
     ${b.author?`<p class="author">${esc(b.author)}</p>`:""}
@@ -651,7 +700,7 @@ function renderToc(b){
       ${p>0?` · ${Math.round(p*100)}% read`:""}</p></div></div>`;
   if(b.description)h+=`<p class="desc">${esc(b.description)}</p>`;
   h+=`<button class="primary" data-ch="${esc(resume.id)}">${p>0?"Continue reading":"Start reading"} — ${esc(resume.title)}</button>`;
-  const nHl=bookHighlightCount(b);
+  const nHl=share?0:bookHighlightCount(b); // highlights page is not part of the shared view
   if(nHl)h+=`<button class="linkrow" id="tocHl">✎ ${nHl} highlight${nHl>1?"s":""} & notes in this book →</button>`;
   const marks=bookmarks.filter(m=>{const c=CHAPTERS.find(x=>x.id===m.ch);return c&&c.book===b.id;});
   if(marks.length){
@@ -678,7 +727,7 @@ function renderToc(b){
   });
   toc.innerHTML=h;
   toc.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
-    ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+    ()=>nav(chHash(el.dataset.ch))));
   toc.querySelectorAll("[data-bkm]").forEach(el=>el.addEventListener("click",e=>{
     const del=e.target.closest("[data-delbkm]");
     const m=marks[+el.dataset.bkm];
@@ -686,7 +735,7 @@ function renderToc(b){
       bookmarks=bookmarks.filter(x=>x!==m);store.set("bookmarks",bookmarks);
       renderToc(b);return;
     }
-    pendingPct=m.pct;nav("#c/"+encodeURIComponent(m.ch));
+    pendingPct=m.pct;nav(chHash(m.ch));
   }));
   const tf=$("tocFilter");
   if(tf)tf.addEventListener("input",()=>{
@@ -702,7 +751,9 @@ function renderToc(b){
   });
   const hlBtn=$("tocHl");
   if(hlBtn)hlBtn.addEventListener("click",()=>nav("#h/"+encodeURIComponent(b.id)));
-  $("tocBack").addEventListener("click",()=>nav(""));
+  const back=$("tocBack");
+  if(back)back.addEventListener("click",()=>nav(""));
+  $("tocShare").addEventListener("click",()=>copyShare("#s/b/"+encodeURIComponent(b.id),$("tocShare")));
   $("tocTheme").addEventListener("click",()=>{cycleTheme();});
 }
 
@@ -747,6 +798,7 @@ function renderHighlightsPage(b){
 function bookOf(c){return BOOKS[c.book];}
 function siblingChapter(offset){
   // next/prev chapter within the current book only; null at the edges
+  if(share&&share.type==="chapter")return null; // a shared chapter has no siblings
   const c=CHAPTERS[cur],b=bookOf(c);
   const pos=b.chapters.indexOf(cur)+offset;
   return (pos>=0&&pos<b.chapters.length)?b.chapters[pos]:null;
@@ -758,15 +810,19 @@ function renderChapter(i,fromEnd){
   content.style.transition="none";content.innerHTML=htmlCache[c.id];
   content.querySelectorAll("a[data-int]").forEach(a=>a.addEventListener("click",e=>{
     e.preventDefault();
+    if(share&&share.type==="chapter")return; // shared chapter: stay on this chapter
     const f=a.getAttribute("href").split("/").pop();
     // resolve within the same book first, then anywhere in the library
     let j=b.chapters.find(k=>CHAPTERS[k].file===f);
-    if(j===undefined)j=CHAPTERS.findIndex(x=>x.file===f);
+    if(j===undefined&&!share)j=CHAPTERS.findIndex(x=>x.file===f); // share mode never leaves the book
     if(j>=0)nav(chapterHash(CHAPTERS[j]));
   }));
   applyHighlights(c.id);
   $("stTitle").textContent=`${b.title} — ${c.title}`;
   $("barTitle").textContent=c.title;
+  const soloCh=!!(share&&share.type==="chapter");
+  $("btnToc").style.visibility=soloCh?"hidden":"";
+  $("btnPrevCh").style.visibility=$("btnNextCh").style.visibility=soloCh?"hidden":"";
   last={id:c.id};store.set("last",last);
   lastByBook[c.book]=c.id;store.set("lastBook",lastByBook);
   requestAnimationFrame(()=>{
@@ -971,6 +1027,7 @@ function prev(){
 }
 let pendingFromEnd=false;
 function backToToc(){
+  if(share&&share.type==="chapter")return; // a shared chapter has no TOC to go back to
   const c=CHAPTERS[cur];
   nav(c?bookHash(bookOf(c)):"");
 }
@@ -994,6 +1051,10 @@ function reflowKeepingPct(fn){
 
 /* ================= events ================= */
 $("btnToc").addEventListener("click",backToToc);
+$("btnShare").addEventListener("click",()=>{
+  const c=CHAPTERS[cur];if(!c)return;
+  copyShare("#s/c/"+encodeURIComponent(c.id),$("btnShare"));
+});
 $("btnAa").addEventListener("click",showPanel);
 $("btnTheme").addEventListener("click",cycleTheme);
 $("scrim").addEventListener("click",hidePanel);
@@ -1084,7 +1145,7 @@ $("pageArea").addEventListener("touchend",e=>{
 document.addEventListener("keydown",e=>{
   if(e.target.tagName==="INPUT")return;
   if(reader.classList.contains("hidden")){
-    if(e.key==="Escape"&&!toc.classList.contains("hidden"))nav("");
+    if(e.key==="Escape"&&!toc.classList.contains("hidden")&&!share)nav("");
     if(e.key==="/"&&!home.classList.contains("hidden")){
       const sb=$("searchBox");if(sb){e.preventDefault();sb.focus();}
     }
@@ -1187,9 +1248,11 @@ function registerServiceWorker(){
 window.addEventListener("hashchange",()=>{
   const fe=pendingFromEnd;pendingFromEnd=false;
   const h=decodeURIComponent(location.hash);
-  if(fe&&h.startsWith("#c/")){
-    const i=CHAPTERS.findIndex(c=>c.id===h.slice(3));
+  const id=fe?chapterIdFromHash(h):null;
+  if(id!=null){
+    const i=CHAPTERS.findIndex(c=>c.id===id);
     if(i>=0){if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
+      parseShare(h);
       hideBars();hidePanel();hideHlPop();showView("reader");renderChapter(i,true);return;}
   }
   route();
