@@ -833,7 +833,9 @@ function showHlPop(x,y,buttons){
   buttons.forEach(([label,fn])=>{
     const b=document.createElement("button");
     b.textContent=label;
-    b.addEventListener("click",e=>{e.stopPropagation();hideHlPop();fn();});
+    // pointerdown, not click: a click would first collapse the text selection,
+    // whose selectionchange handler hides this popup before the click lands
+    b.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();hideHlPop();fn();});
     hlPop.appendChild(b);
   });
   hlPop.classList.remove("hidden");
@@ -1038,7 +1040,7 @@ $("pageArea").addEventListener("click",e=>{
 /* selection -> highlight popup */
 document.addEventListener("pointerup",e=>{
   if(reader.classList.contains("hidden"))return;
-  if(e.target.closest("#hlPop"))return;
+  if(e.target instanceof Element&&e.target.closest("#hlPop"))return;
   setTimeout(maybeShowSelectionPop,10);
 });
 document.addEventListener("selectionchange",()=>{

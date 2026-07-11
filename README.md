@@ -15,12 +15,25 @@ up on the shelf with its own cover, table of contents, and reading progress.
 ## Quick start
 
 ```bash
-python3 tools/build-reader.py   # rebuild index.html from library/
-open index.html                 # or serve it, or push to GitHub Pages
+python3 tools/build-reader.py           # rebuild index.html from library/
+open index.html                         # or serve it, or push to GitHub Pages
+
+python3 tools/build-reader.py --serve   # dev mode: serve on :8080 and rebuild
+                                        # automatically whenever library/ changes
+
+python3 tools/new-book.py books "Deep Work" --author "Cal Newport" \
+    --chapters "Intro,Focus,Rituals"    # scaffold a new book with chapter stubs
 ```
 
 That is the entire workflow. There are no other build steps or dependencies
-(Python 3 stdlib only).
+(Python 3 stdlib only). A GitHub Action (`.github/workflows/build.yml`) also
+rebuilds `index.html` on every push to `main` and commits it back if it drifted,
+so GitHub Pages never serves a stale build.
+
+The build prints `!` warnings for content the reader can't display well:
+chapters missing a `# Title` H1, duplicate `NN-` prefixes in one folder,
+images/footnotes (unsupported), lists nested deeper than one level, and an
+oversized `index.html` (>5 MB).
 
 ## How content is structured (READ THIS BEFORE ADDING ANYTHING)
 
@@ -120,8 +133,21 @@ Top-to-bottom map:
 
 - **Home** → tap a cover → **book TOC** → tap a chapter → **reader**.
 - In the reader: tap center = toolbars, tap/swipe edges = turn page,
-  `←/→`/space = pages, `T` = theme, `+/-` = font size, `Esc`/☰ = back to TOC.
-- "Continue reading" card on Home jumps to the last-read chapter across all books.
+  `←/→`/space = pages, `T` = theme, `+/-` = font size, `B`/⚑ = bookmark this page,
+  `Esc`/☰ = back to TOC.
+- "Continue reading" card on Home jumps to the last-read chapter across all books;
+  each book's TOC additionally remembers its own last-read chapter.
+- **Search** (box on Home, or press `/`): full-text search across every chapter,
+  with matched snippets; tap a result to open the chapter.
+- **Highlights & notes**: select text in the reader → tap "Highlight" or "＋ Note".
+  Tap an existing highlight to view/edit its note or remove it. Each book's TOC
+  links to a per-book "Highlights" page listing them all.
+- **Bookmarks**: the ⚑ button (or `B`) marks the current page; bookmarks are
+  listed on the book's TOC and jump back to the exact spot.
+- **TOC filter**: books with 10+ chapters get a filter box on their TOC page.
+- **Backup**: "⬇ Back up my data" at the bottom of Home downloads progress,
+  highlights, bookmarks and settings as JSON; "⬆ Restore backup" imports it —
+  use this before clearing site data or when switching devices.
 
 ## Offline mode (PWA)
 
