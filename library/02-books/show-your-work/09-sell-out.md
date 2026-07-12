@@ -1,31 +1,56 @@
 # 9. Sell Out
 
-**The idea in one line:** money and art are not enemies — charging for your work is how you get to keep doing it, so lose the guilt.
+> “Sellout . . . I’m not crazy about that word. We’re all entrepreneurs. To me, I don’t care if you own a furniture store or whatever—the best sign you can put up is sold out.”
+> —Bill Withers
 
-## Even the Renaissance had to be funded
+People need to eat and pay the rent. “An amateur is an artist who supports himself with outside jobs which enable him to paint,” said artist Ben Shahn. “A professional is someone whose wife works to enable him to paint.” Whether an artist makes money off his work or not, money has to come from somewhere, be it a day job, a wealthy spouse, a trust fund, an arts grant, or a patron.
 
-The starving-artist ideal treats commerce as corruption: the moment you charge, you've "sold out." Kleon's rebuttal is historical — the art we revere was bankrolled by patrons, church commissions, and markets. Creative work has always needed funding; pretending otherwise doesn't make you pure, it makes you unsustainable. Being good at business doesn't make you a bad artist.
+We all have to get over our “starving artist” romanticism and the idea that touching money inherently corrupts creativity. Some of our most meaningful and most cherished cultural artifacts were made for money. Michelangelo painted the Sistine Chapel ceiling because the pope commissioned him. Mario Puzo wrote *The Godfather *to make money: He was 45 years old, tired of being an artist, and owed $20,000 to assorted relatives, banks, bookmakers, and shylocks. Paul McCartney has said that he and John Lennon used to sit down before a Beatles songwriting session and say, “Now, let’s write a swimming pool.”
 
-The audience relationship changes when money enters, but it doesn't have to sour — if you've been generous all along (chapters 3–6), asking to be paid is fair exchange, not betrayal.
+Everybody says they want artists to make money, and then when they do, everybody hates them for it. The word *sellout* is spit out by the bitterest, smallest parts of ourselves. Don’t be one of those horrible fans who stops listening to your favorite band just because they have a hit single. Don’t write off your friends because they’ve had a little bit of success. Don’t be jealous when the people you like do well—celebrate their victory as if it’s your own.
 
-## Pass around the hat
+> “I’d love to sell out completely. It’s just that nobody has been willing to buy.”
+> —John Waters
 
-Practical, low-shame ways to let value flow back:
+When an audience starts gathering for the work that you’re freely putting into the world, you might eventually want to take the leap of turning them into patrons. The easiest way to do this is to simply ask for donations: Put a little virtual tip jar or a donate now button on your website. These links do well with a little bit of human copy, such as “Like this? Buy me a coffee.”  This is a very simple transaction, which is the equivalent of a band passing a hat during a gig—if people are digging what you do, they’ll throw a few bucks your way.
 
-- **Take donations** — a tip jar or sponsor link on your site costs nothing and lets grateful readers act on their gratitude.
-- **Crowdfund when you have something to make** — but note Kleon's warning: build the audience *before* you need it. Kickstarting to strangers doesn't work; the crowd in crowdfunding is the audience you already earned.
-- **Charge what you're worth** — when you move from hobby to livelihood, price honestly and don't apologize. The people who value the work will pay; the ones who complain that it used to be free were never customers.
+If you have work you want to attempt that requires some up-front capital, platforms like Kickstarter and Indiegogo make it easy to run fund-raising campaigns with tiered rewards for donors. It’s important to note that these platforms work best when you’ve already gathered a group of people who are into what you do. The musician Amanda Palmer has had wild success turning her audience into patrons: After showing her work, sharing her music freely, and cultivating relationships with her fans, she asked for $100,000 from them to help record her next album. They gave her more than a million dollars.
 
-## Keep a mailing list
+There are certainly some strings attached to crowdfunding—when people become patrons, they feel, not altogether wrongly, that they should have some say in how their money is being used. It’s partly for this reason that my business model is still pretty old-fashioned: I make something and sell it for money. Instead of having a donate now button on my website, I have buy now and hire me buttons. But even though I operate more like a traditional salesman, I do use some of the same tactics as crowdfunders: I try to be open about my process, connect with my audience, and ask them to support me by buying the things I’m selling.
 
-The most concrete advice in the book: **collect email addresses.** Platforms rise and fall, algorithms bury you, but the mailing list is a direct line you own to the people who explicitly asked to hear from you. Even if you have nothing to sell today, build the list — it's the machine you'll be glad exists the day you launch something. The formula: give away great free stuff, and ask for an email in return.
+Beware of selling the things that you love: When people are asked to get out their wallets, you find out how much they really value what you do. My friend John T. Unger tells this terrific story from his days as a street poet. He would do a poetry reading and afterward some guy would come up to him and say, “Your poem changed my life, man!” And John would say, “Oh, thanks. Want to buy a book? It’s five dollars.” And the guy would take the book, hand it back to John, and say, “Nah, that’s okay.”   To which John would respond, “Geez, how much is your life worth?”
 
-## When success arrives, stay generous
+Whether you ask for donations, crowdfund, or sell your products or services, asking for money in return for your work is a leap you want to take only when you feel confident that you’re putting work out into the world that you think is truly worth something. Don’t be afraid to charge for your work, but put a price on it that you think is fair.
 
-Two closing cautions. First, as you grow, more people will want things from you — guard your working time, but "be as generous as you can, and selfish enough to get your work done." Second, **don't forget the ones who got you there**: credit your influences, pay your collaborators, thank your audience. Success that forgets its scenius doesn't last.
+Even if you don’t have anything to sell right now, you should always be collecting email addresses from people who come across your work and want to stay in touch. Why email? You’ll notice a pattern with technology—often the most boring and utilitarian technologies are the ones that stick around the longest. Email is decades and decades old, but it’s nowhere close to being dead. Even though almost everybody hates it, everybody has an email address. And unlike RSS and social media feeds, if you send someone an email, it will land in her inbox, and it will come to her attention. She might not open it, but she definitely has to go to the trouble of deleting it.
 
-## Takeaways for practice
+I know people who run multimillion-dollar businesses off of their mailing lists. The model is very simple: They give away great stuff on their sites, they collect emails, and then when they have something remarkable to share or sell, they send an email. You’d be amazed at how well the model works.
 
-- Kill the guilt: decide now that being paid for good work is legitimate.
-- Start the mailing list this week, before you need it.
-- Sequence matters: generosity first, audience second, ask third.
+Keep your own list, or get an account with an email newsletter company like MailChimp and put a little sign-up widget on every page of your website. Write a little bit of copy to encourage people to sign up. Be clear about what they can expect, whether you’ll be sending daily, monthly, or infrequent updates. *Never ever add someone’s email address to your mailing list without her permission.*
+
+The people who sign up for your list will be some of your biggest supporters, just by the simple fact that they signed up for the potential to be spammed by you. Don’t betray their trust and don’t push your luck. Build your list and treat it with respect. It will come in handy.
+
+> “We don’t make movies to make money, we make money to make more movies.”
+> —Walt Disney
+
+Some awful people use the term *sellout* to include any artist who dares to have any ambition whatsoever. They’ll say you’re a sellout if you try to make it outside your hometown. They say you’re a sellout if you buy better equipment. They’ll say you’re a sellout if you try anything new at all.
+
+“There is a point in one’s life when one cares about selling out and not selling out,” writes author Dave Eggers. “Thankfully, for some, this all passes.” What really matters, Eggers says, is doing good work and taking advantage of every opportunity that comes your way. “I really like saying yes. I like new things, projects, plans, getting people together and doing something, trying something, even when it’s corny or stupid.” The people who holler “Sellout!” are all hollering “No!” They’re the people who don’t want things to ever change.
+
+Yet a life of creativity is all about change—moving forward, taking chances, exploring new frontiers. “The real risk is in not changing,” said saxophonist John Coltrane. “I have to feel that I’m after something. If I make money, fine. But I’d rather be striving. It’s the striving, man, it’s that I want.”
+
+Be ambitious. Keep yourself busy. Think bigger. Expand your audience. Don’t hobble yourself in the name of “keeping it real,” or “not selling out.” Try new things. If an opportunity comes along that will allow you to do more of the kind of work you want to do, say *Yes*. If an opportunity comes along that would mean more money, but less of the kind of work you want to do, say *No*.
+
+> “There is no misery in art. All art is about saying yes, and all art is about its own making.”
+> —John Currin
+
+When you have success, it’s important to use any dough, clout, or platform you’ve acquired to help along the work of the people who’ve helped you get to where you are. Extol your teachers, your mentors, your heroes, your influences, your peers, and your fans. Give them a chance to share their own work. Throw opportunities their way.
+
+There’s a caveat to all this: As a human being, you have a finite amount of time and attention. At some point, you have to switch from saying “yes” a lot to saying “no” a lot. “The biggest problem of success is that the world conspires to stop you doing the thing that you do, because you are successful,” writes author Neil Gaiman. “There was a day when I looked up and realised that I had become someone who professionally replied to email, and who wrote as a hobby. I started answering fewer emails, and was relieved to find I was writing much more.”
+
+I find myself in the weird position now where I get way more email from people than I could ever answer and still do everything I need to do. The way I get over my guilt about not answering email is to hold *office hours*. Once a month, I make myself available so that anybody can ask me anything on my website, and I try to give thoughtful answers that I then post so anyone can see.
+
+You just have to be as generous as you can, but selfish enough to get your work done.
+
+> “Above all, recognize that if you have had success, you have also had luck—and with luck comes obligation. You owe a debt, and not just to your gods. You owe a debt to the unlucky.”
+> —Michael Lewis

@@ -1,29 +1,44 @@
 # 4. Open Up Your Cabinet of Curiosities
 
-**The idea in one line:** what you love and collect is part of your work — share your influences honestly and always credit them.
+> “The problem with hoarding is you end up living off your reserves. Eventually, you’ll become stale. If you give away everything you have, you are left with nothing. This forces you to look, to be aware, to replenish. . . . Somehow the more you give away, the more comes back to you.”
+> —Paul Arden
 
-## Your taste is content
+If you happened to be wealthy and educated and alive in 16th- and 17th-century Europe, it was fashionable to have a *Wunderkammern*, a “wonder chamber,” or a “cabinet of curiosities” in your house—a room filled with rare and remarkable objects that served as a kind of external display of your thirst for knowledge of the world. Inside a cabinet of curiosities you might find books, skeletons, jewels, shells, art, plants, minerals, taxidermy specimens, stones, or any other exotic artifact. These collections often juxtaposed both natural and human-made marvels, revealing a kind of mash-up of handiwork by both God and human beings. They were the precursors to what we think of today as the modern museum—a place dedicated to the study of history, nature, and the arts.
 
-Before museums, wealthy Renaissance collectors kept *Wunderkammern* — "wonder chambers," rooms of curiosities: fossils, art, oddities, books. The collection expressed the collector. Kleon's point: everyone carries a mental cabinet of curiosities — the books, music, tools, obscure blogs, and dead artists that shaped them — and that collection is worth showing.
+We all have our own treasured collections. They can be physical cabinets of curiosities, say, living room bookshelves full of our favorite novels, records, and movies, or they can be more like intangible museums of the heart, our skulls lined with memories of places we’ve been, people we’ve met, experiences we’ve accumulated. We all carry around the weird and wonderful things we’ve come across while doing our work and living our lives. These mental scrapbooks form our tastes, and our tastes influence our work.
 
-Where creativity comes from is no mystery: it comes from what you take in. So sharing your influences is a form of showing your work. Curation *is* creative work: finding the good stuff and passing it along, with your reasons, is genuinely valuable to others — and it's something you can do on the days you have nothing of your own to show.
+There’s not as big of a difference between collecting and creating as you might think. A lot of the writers I know see the act of reading and the act of writing as existing on opposite ends of the same spectrum: The reading feeds the writing, which feeds the reading. “I’m basically a curator,” says the writer and former bookseller Jonathan Lethem. “Making books has always felt very connected to my bookselling experience, that of wanting to draw people’s attention to things that I liked, to shape things that I liked into new shapes.”
 
-## Don't be a hoarder
+Our tastes make us what we are, but they can also cast a shadow over our own work. “All of us who do creative work, we get into it because we have good taste,” says public radio personality Ira Glass. “But there is this gap. For the first couple years you make stuff, it’s just not that good. It’s trying to be good, it has potential, but it’s not. But your taste, the thing that got you into the game, is still killer.” Before we’re ready to take the leap of sharing our own work with the world, we can share our tastes in the work of others.
 
-Some people guard their sources, afraid that revealing influences makes them look derivative or hands competitors an advantage. The opposite is true: pointing at what you love makes people trust your judgment, and your unique *combination* of influences is not reproducible anyway. Generosity with sources is a competitive advantage disguised as a gift.
+Where do you get your inspiration? What sorts of things do you fill your head with? What do you read? Do you subscribe to anything? What sites do you visit on the Internet? What music do you listen to? What movies do you see? Do you look at art? What do you collect? What’s inside your scrapbook? What do you pin to the corkboard above your desk? What do you stick on your refrigerator? Who’s done work that you admire? Who do you steal ideas from? Do you have any heroes? Who do you follow online? Who are the practitioners you look up to in your field?
 
-## No guilty pleasures
+Your influences are all worth sharing because they clue people in to who you are and what you do—sometimes even more than your own work.
 
-Don't curate your tastes for status. If you love something unfashionable, own it — authentic enthusiasm is rarer and more magnetic than approved taste. The people you attract by being honest about what you love are *your* people.
+> “You’re only as good as your record collection.”
+> —DJ Spooky
+> “I don’t believe in guilty pleasures. If you f---ing like something, like it.”
+> —Dave Grohl
 
-## Credit is always due
+About twenty years ago, a trashman in New York City named Nelson Molina started collecting little bits and pieces of art and unique objects that he found discarded along his route. His collection, The Trash Museum, is housed on the second floor of the Sanitation Department garage on East 99th Street, and it now features more than a thousand paintings, posters, photographs, musical instruments, toys, and other ephemera. There isn’t a big unifying principle to the collection, just what Molina likes. He gets submissions from some of his fellow workers, but he says what goes on the wall and what doesn’t. “I tell the guys, just bring it in and I’ll decide if I can hang it.” At some point, Molina painted a sign for the museum that reads treasure in the trash by nelson molina.
 
-The chapter's hard rule: **always attribute.** Sharing someone's work without saying who made it isn't sharing, it's theft of credit. Proper attribution means naming the creator, linking to the original, and giving context — what it is, why you're sharing it. A useful corollary: if you don't know who made something, don't share it until you find out; an image without a source is a dead end for everyone downstream.
+“Dumpster diving” is one of the jobs of the artist—finding the treasure in other people’s trash, sifting through the debris of our culture, paying attention to the stuff that everyone else is ignoring, and taking inspiration from the stuff that people have tossed aside for whatever reasons. More than 400 years ago, Michel de Montaigne, in his essay “On Experience,” wrote, “In my opinion, the most ordinary things, the most common and familiar, if we could see them in their true light, would turn out to be the grandest miracles . . . and the most marvelous examples.” All it takes to uncover hidden gems is a clear eye, an open mind, and a willingness to search for inspiration in places other people aren’t willing or able to go.
 
-Attribution also runs forward: credit the person who *showed you* the thing, not just the person who made it (the "via" link). That's how curation chains stay generous.
+We all love things that other people think are garbage. You have to have the courage to keep loving your garbage, because what makes us unique is the diversity and breadth of our influences, the unique ways in which we mix up the parts of culture others have deemed “high” and the “low.”
 
-## Takeaways for practice
+When you find things you genuinely enjoy, don’t let anyone else make you feel bad about it. Don’t feel guilty about the pleasure you take in the things you enjoy. Celebrate them. When you share your taste and your influences, have the guts to own all of it. Don’t give in to the pressure to self-edit too much. Don’t be the lame guys at the record store arguing over who’s the more “authentic” punk rock band. Don’t try to be hip or cool. Being open and honest about what you like is the best way to connect with people who like those things, too.
 
-- On empty days, share an influence instead of an output — one link, with why it matters to you.
-- Keep a running file of things that blow your mind; it's your future material.
-- Attribution discipline: creator named, original linked, no source = no share.
+> “Do what you do best and link to the rest.”
+> —Jeff Jarvis
+
+If you share the work of others, it’s your duty to make sure that the creators of that work get proper credit. Crediting work in our copy-and-paste age of reblogs and retweets can seem like a futile effort, but it’s worth it, and it’s the right thing to do. You should always share the work of others as if it were your own, treating it with respect and care.
+
+When we make the case for crediting our sources, most of us concentrate on the plight of the original creator of the work. But that’s only half of the story—if you fail to properly attribute work that you share, you not only rob the person who made it, you rob all the people you’ve shared it with. Without attribution, they have no way to dig deeper into the work or find more of it.
+
+So, what makes for great attribution? Attribution is all about providing context for what you’re sharing: what the work is, who made it, how they made it, when and where it was made, why you’re sharing it, why people should care about it, and where people can see some more work like it. Attribution is about putting little museum labels next to the stuff you share.
+
+Another form of attribution that we often neglect is where we found the work that we’re sharing. It’s always good practice to give a shout-out to the people who’ve helped you stumble onto good work and also leave a bread-crumb trail that people you’re sharing with can follow back to the sources of your inspiration. I’ve come across so many interesting people online by following “via” and “H/T” links—I’d have been robbed of a lot of these connections if it weren’t for the generosity and meticulous attribution of many of the people I follow.
+
+Online, the most important form of attribution is a hyperlink pointing back to the website of the creator of the work. This sends people who come across the work back to the original source. The number one rule of the Internet: People are lazy. If you don’t include a link, no one can click it. Attribution without a link online borders on useless: 99.9 percent of people are not going to bother Googling someone’s name.
+
+All of this raises a question: What if you want to share something and you don’t know where it came from or who made it? The answer: Don’t share things you can’t properly credit. Find the right credit, or don’t share.

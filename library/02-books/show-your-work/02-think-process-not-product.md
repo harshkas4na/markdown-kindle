@@ -1,35 +1,31 @@
 # 2. Think Process, Not Product
 
-**The idea in one line:** the finished work is only the visible tip — the process of making it is valuable, shareable material in its own right.
+> “A lot of people are so used to just seeing the outcome of work. They never see the side of the work you go through to produce the outcome.”
+> —Michael Jackson
 
-## Take people behind the scenes
+When a painter talks about her “work,” she could be talking about two different things: There’s the *artwork*, the finished piece, framed and hung on a gallery wall, and there’s the *art work*, all the day-to-day stuff that goes on behind the scenes in her studio: looking for inspiration, getting an idea, applying oil to a canvas, etc. There’s “painting,” the noun, and there’s “painting,” the verb. As in all kinds of work, there is a distinction between the painter’s *process*, and the *products* of her process.
 
-Traditionally artists guarded the messy middle: you only ever saw the polished result on the gallery wall. But audiences are genuinely hungry for the *backstage* view — sketchbooks, studio shots, drafts, tools, dead ends. Documentaries about the making of an album are often more compelling than the album itself.
+Traditionally, the artist has been trained to regard her creative process as something that should be kept to herself. This way of thinking is articulated by David Bayles and Ted Orland in their book, *Art and Fear*: “To all viewers but yourself, what matters is the product: the finished artwork. To you, and you alone, what matters is the process: the experience of shaping the artwork.” An artist is supposed to toil in secrecy, keeping her ideas and her work under lock and key, waiting until she has a magnificent product to show for herself before she tries to connect with an audience. “The private details of artmaking are utterly uninteresting to audiences,” write Bayles and Orland, “because they’re almost never visible—or even knowable—from examining the finished work.”
 
-Sharing process does two things:
+This all made sense in a pre-digital age, when the only way an artist could connect with an audience was through a gallery show or write-up in some fancy art magazine. But today, by taking advantage of the Internet and social media, an artist can share whatever she wants, whenever she wants, at almost no cost. She can decide exactly how much or how little of her work and herself she will share, and she can be as open about her process as she wants to—she can share her sketches and works-in-progress, post pictures of her studio, or blog about her influences, inspiration, and tools. By sharing her day-to-day process—the thing she really cares about—she can form a unique bond with her audience.
 
-1. **It forms a connection.** People who watch you work feel invested in the outcome. By the time the product ships, they already care.
-2. **It turns one product into a stream.** A book takes two years to write; process gives you two years of material instead of one launch day.
+To many artists, particularly those who grew up in the pre-digital era, this kind of openness and the potential vulnerability that goes along with sharing one’s process is a terrifying idea. Here’s the author Edgar Allan Poe, writing in 1846: “Most writers—poets in especial—prefer having it understood that they compose by a species of fine frenzy—an ecstatic intuition—and would positively shudder at letting the public take a peep behind the scenes.”
 
-There's also an honesty argument: work *is* mostly unglamorous grind, and pretending otherwise feeds the genius myth the first chapter tried to kill.
+But human beings are interested in other human beings and what other human beings do. “People really do want to see how the sausage gets made.” That’s how designers Dan Provost and Tom Gerhardt put it in their book on entrepreneurship, *It Will Be Exhilarating*. “By putting things out there, consistently, you can form a relationship with your customers. It allows them to see the person behind the products.” Audiences not only want to stumble across great work, but they, too, long to be creative and part of the creative process. By letting go of our egos and sharing our process, we allow for the possibility of people having an ongoing connection with us and our work, which helps us move more of our product.
 
-## Become a documentarian of what you do
+> “In order for connection to happen, we have to allow ourselves to be seen—really seen.”
+> —Brené Brown
 
-You can't share your process if you don't capture it. Kleon's advice is to treat yourself like the subject of a documentary:
+In 2013, the Internet fell in love with astronaut Chris Hadfield, commander of the International Space Station. Three years earlier, Hadfield and his family were sitting around the dinner table, trying to figure out ways to generate interest for the Canadian Space Agency, which, like many space programs, faced major budget cuts and needed more public support. “Dad wanted a way to help people connect with the real side of what an astronaut’s life is,” said Hadfield’s son Evan. “Not just the glamour and science, but also the day-to-day activities.”
 
-- Keep a **work journal** — what you did, what worked, what didn't.
-- **Photograph** work in progress; shoot short videos.
-- Keep a **scrapbook** of scraps, clippings, and false starts.
-- Do this *regardless of whether you share it*. The record has value for you alone — reviewing it shows your own progress and patterns.
+Commander Hadfield wanted to show his work.
 
-The habit matters more than the medium. A camera roll full of work-in-progress shots, a daily log file, a thread of notes — any of these becomes a reservoir you can draw from when it's time to share.
+Things fell into place when his sons explained social media to him and got him set up on Twitter and other social networks. During his next five-month mission, while performing all his regular astronautical duties, he tweeted, answered questions from his followers, posted pictures he’d taken of Earth, recorded music, and filmed YouTube videos of himself clipping his nails, brushing his teeth, sleeping, and even performing maintenance on the space station. Millions of people ate it all up, including my agent, Ted, who tweeted, “Wouldn’t normally watch live video of a couple of guys doing plumbing repair, but IT’S IN SPACE!”
 
-## What if my work doesn't produce "process"?
+Now, let’s face it: We’re not all artists or astronauts. A lot of us go about our work and feel like we have nothing to show for it at the end of the day. But whatever the nature of your work, there is an art to what you do, and there are people who would be interested in that art, if only you presented it to them in the right way. In fact, sharing your process might actually be most valuable if the products of your work aren’t easily shared, if you’re still in the apprentice stage of your work, if you can’t just slap up a portfolio and call it a day, or if your process doesn’t necessarily lead to tangible finished products.
 
-Even desk jobs have process: how you think through a problem, what you read, how a decision got made, tools and workflow. The invisible work in any field becomes interesting the moment somebody bothers to show it — because nobody else is showing it.
+How can you show your work even when you have nothing to show? The first step is to scoop up the scraps and the residue of your process and shape them into some interesting bit of media that you can share. You have to turn the invisible into something other people can see. “You have to make stuff,” said journalist David Carr when he was asked if he had any advice for students. “No one is going to give a damn about your résumé; they want to see what you have made with your own little fingers.”
 
-## Takeaways for practice
+Become a documentarian of what you do. Start a work journal: Write your thoughts down in a notebook, or speak them into an audio recorder. Keep a scrapbook. Take a lot of photographs of your work at different stages in your process. Shoot video of you working. This isn’t about making art, it’s about simply keeping track of what’s going on around you. Take advantage of all the cheap, easy tools at your disposal—these days, most of us carry a fully functional multimedia studio around in our smartphones.
 
-- Start a daily work log today; it's the raw material for everything else in this book.
-- Default to capturing: screenshots, photos, commit messages that explain reasoning, voice memos.
-- When you finish something, don't just announce the result — show three artifacts from the road to it.
+Whether you share it or not, documenting and recording your process as you go along has its own rewards: You’ll start to see the work you’re doing more clearly and feel like you’re making progress. And when you’re ready to share, you’ll have a surplus of material to choose from.

@@ -1,31 +1,63 @@
 # 5. Tell Good Stories
 
-**The idea in one line:** work doesn't speak for itself — the story wrapped around it changes how people value it, so learn to tell yours well.
+Close your eyes and imagine you’re a wealthy collector who’s just entered a gallery in an art museum. On the wall facing you there are two gigantic canvases, each more than 10 feet tall. Both paintings depict a harbor at sunset. From across the room, they look identical: the same ships, the same reflections on the water, the same sun at the same stage of setting. You go in for a closer look. You can’t find a label or a museum tag anywhere. You become obsessed with the paintings, which you nickname Painting A and Painting B. You spend an hour going back and forth from canvas to canvas, comparing brushstrokes. You can’t detect a single difference.
 
-## Work doesn't speak for itself
+Just as you go to fetch a museum guard or someone who can shed light on these mysterious twin masterpieces, the head curator of the museum walks in. You eagerly inquire as to the origins of your new obsessions. The curator tells you that Painting A was painted in the 17th century by a Dutch master. “And what of Painting B?” you ask. “Ah yes, Painting B,” the curator says. “That’s a forgery. It was copied last week by a graduate student at the local art college.”
 
-Humans don't judge things in a vacuum; context and narrative measurably change perceived value. Kleon points to the famous *Significant Objects* experiment: writers attached invented stories to thrift-store trinkets, and the junk sold on eBay for a huge multiple of its cost. The stories did that. Museums work the same way — the wall label changes what you see in the painting.
+Look up at the paintings. Which canvas looks better now? Which one do you want to take home?
 
-If you're sharing your work, "the work" includes the words around it: where it came from, how it was made, what problem it solves, why you made it. Telling that story well isn't spin; it's finishing the job.
+Art forgery is a strange phenomenon. “You might think that the pleasure you get from a painting depends on its color and its shape and its pattern,” says psychology professor Paul Bloom. “And if that’s right, it shouldn’t matter whether it’s an original or a forgery.” But our brains don’t work that way. “When shown an object, or given a food, or shown a face, people’s assessment of it—how much they like it, how valuable it is—is deeply affected by what you tell them about it.”
 
-## Structure is everything
+In their book, *Significant Objects*, Joshua Glenn and Rob Walker recount an experiment in which they set out to test this hypothesis: “Stories are such a powerful driver of emotional value that their effect on any given object’s subjective value can actually be measured objectively.” First, they went out to thrift stores, flea markets, and yard sales and bought a bunch of “insignificant” objects for an average of $1.25 an object. Then, they hired a bunch of writers, both famous and not-so-famous, to invent a story “that attributed significance” to each object. Finally, they listed each object on eBay, using the invented stories as the object’s description, and whatever they had originally paid for the object as the auction’s starting price. By the end of the experiment, they had sold $128.74 worth of trinkets for $3,612.51.
 
-Good stories are structured, and structure can be learned. Kleon's references:
+> “To fake a photograph, all you have to do is change the caption. To fake a painting, change the attribution.”
+> —Errol Morris
 
-- The classic **fairy-tale shape**: a character wants something, obstacles stand in the way, they struggle, and emerge changed.
-- Kurt Vonnegut's **story graphs** — plot as a line of good and ill fortune over time. The most popular shape: person in a hole, person climbs out.
-- **Dan Harmon's story circle** — a character wants, enters an unfamiliar situation, adapts, gets it, pays a price, returns changed.
+Words matter. Artists love to trot out the tired line, “My work speaks for itself,” but the truth is, *our work doesn’t speak for itself*. Human beings want to know where things came from, how they were made, and who made them. The stories you tell about the work you do have a huge effect on how people feel and what they understand about your work, and how people feel and what they understand about your work effects how they value it.
 
-For work-in-progress, your story is *unfinished* — so tell it that way: here's where I am, here's where I'm trying to go, here's how you can help. A pitch is a story whose third act you're inviting the listener into.
+“Why should we describe the frustrations and turning points in the lab, or all the hours of groundwork and failed images that precede the final outcomes?” asks artist Rachel Sussman. “Because, rarified exceptions aside, our audience is a human one, and humans want to connect. Personal stories can make the complex more tangible, spark associations, and offer entry into things that might otherwise leave one cold.”
 
-## Talk about yourself at parties
+Your work doesn’t exist in a vacuum. Whether you realize it or not, you’re already telling a story about your work. Every email you send, every text, every conversation, every blog comment, every tweet, every photo, every video—they’re all bits and pieces of a multimedia narrative you’re constantly constructing. If you want to be more effective when sharing yourself and your work, you need to become a better storyteller. You need to know what a good story is and how to tell one.
 
-"What do you do?" is a story prompt, and most people fumble it. Have an honest, human answer ready — one or two sentences, no jargon, no false modesty, no inflated title. If you're a student, say what you're studying and why it matters to you. The test of jargon-free clarity: a child should be able to understand what you do.
+> “‘The cat sat on a mat’ is not a story. ‘The cat sat on the dog’s mat’ is a story.”
+> —John le Carré
+> “In the first act, you get your hero up a tree. The second act, you throw rocks at him. For the third act, you let him down.”
+> —George Abbott
 
-And keep the facts straight: honesty beats embellishment, because your story follows you.
+The most important part of a story is its structure. A good story structure is tidy, sturdy, and logical. Unfortunately, most of life is messy, uncertain, and illogical. A lot of our raw experiences don’t fit neatly into a traditional fairy tale or a Hollywood plot. Sometimes we have to do a lot of cropping and editing to fit our lives into something that resembles a story. If you study the structure of stories, you start to see how they work, and once you know how they work, you can then start stealing story structures and filling them in with characters, situations, and settings from your own life.
 
-## Takeaways for practice
+Most story structures can be traced back to myths and fairy tales. Emma Coats, a former storyboard artist at Pixar, outlined the basic structure of a fairy tale as a kind of Mad Lib that you can fill in with your own elements: “Once upon a time, there was _____. Every day, _____. One day, _____. Because of that, _____. Because of that, _____. Until finally, _____.” Pick your favorite story and try to fill in the blanks. It’s striking how often it works.
 
-- Never ship work naked. Every release gets at least a paragraph: origin, process, purpose.
-- Study story shape once (Vonnegut's graphs or Harmon's circle) and reuse it everywhere — READMEs, demos, pitches.
-- Script your two-sentence "what I do" answer and say it out loud until it stops sounding rehearsed.
+Philosopher Aristotle said a story had a beginning, a middle, and an end. Author John Gardner said the basic plot of nearly all stories is this: “A character wants something, goes after it despite opposition (perhaps including his own doubts), and so arrives at a win, lose, or draw.” I like Gardner’s plot formula because it’s also the shape of most creative work: You get a great idea, you go through the hard work of executing the idea, and then you release the idea out into the world, coming to a win, lose, or draw. Sometimes the idea succeeds, sometimes it fails, and more often than not, it does nothing at all. This simple formula can be applied to almost any type of work project: There’s the initial problem, the work done to solve the problem, and the solution.
+
+Of course, when you’re in the middle of a story, as most of us in life are, you don’t know if it’s a story at all, because you don’t know how far into it you are, and you don’t know how it’s going to end. Fortunately, there’s a way to tell open-ended stories, where we acknowledge that we’re smack-dab in the middle of a story, and we don’t know how it all ends.
+
+Every client presentation, every personal essay, every cover letter, every fund-raising request—they’re all *pitches*. They’re stories with the endings chopped off. A good pitch is set up in three acts: The first act is the past, the second act is the present, and the third act is the future. The first act is where you’ve been—what you want, how you came to want it, and what you’ve done so far to get it. The second act is where you are now in your work and how you’ve worked hard and used up most of your resources. The third act is where you’re going, and how exactly the person you’re pitching can help you get there. Like a Choose Your Own Adventure book, this story shape effectively turns your listener into the hero who gets to decide how it ends.
+
+Whether you’re telling a finished or unfinished story, always keep your audience in mind. Speak to them directly in plain language. Value their time. Be brief. Learn to speak. Learn to write. Use spell-check. You’re never “keeping it real” with your lack of proofreading and punctuation, you’re keeping it unintelligible.
+
+Everybody loves a good story, but good storytelling doesn’t come easy to everybody. It’s a skill that takes a lifetime to master. So study the great stories and then go find some of your own. Your stories will get better the more you tell them.
+
+> “You got to make your case.”
+> —Kanye West
+
+We’ve all been there. You’re standing at a party, enjoying your drink, when a stranger approaches, introduces herself, and asks the dreaded question, “So, what do you do?”
+
+If you happen to be a doctor or a teacher or a lawyer or a plumber, congratulations. You may proceed without caution. For the rest of us, we’re going to need to practice our answers.
+
+Artists have it the worst. If you answer, “I’m a writer,” for example, there’s a very good chance that the next question will be, “Oh, have you published anything?” which is actually a veiled way of asking, “Do you make any money off that?”
+
+The way to get over the awkwardness in these situations is to stop treating them as interrogations, and start treating them as opportunities to connect with somebody by honestly and humbly explaining what it is that you do. You should be able to explain your work to a kindergartner, a senior citizen, and everybody in between. Of course, you always need to keep your audience in mind: The way you explain your work to your buddies at the bar is not the way you explain your work to your mother.
+
+Just because you’re trying to tell a good story about yourself doesn’t mean you’re inventing fiction. Stick to nonfiction. Tell the truth and tell it with dignity and self-respect. If you’re a student, say you’re a student. If you work a day job, say you work a day job. (For years, I said, “By day I’m a web designer, and by night I write poetry.”) If you have a weird hybrid job, say something like, “I’m a writer who draws.” (I stole that bio from the cartoonist Saul Steinberg.) If you’re unemployed, say so, and mention what kind of work you’re looking for. If you’re employed, but you don’t feel good about your job title, ask yourself why that is. Maybe you’re in the wrong line of work, or maybe you’re not doing the work you’re supposed to be doing. (There were many years where answering, “I’m a writer,” felt wrong, because I wasn’t actually writing.) Remember what the author George Orwell wrote: “Autobiography is only to be trusted when it reveals something disgraceful.”
+
+Have empathy for your audience. Anticipate blank stares. Be ready for more questions. Answer patiently and politely.
+
+All the same principles apply when you start writing your bio. Bios are not the place to practice your creativity. We all like to think we’re more complex than a two-sentence explanation, but a two-sentence explanation is usually what the world wants from us. Keep it short and sweet.
+
+Strike all the adjectives from your bio. If you take photos, you’re not an “aspiring” photographer, and you’re not an “amazing” photographer, either. You’re a photographer. Don’t get cute. Don’t brag. Just state the facts.
+
+One more thing: Unless you are actually a ninja, a guru, or a rock star, don’t ever use any of those terms in your bio. Ever.
+
+> “Whatever we say, we’re always talking about ourselves.”
+> —Alison Bechdel

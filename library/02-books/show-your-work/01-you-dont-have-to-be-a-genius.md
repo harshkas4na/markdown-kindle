@@ -1,33 +1,58 @@
 # 1. You Don't Have to Be a Genius
 
-**The idea in one line:** creativity isn't the product of lone geniuses — it comes out of communities, and you can join one right now as an amateur.
+> “Give what you have. To someone, it may be better than you dare to think.”
+> —Henry Wadsworth Longfellow
 
-## Find a scenius
+There are a lot of destructive myths about creativity, but one of the most dangerous is the “lone genius” myth: An individual with superhuman talents appears out of nowhere at certain points in history, free of influences or precedent, with a direct connection to God or The Muse. When inspiration comes, it strikes like a lightning bolt, a lightbulb switches on in his head, and then he spends the rest of his time toiling away in his studio, shaping this idea into a finished masterpiece that he releases into the world to great fanfare. If you believe in the lone genius myth, creativity is an *antisocial* act, performed by only a few great figures—mostly dead men with names like Mozart, Einstein, or Picasso. The rest of us are left to stand around and gawk in awe at their achievements.
 
-We inherit a romantic myth: the genius who retreats from the world and returns with a masterpiece. Kleon borrows musician Brian Eno's alternative word, **"scenius"** — the notion that great work tends to come out of *scenes*: clusters of artists, thinkers, and hangers-on who trade ideas, copy each other, compete, and lift the whole group's level. The Impressionists had their cafés; the early web had its blogrolls.
+There’s a healthier way of thinking about creativity that the musician Brian Eno refers to as “scenius.” Under this model, great ideas are often birthed by a group of creative individuals—artists, curators, thinkers, theorists, and other tastemakers—who make up an “ecology of talent.” If you look back closely at history, many of the people who we think of as lone geniuses were actually part of “a whole scene of people who were supporting each other, looking at each other’s work, copying from each other, stealing ideas, and contributing ideas.” Scenius doesn’t take away from the achievements of those great individuals; it just acknowledges that good work isn’t created in a vacuum, and that creativity is always, in some sense, a collaboration, the result of a mind connected to other minds.
 
-The liberating consequence: you don't need to be a genius to matter, you just need to be a *contributor*. The internet is a collection of open sceniuses — forums, comment threads, open-source projects, niche communities — and they don't check credentials at the door. What you contribute is what counts: the ideas you share, the conversations you start, the quality of the links you pass along.
+What I love about the idea of scenius is that it makes room in the story of creativity for the rest of us: the people who don’t consider ourselves geniuses. Being a valuable part of a scenius is not necessarily about how smart or talented you are, but about what you have to contribute—the ideas 
+you share, the quality of the connections you make, and the conversations you start. If we forget about genius and think more about how we can nurture and contribute to a scenius, we can adjust our own expectations and the expectations of  the worlds we want to accept us. We can stop asking what others can do for us, and start asking what we can do for others.
 
-## Be an amateur
+We live in an age where it’s easier than ever to join a scenius. The Internet is basically a bunch of sceniuses connected together, divorced from physical geography. Blogs, social media sites, email groups, discussion boards, forums—they’re all the same thing: virtual scenes where people go to hang out and talk about the things they care about. There’s no bouncer, no gatekeeper, and no barrier to entering these scenes: You don’t have to be rich, you don’t have to be famous, and you don’t have to have a fancy résumé or a degree from an expensive school. Online, everyone—the artist and the curator, the master and the apprentice, the expert and the amateur—has the ability to contribute something.
 
-The word *amateur* comes from the Latin for "lover" — someone who does the work for the love of it. Amateurs have advantages professionals lose:
+> “That’s all any of us are: amateurs. We don’t live long enough to be anything else.”
+> —Charlie Chaplin
 
-- **Nothing to lose.** No reputation to protect means freedom to experiment in public.
-- **Closer to beginners.** An amateur just figured something out, so they can explain it in language a newcomer actually understands — often better than the expert who forgot what not-knowing feels like.
-- **Willing to look dumb.** The amateur asks the "stupid" questions everyone else is too polished to ask.
+We’re all terrified of being revealed as amateurs, but in fact, today it is the *amateur*—the enthusiast who pursues her work in the spirit of love (in French, the word means “lover”), regardless of the potential for fame, money, or career—who often has the advantage over the professional. Because they have little to lose, amateurs are willing to try anything and share the results. They take chances, experiment, and follow their whims. Sometimes, in the process of doing things in an unprofessional way, they make new discoveries.  “In the beginner’s mind, there are many possibilities,” said Zen monk Shunryu Suzuki. “In the expert’s mind, there are few.”
 
-In a world that changes this fast, everyone is an amateur at something new anyway. The way to learn in public is to *work* in public: share what you're learning while you're learning it.
+Amateurs are not afraid to make mistakes or look ridiculous in public. They’re in love, so they don’t hesitate to do work that others think of as silly or just plain stupid. “The stupidest possible creative act is still a creative act,” writes Clay Shirky in his book *Cognitive Surplus*. “On the spectrum of creative work, the difference between the mediocre and the good is vast. Mediocrity is, however, still on the spectrum; you can move from mediocre to good in increments. The real gap is between doing nothing and doing something.” Amateurs know that contributing something is better than contributing nothing.
 
-## You can't find your voice if you don't use it
+Amateurs might lack formal training, but they’re all lifelong learners, and they make a point of learning in the open, so that others can learn from their failures and successes. Writer David Foster Wallace said that he thought good nonfiction was a chance to “watch somebody reasonably bright but also reasonably average pay far closer attention and think at far more length about all sorts of different stuff than most of us have a chance to in our daily lives.” Amateurs fit the same bill: They’re just regular people who get obsessed by something and spend a ton of time thinking out loud about it.
 
-People wait to share until they "find their voice." Kleon inverts it: your voice shows up *because* you talk. Write, post, make — the style emerges from volume, not from waiting.
+Sometimes, amateurs have more to teach us than experts. “It often happens that two schoolboys can solve difficulties in their work for one another better than the master can,” wrote author C. S. Lewis. “The fellow-pupil can help more than the master because he knows less. The difficulty we want him to explain is one he has recently met. The expert met it so long ago he has forgotten.”  Watching amateurs at work can also inspire us to attempt the work ourselves. “I saw the Sex Pistols,” said New Order frontman Bernard Sumner. “They were terrible. . . . I wanted to get up and be terrible with them.” Raw enthusiasm is contagious.
 
-## Think about what you want to leave behind
+The world is changing at such a rapid rate that it’s turning us *all* into amateurs. Even for professionals, the best way to flourish is to retain an amateur’s spirit and embrace uncertainty and the unknown. When Radiohead frontman Thom Yorke was asked what he thought his greatest strength was, he answered, “That I don’t know what I’m doing.” Like one of his heroes, Tom Waits, whenever Yorke feels like his songwriting is getting too comfortable or stale, he’ll pick up an instrument he doesn’t know how to play and try to write with it. This is yet another trait of amateurs—they’ll use whatever tools they can get their hands on to try to get their ideas into the world. “I’m an artist, man,” said John Lennon. “Give me a tuba, and I’ll get you something out of it.”
 
-The chapter closes on a memento-mori note: read obituaries. They're near-death experiences by proxy — a daily reminder that the clock runs, and that the people remembered fondly are the ones who made and shared things. Fear of sharing shrinks next to that.
+The best way to get started on the path to sharing your work is to think about what you want to learn, and make a commitment to learning it in front of others. Find a scenius, pay attention to what others are sharing, and then start taking note of what they’re *not* sharing. Be on the lookout for voids that you can fill with your own efforts, no matter how bad they are at first. Don’t worry, for now, about how you’ll make money or a career off it. Forget about being an expert or a professional, and wear your amateurism (your heart, your love) on your sleeve. Share what you love, and the people who love the same things will find you.
 
-## Takeaways for practice
+> “Find your voice, shout it from the rooftops, and keep doing it until the people that are looking for you find you.”
+> — Dan Harmon
 
-- Stop waiting for credentials or mastery. Find the scenius for your field (a Discord, a forum, a local meetup) and start contributing today.
-- Embrace amateur status explicitly: "I'm learning X in public" is a stronger position than pretending expertise.
-- Volume first, voice later.
+We’re always being told *find your voice.* When I was younger, I never really knew what this meant. I used to worry a lot about voice, wondering if I had my own. But now I realize that the only way to find your voice is to use it. It’s hardwired, built into you. Talk about the things you love. Your voice will follow.
+
+When the late film critic Roger Ebert went through several intense surgeries to treat his cancer, he lost the ability to speak. He lost his voice—physically and permanently. Here was a man who made a great deal of his living by speaking on television and now he couldn’t say a word. In order to communicate with his friends and family, he’d have to either scribble responses on a pad of paper, or type on his Mac and have the awkward computer voice read it out loud through his laptop speakers.
+
+Cut off from everyday conversation, he poured himself into tweeting, posting to Facebook, and blogging at rogerebert.com. He ripped out posts at a breakneck speed, writing thousands and thousands of words about everything he could think of—his boyhood in Urbana, Illinois, his love for Steak ’n Shake, his conversations with famous movie actors, his thoughts on his inevitable death. Hundreds and hundreds of people would respond to his posts, and he would respond back. Blogging became his primary way of communicating with the world. “On the web, my real voice finds expression,” he wrote.
+
+Ebert knew his time on this planet was short, and he wanted to share everything he could in the time he had left. “Mr. Ebert writes as if it were a matter of life and death,” wrote journalist Janet Maslin, “because it is.” Ebert was blogging because he had to blog—because it was a matter of being heard, or not being heard. A matter of existing or not existing.
+
+It sounds a little extreme, but in this day and age, if your work isn’t online, it doesn’t exist. We all have the opportunity to use our voices, to have our say, but so many of us are wasting it. If you want people to know about what you do and the things you care about, you have to share.
+
+> “Remembering that I’ll be dead soon is the most important tool I’ve ever encountered to help me make the big choices in life. Because almost everything—all external expectations, all pride, all fear of embarrassment or failure—these things just fall away in the face of death, leaving only what is truly important. Remembering that you are going to die is the best way I know to avoid the trap of thinking you have something to lose. You are already naked.”
+> —Steve Jobs
+
+If all this sounds scary or like a lot of work, consider this: One day you’ll be dead. Most of us prefer to ignore this most basic fact of life, but thinking about our inevitable end has a way of putting everything into perspective.
+
+We’ve all read stories of near-death experiences changing people’s lives. When George Lucas was a teenager, he almost died in a car accident. He decided “every day now is an extra day,” dedicated himself to film, and went on to direct *Star Wars*. Wayne Coyne, lead singer of  The Flaming Lips, was 16 when he was held up while working at a Long John Silver’s. “I realized I was going to die,” he says. “And when that gets into your mind . . . it utterly changed me . . . I thought, *I’m not going to sit here and wait for things to happen, I’m going to make them happen, and if people think I’m an idiot I don’t care.*”
+
+Tim Kreider, in his book *We Learn Nothing*, says that getting stabbed in the throat was the best thing to ever happen to him. For a whole year, he was happy and life was good. “You’d like to think that nearly getting killed would be a permanently life-altering experience,” Kreider writes, but “the illumination didn’t last.” Eventually, he was back to “the busy work of living.”  The writer George Saunders, speaking of his own near-death experience, said, “For three or four days after that, it was the most beautiful world. To have gotten back in it, you know? And I thought,* if you could walk around like that all the time, to really have that awareness that it’s actually going to end. That’s the trick.” *
+
+Unfortunately, I am a coward. As much as I would like the existential euphoria that comes with it, I don’t really *want* a near-death experience. I want to stay safe and stay away from death as much as I can. I certainly don’t want to taunt it or court it or invite it any closer than it needs to be. But I do somehow want to remember that it’s coming for me.
+
+It’s for this reason that I read the obituaries every morning. Obituaries are like near-death experiences for cowards. Reading them is a way for me to think about death while also keeping it at arm’s length.
+
+Obituaries aren’t really about death; they’re about life. “The sum of every obituary is how heroic people are, and how noble,” writes artist Maira Kalman. Reading about people who are dead now and did things with their lives makes me want to get up and do something decent with mine. Thinking about death every morning makes me want to live.
+
+Try it: Start reading the obituaries every morning. Take inspiration from the people who muddled through life before you—they all started out as amateurs, and they got where they were going by making do with what they were given, and having the guts to put themselves out there. Follow their example.
