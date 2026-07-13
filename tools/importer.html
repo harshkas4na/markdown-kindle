@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Import a book</title>
+<style>
+  :root {
+    --paper: #faf7f0; --card: #ffffff; --ink: #2c2620; --muted: #8a7f70;
+    --accent: #b3762f; --accent-ink: #fff; --line: #e8e0d2; --ok: #2e7d32; --err: #b3382f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #17150f; --card: #211e16; --ink: #e8e0d2; --muted: #9a8f7e;
+      --line: #373226; --ok: #7bc47f; --err: #e08078;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 16px/1.55 Georgia, "Times New Roman", serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 80px; }
+  header h1 { font-size: 1.7rem; margin: 8px 0 4px; }
+  header p { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+          padding: 18px; margin-bottom: 16px; }
+  label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 12px;
+          font-family: -apple-system, system-ui, sans-serif; }
+  input, select, textarea {
+    display: block; width: 100%; margin-top: 4px; padding: 8px 10px;
+    font: 15px/1.5 -apple-system, system-ui, sans-serif; color: var(--ink);
+    background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+  }
+  textarea#paste { font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+                   min-height: 260px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  @media (max-width: 620px) { .row { grid-template-columns: 1fr; } }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .tabs button { font: 600 14px -apple-system, system-ui, sans-serif; cursor: pointer;
+                 padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line);
+                 background: transparent; color: var(--muted); }
+  .tabs button.active { background: var(--accent); border-color: var(--accent);
+                        color: var(--accent-ink); }
+  #drop { border: 2px dashed var(--line); border-radius: 10px; padding: 34px 16px;
+          text-align: center; color: var(--muted); cursor: pointer;
+          font-family: -apple-system, system-ui, sans-serif; font-size: 14px; }
+  #drop.over { border-color: var(--accent); color: var(--accent); }
+  #filelist { list-style: none; margin: 12px 0 0; padding: 0;
+              font-family: -apple-system, system-ui, sans-serif; font-size: 14px; }
+  #filelist li { display: flex; align-items: center; gap: 8px; padding: 5px 2px;
+                 border-bottom: 1px solid var(--line); }
+  #filelist .size { color: var(--muted); font-size: 12px; margin-left: auto; }
+  #filelist button { border: none; background: none; color: var(--err);
+                     cursor: pointer; font-size: 15px; }
+  h2 { font-size: 1.05rem; margin: 0 0 10px; }
+  table { width: 100%; border-collapse: collapse;
+          font-family: -apple-system, system-ui, sans-serif; font-size: 13.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px;
+       text-transform: uppercase; letter-spacing: .04em; }
+  td.num, td.words { color: var(--muted); white-space: nowrap; }
+  td.file { font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+            color: var(--muted); }
+  .empty { color: var(--muted); font-family: -apple-system, system-ui, sans-serif;
+           font-size: 14px; }
+  .warn { color: var(--err); font-family: -apple-system, system-ui, sans-serif;
+          font-size: 13.5px; margin: 10px 0 0; padding-left: 18px; }
+  .actions { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+  #importBtn { font: 600 15px -apple-system, system-ui, sans-serif; cursor: pointer;
+               background: var(--accent); color: var(--accent-ink); border: none;
+               border-radius: 10px; padding: 11px 22px; }
+  #importBtn:disabled { opacity: .45; cursor: default; }
+  #result { font-family: -apple-system, system-ui, sans-serif; font-size: 14px; }
+  #result.ok { color: var(--ok); } #result.err { color: var(--err); }
+  #result a { color: var(--accent); font-weight: 600; }
+  #buildOut { margin-top: 10px; max-height: 160px; overflow: auto; background: var(--paper);
+              border: 1px solid var(--line); border-radius: 8px; padding: 10px;
+              font: 12px/1.5 ui-monospace, Menlo, monospace; white-space: pre-wrap; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details pre { background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+                padding: 12px; font: 12.5px/1.55 ui-monospace, Menlo, monospace;
+                white-space: pre-wrap; }
+  #copyPrompt { font: 600 13px -apple-system, system-ui, sans-serif; cursor: pointer;
+                margin: 10px 0; padding: 7px 14px; border-radius: 8px;
+                border: 1px solid var(--accent); background: none; color: var(--accent); }
+  footer { color: var(--muted); font-family: -apple-system, system-ui, sans-serif;
+           font-size: 13px; }
+  footer code { font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>📚 Import a book</h1>
+    <p>Paste text or drop files — chapters are detected automatically and the book
+       lands on your shelf. <a href="/index.html" style="color:var(--accent)">Open the reader ↗</a></p>
+  </header>
+
+  <section class="card">
+    <div class="row">
+      <label>Section
+        <select id="section"></select>
+      </label>
+      <label id="newSecWrap" hidden>New section name
+        <input id="sectionNew" placeholder="e.g. Articles">
+      </label>
+      <label>Book title *
+        <input id="title" placeholder="required">
+      </label>
+      <label>Author
+        <input id="author" placeholder="optional">
+      </label>
+    </div>
+    <label>Description
+      <textarea id="description" rows="2" placeholder="One paragraph shown on the book's TOC page (optional)"></textarea>
+    </label>
+  </section>
+
+  <section class="card">
+    <div class="tabs">
+      <button id="tabPaste" class="active">Paste text</button>
+      <button id="tabFiles">Upload files</button>
+    </div>
+    <div id="panePaste">
+      <textarea id="paste" placeholder="Paste markdown or plain text here.
+
+One big text? Use  <!-- chapter: Title -->  marker lines (or plain # H1 headings) and it will be split into chapters automatically."></textarea>
+    </div>
+    <div id="paneFiles" hidden>
+      <div id="drop">Drop .md / .txt files here (one book — one bulk file or one file per chapter)<br>or click to choose</div>
+      <input type="file" id="fileInput" multiple accept=".md,.markdown,.txt,text/plain,text/markdown" hidden>
+      <ul id="filelist"></ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Detected chapters</h2>
+    <div id="preview"><p class="empty">Nothing yet — paste text or add files above.</p></div>
+    <ul id="warnings" class="warn" hidden></ul>
+    <div class="actions">
+      <button id="importBtn" disabled>➕ Add to library</button>
+      <div id="result"></div>
+    </div>
+    <div id="buildOut" hidden></div>
+  </section>
+
+  <details class="card">
+    <summary>🪄 Prompt for formatting raw text with an LLM</summary>
+    <p style="font-family:-apple-system,system-ui,sans-serif;font-size:14px;color:var(--muted)">
+      Give this prompt plus your raw text to any AI model, then paste its output above —
+      the markers it adds are what the splitter looks for.</p>
+    <button id="copyPrompt">Copy prompt</button>
+    <pre id="promptText">loading…</pre>
+  </details>
+
+  <footer>
+    How splitting works: <code>&lt;!-- chapter: Title --&gt;</code> marker lines win;
+    otherwise 2+ <code># H1</code> headings split the text; otherwise it becomes a
+    one-chapter book. <code>&lt;!-- part: Name --&gt;</code> groups the chapters after it
+    under a part heading. Multiple files import in natural filename order, and any file
+    containing markers is split further.
+  </footer>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+let filesData = [];          // [{name, text}]
+let mode = "paste";          // "paste" | "files"
+let suggested = "";
+let timer = null;
+
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---- sections + prompt ----------------------------------------------------
+async function loadSections() {
+  const secs = await fetch("/api/sections").then(r => r.json());
+  const sel = $("#section");
+  sel.innerHTML = "";
+  for (const s of secs) {
+    const o = document.createElement("option");
+    o.value = s.id; o.textContent = s.title;
+    sel.appendChild(o);
+  }
+  const o = document.createElement("option");
+  o.value = "__new__"; o.textContent = "＋ New section…";
+  sel.appendChild(o);
+}
+loadSections();
+fetch("/api/prompt").then(r => r.json()).then(j => {
+  $("#promptText").textContent = j.prompt || "(tools/FORMAT-PROMPT.md not found)";
+});
+$("#section").addEventListener("change", () => {
+  $("#newSecWrap").hidden = $("#section").value !== "__new__";
+});
+$("#copyPrompt").addEventListener("click", async () => {
+  await navigator.clipboard.writeText($("#promptText").textContent);
+  $("#copyPrompt").textContent = "✓ Copied";
+  setTimeout(() => $("#copyPrompt").textContent = "Copy prompt", 1500);
+});
+
+// ---- tabs -------------------------------------------------------------------
+function setMode(m) {
+  mode = m;
+  $("#tabPaste").classList.toggle("active", m === "paste");
+  $("#tabFiles").classList.toggle("active", m === "files");
+  $("#panePaste").hidden = m !== "paste";
+  $("#paneFiles").hidden = m !== "files";
+  refreshSoon();
+}
+$("#tabPaste").addEventListener("click", () => setMode("paste"));
+$("#tabFiles").addEventListener("click", () => setMode("files"));
+
+// ---- file handling ----------------------------------------------------------
+const OK_EXT = /\.(md|markdown|txt)$/i;
+async function addFiles(list) {
+  for (const f of list) {
+    if (!OK_EXT.test(f.name)) { alert(`Skipping ${f.name} — only .md / .markdown / .txt`); continue; }
+    const text = await f.text();
+    filesData = filesData.filter(x => x.name !== f.name);   // re-adding replaces
+    filesData.push({ name: f.name, text });
+  }
+  renderFiles(); refreshSoon();
+}
+function renderFiles() {
+  const ul = $("#filelist");
+  ul.innerHTML = "";
+  for (const f of filesData) {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>📄 ${esc(f.name)}</span><span class="size">${(f.text.length/1024).toFixed(1)} KB</span>`;
+    const rm = document.createElement("button");
+    rm.textContent = "✕";
+    rm.onclick = () => { filesData = filesData.filter(x => x !== f); renderFiles(); refreshSoon(); };
+    li.appendChild(rm);
+    ul.appendChild(li);
+  }
+}
+$("#drop").addEventListener("click", () => $("#fileInput").click());
+$("#fileInput").addEventListener("change", e => { addFiles(e.target.files); e.target.value = ""; });
+$("#drop").addEventListener("dragover", e => { e.preventDefault(); $("#drop").classList.add("over"); });
+$("#drop").addEventListener("dragleave", () => $("#drop").classList.remove("over"));
+$("#drop").addEventListener("drop", e => {
+  e.preventDefault(); $("#drop").classList.remove("over");
+  addFiles(e.dataTransfer.files);
+});
+
+// ---- preview ------------------------------------------------------------------
+function currentFiles() {
+  if (mode === "paste")
+    return $("#paste").value.trim() ? [{ name: "pasted-text.md", text: $("#paste").value }] : [];
+  return filesData;
+}
+function refreshSoon() { clearTimeout(timer); timer = setTimeout(refresh, 500); }
+$("#paste").addEventListener("input", refreshSoon);
+$("#title").addEventListener("input", () => { $("#result").textContent = ""; });
+
+async function refresh() {
+  const fs = currentFiles();
+  $("#importBtn").disabled = fs.length === 0;
+  $("#result").textContent = ""; $("#result").className = "";
+  $("#buildOut").hidden = true;
+  if (fs.length === 0) {
+    $("#preview").innerHTML = '<p class="empty">Nothing yet — paste text or add files above.</p>';
+    $("#warnings").hidden = true;
+    return;
+  }
+  const r = await fetch("/api/preview", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ files: fs, title: $("#title").value }),
+  }).then(r => r.json());
+  suggested = r.suggested_title || "";
+  if (suggested && !$("#title").value) $("#title").placeholder = suggested + "  (suggested — click Add to use)";
+  const hasParts = r.chapters.some(c => c.part);
+  let html = `<table><tr><th>#</th>${hasParts ? "<th>Part</th>" : ""}<th>Chapter</th><th>File</th><th>Words</th></tr>`;
+  for (const c of r.chapters)
+    html += `<tr><td class="num">${c.n}</td>${hasParts ? `<td>${esc(c.part)}</td>` : ""}` +
+            `<td>${esc(c.title)}</td><td class="file">${esc(c.file)}</td><td class="words">${c.words}</td></tr>`;
+  $("#preview").innerHTML = html + "</table>";
+  const w = $("#warnings");
+  w.hidden = r.warnings.length === 0;
+  w.innerHTML = r.warnings.map(x => `<li>${esc(x)}</li>`).join("");
+}
+
+// ---- import ----------------------------------------------------------------------
+$("#importBtn").addEventListener("click", async () => {
+  const title = $("#title").value.trim() || suggested;
+  if (!title) { $("#result").className = "err"; $("#result").textContent = "Give the book a title first."; return; }
+  if (!$("#title").value.trim()) $("#title").value = title;
+  const body = {
+    title,
+    author: $("#author").value,
+    description: $("#description").value,
+    section: $("#section").value === "__new__" ? "" : $("#section").value,
+    section_new: $("#section").value === "__new__" ? $("#sectionNew").value : "",
+    files: currentFiles(),
+  };
+  $("#importBtn").disabled = true;
+  $("#result").className = ""; $("#result").textContent = "Importing…";
+  try {
+    const resp = await fetch("/api/import", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const r = await resp.json();
+    if (!resp.ok) throw new Error(r.error || resp.statusText);
+    $("#result").className = "ok";
+    $("#result").innerHTML = `✓ Added <b>${esc(title)}</b> — ${r.chapters} chapter(s) in ${esc(r.folder)}/ · ` +
+      `<a href="/index.html#b/${r.book_id}" target="_blank">Open it in the reader ↗</a>`;
+    const out = $("#buildOut");
+    out.hidden = false;
+    out.textContent = r.build + (r.warnings.length ? "\n" + r.warnings.map(w => "! " + w).join("\n") : "");
+    loadSections();   // a new section may have been created
+  } catch (e) {
+    $("#result").className = "err";
+    $("#result").textContent = "✗ " + e.message;
+    $("#importBtn").disabled = false;
+  }
+});
+</script>
+</body>
+</html>

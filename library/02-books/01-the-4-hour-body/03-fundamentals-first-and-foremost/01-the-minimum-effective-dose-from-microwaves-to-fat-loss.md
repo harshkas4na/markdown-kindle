@@ -1,9 +1,7 @@
-# The Minimum Effective Dose
+# The Minimum Effective Dose: From Microwaves to Fat-Loss
 
-*From Microwaves to Fat-Loss*
-
-> Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.
-> —Antoine de Saint-Exupéry
+**Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.**
+—Antoine de Saint-Exupéry
 
 Arthur Jones was a precocious young child and particularly fond of crocodiles.
 
@@ -13,21 +11,19 @@ From humble beginnings in Oklahoma, he would mature into one of the most influen
 
 One of Jones's protégés, Ellington Darden PhD, shares a prototypical Jones anecdote:
 
-> In 1970, Arthur invited Arnold [Schwarzenegger] and Franco Colombu to visit him in Lake Helen, Florida, right after the 1970 Mr. Olympia. Arthur picked them up at the airport in his Cadillac, with Arnold in the passenger seat and Franco in the back. There are probably 12 stoplights in between the airport and the Interstate, so it was a lot of stop-and-go driving.
->
-> Now, you have to know that Arthur was a man who talked loud and dominated every conversation. But he couldn't get Arnold to shut up. He was just blabbing in his German or whatever and Arthur was having a hard time understanding what he was saying. So Arthur was getting annoyed and told him to quiet down, but Arnold just kept talking and talking.
->
-> By the time they got onto the Interstate, Arthur had had enough. So he pulled over to the side of the road, got out, walked around, opened Arnold's door, grabbed him by the shirt collar, yanked him out, and said something to the effect of, "Listen here, you son of a bitch. If you don't shut the hell up, a man twice your age is going to whip your ass right out here in front of I-4 traffic. Just dare me."
->
-> Within five seconds Arnold had apologized, got back in the car, and was a perfect gentleman for the next three or four days.
+*In 1970, Arthur invited Arnold [Schwarzenegger] and Franco Colombu to visit him in Lake Helen, Florida, right after the 1970 Mr. Olympia. Arthur picked them up at the airport in his Cadillac, with Arnold in the passenger seat and Franco in the back. There are probably 12 stoplights in between the airport and the Interstate, so it was a lot of stop-and-go driving.*
+
+*Now, you have to know that Arthur was a man who talked loud and dominated every conversation. But he couldn't get Arnold to shut up. He was just blabbing in his German or whatever and Arthur was having a hard time understanding what he was saying. So Arthur was getting annoyed and told him to quiet down, but Arnold just kept talking and talking.*
+
+*By the time they got onto the Interstate, Arthur had had enough. So he pulled over to the side of the road, got out, walked around, opened Arnold's door, grabbed him by the shirt collar, yanked him out, and said something to the effect of, "Listen here, you son of a bitch. If you don't shut the hell up, a man twice your age is going to whip your ass right out here in front of I-4 traffic. Just dare me."*
+
+*Within five seconds Arnold had apologized, got back in the car, and was a perfect gentlemen for the next three or four days.*
 
 Jones was more frequently pissed off than anything else.
 
 He was infuriated by what he considered stupidity in every corner of the exercise science world, and he channeled this anger into defying the odds. This included putting 63.21 pounds on champion bodybuilder Casey Viator in 28 days and putting himself on the Forbes 400 list by founding and selling exercise equipment manufacturer Nautilus, which was estimated to have grossed $300 million per year at its zenith.
 
-He had no patience for fuzzy thinking in fields that depended on scientific clarity. In response to researchers who drew conclusions about muscular function using electromyography (EMG), Arthur attached their machines to a cadaver and moved its limbs to record similar "activity."
-
-Internal friction, that is.
+He had no patience for fuzzy thinking in fields that depended on scientific clarity. In response to researchers who drew conclusions about muscular function using electromyography (EMG), Arthur attached their machines to a cadaver and moved its limbs to record similar "activity." Internal friction, that is.
 
 Jones lamented his fleeting time: "My age being what it is, universal acceptance of what we are now doing may not come within my lifetime; but it will come, because what we are doing is clearly established by simple laws of basic physics that cannot be denied forever." He passed away on August 28, 2007, of natural causes, 80 years old and as ornery as ever.
 
@@ -37,7 +33,7 @@ Jones left a number of important legacies, one of which will be the cornerstone 
 
 The minimum effective dose (MED) is defined simply: the smallest dose that will produce a desired outcome.
 
-Jones referred to this critical point as the "minimum effective load," as he was concerned exclusively with weight-bearing exercise, but we will look at precise "dosing" of both exercise and anything you ingest. (Credit for this framing is due to Dr. Doug McGuff, who will reappear later.)
+Jones referred to this critical point as the "minimum effective load," as he was concerned exclusively with weight-bearing exercise, but we will look at precise "dosing" of both exercise and anything you ingest.
 
 Anything beyond the MED is wasteful.
 
@@ -47,8 +43,8 @@ If you need 15 minutes in the sun to trigger a melanin response, 15 minutes is y
 
 In the context of body redesign, there are two fundamental MEDs to keep in mind:
 
-- *To remove stored fat* → *do the least necessary to trigger a fat-loss cascade of specific hormones.*
-- *To add muscle in small or large quantities* → *do the least necessary to trigger local (specific muscles) and systemic (hormonal, or more precisely neuroendocrine) growth mechanisms.*
+*To remove stored fat* → *do the least necessary to trigger a fat-loss cascade of specific hormones.*
+*To add muscle in small or large quantities* → *do the least necessary to trigger local (specific muscles) and systemic (hormonal) growth mechanisms.*
 
 Knocking over the dominos that trigger both of these events takes surprisingly little. Don't complicate them.
 
@@ -70,8 +66,13 @@ The MED not only delivers the most dramatic results, but it does so in the least
 
 "REMEMBER: it is impossible to evaluate, or even understand, anything that you cannot measure."
 
-- 80 secs. of 20 lbs.
-- 10:00 mins. of 54°F water
-- 200 mg of allicin extract before bed
+80 secs. of 20 lbs.
+10:00 mins. of 54°F water
+200 mg of allicin extract before bed
 
 These are the types of prescriptions you should seek, and these are the types of prescriptions I will offer.
+
+### End of Chapter Notes
+
+1. Credit is due to Dr. Doug McGuff, who's written extensively on this and who will reappear later.
+2. In fancier and more accurate terms, *neuroendocrine*.

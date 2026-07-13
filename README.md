@@ -23,6 +23,9 @@ python3 tools/build-reader.py --serve   # dev mode: serve on :8080 and rebuild
 
 python3 tools/new-book.py books "Deep Work" --author "Cal Newport" \
     --chapters "Intro,Focus,Rituals"    # scaffold a new book with chapter stubs
+
+python3 tools/import-book.py --serve    # import UI on :8081 — paste text or drop
+                                        # files, preview chapters, add to library
 ```
 
 That is the entire workflow. There are no other build steps or dependencies
@@ -87,9 +90,50 @@ library/
 5. Never edit `index.html` by hand — it is generated output and any edit will be
    overwritten by the next build.
 
+## Importing content (paste or upload)
+
+`tools/import-book.py` turns raw text into a properly structured book — no manual
+file-splitting or renaming:
+
+```bash
+python3 tools/import-book.py --serve                # web UI at http://127.0.0.1:8081
+python3 tools/import-book.py books "Deep Work" dump.md            # one bulk file
+python3 tools/import-book.py books "Deep Work" ch1.md ch2.md ...  # one file per chapter
+cat dump.md | python3 tools/import-book.py books "Deep Work"      # pipe / paste (stdin)
+```
+
+Extra flags: `--author "..."`, `--description "..."`, `--dry-run` (print the
+detected chapter plan without writing anything), `--no-build`. The web UI does the
+same thing with a paste box, drag-and-drop multi-file upload, and a live chapter
+preview; it also serves the reader at `/index.html` so you can check the result
+immediately.
+
+**How chapters are detected** (priority order):
+
+1. **Explicit markers** — a line `<!-- chapter: The Title -->` starts a new chapter
+   (`=== chapter: The Title ===` also works). A line `<!-- part: Part Name -->`
+   groups the chapters after it into a part subfolder. Markers inside ``` code
+   fences are ignored.
+2. **H1 fallback** — no markers but two or more `# Heading` lines: the text is
+   split on H1s.
+3. **Single chapter** — otherwise the whole text becomes a one-chapter book.
+
+Multiple files import in natural filename order (`ch1, ch2, … ch10`), one chapter
+per file — and any file that itself contains markers/H1s is split further, so a
+mix of bulk and per-chapter files works. Content before the first chapter becomes
+a "Front Matter" chapter, and every written chapter gets a `# Title` H1 if it
+lacks one.
+
+**Formatting raw text with an LLM:** `tools/FORMAT-PROMPT.md` is a ready-made
+prompt (also behind the 🪄 box in the import UI, with a copy button). Paste it
+into any AI model together with your raw text — book dump, article, lecture
+notes — and it returns the text restructured with the chapter/part markers above.
+If the model's output gets cut off, say "continue" and simply concatenate the
+replies before uploading; the markers make the seams harmless.
+
 ## Where the code lives
 
-Only two source files matter:
+Only two source files matter for the reader app itself:
 
 ### `tools/build-reader.py` — the compiler (~170 lines)
 
@@ -126,6 +170,9 @@ Top-to-bottom map:
 
 - `index.html` — **generated**; never hand-edit (see above).
 - `library/` — all content (structure above).
+- Content helpers in `tools/`: `new-book.py` (scaffold stubs), `import-book.py` +
+  `importer.html` + `FORMAT-PROMPT.md` (import pasted/uploaded text — see
+  "Importing content"), `epub-to-markdown.py` (convert a chapter of an EPUB you own).
 - Reading progress lives in the *browser's* localStorage, not in this repo —
   clearing site data or switching devices resets it.
 

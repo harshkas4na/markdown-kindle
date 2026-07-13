@@ -1,7 +1,4 @@
-# Local-only, unpublished full-text conversions (personal format-shifting).
-# This repo auto-publishes library/ to public GitHub Pages via .github/workflows/build.yml,
-# so full-text copies of copyrighted books must live here and NEVER be committed/deployed.
-/local/
+
 index.local.html
 
 # Raw source ebooks — keep out of the public Pages build.
