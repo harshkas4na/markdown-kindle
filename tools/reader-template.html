@@ -553,14 +553,14 @@ function route(){
   showView("home");renderHome();window.scrollTo(0,0);
 }
 /* copy a share link to the clipboard, with a brief ✓ on the button.
-   When the site is locked, every generated link carries ?k=<token> so it
-   opens standalone for whoever receives it — they don't need the token
-   separately, and (unless hash is empty, i.e. a full-home link) unlocking
-   via a scoped link does NOT remember the device, so a shared book/chapter
-   link only ever grants that one view, never the whole library. */
+   #s/... share links (hash starting "#s/") never carry the key — those are
+   always-open links by design, same as before the site lock existed. The
+   key is only added for a non-share link (currently just the empty-hash
+   "copy whole library" link from the home screen's 🔗 button). */
 function copyShare(hash,btn){
   const base=location.href.split("#")[0].split("?")[0];
-  const tokenQS=ACCESS_TOKEN?("?k="+encodeURIComponent(ACCESS_TOKEN)):"";
+  const isShareLink=hash.startsWith("#s/");
+  const tokenQS=(ACCESS_TOKEN&&!isShareLink)?("?k="+encodeURIComponent(ACCESS_TOKEN)):"";
   const url=base+tokenQS+hash;
   if(location.protocol==="file:"){
     prompt("You're viewing a local file, so this link only works on this computer. "+
@@ -580,11 +580,13 @@ function copyShare(hash,btn){
 /* ================= site lock =================
    ACCESS_TOKEN null -> gating disabled, everyone in (unchanged behavior).
    Otherwise the bare URL shows the #locked screen. Getting in requires
-   either ?k=<token> in the URL (auto, from a shared/master link) or typing
-   the token into the lock screen. A plain full-home unlock (no #s/... share
-   scope active) is remembered on that device via localStorage; a scoped
-   share link (?k=...#s/b/<id> etc.) is checked fresh every load and never
-   remembered, so it only ever opens the one thing it points to. */
+   either ?k=<token> in the URL (auto, from a master link) or typing the
+   token into the lock screen — that unlock is remembered on the device
+   afterward. #s/... share links (the app's existing "send this one book or
+   chapter to someone" links, from the tocShare/btnShare buttons) ALWAYS
+   bypass the key entirely, including ones already sent out before this lock
+   existed — the key only ever guards general "/" library browsing, never a
+   link you deliberately shared. */
 function unlockedOnThisDevice(){return localStorage.getItem("hkr.unlocked")==="1";}
 function showLocked(msg){
   locked.classList.remove("hidden");
@@ -594,6 +596,7 @@ function showLocked(msg){
 }
 function tryEnter(){
   if(!ACCESS_TOKEN)return true; // gating off
+  if(share)return true; // #s/... link — always open, key not required
   if(unlockedOnThisDevice())return true;
   const params=new URLSearchParams(location.search);
   return params.get("k")===ACCESS_TOKEN;
@@ -607,13 +610,11 @@ function attemptUnlock(){
   boot();
 }
 function boot(){
+  parseShare(decodeURIComponent(location.hash)); // sets `share`, which tryEnter needs
   if(!tryEnter()){showLocked();return;}
-  const h=decodeURIComponent(location.hash);
-  parseShare(h);
   const params=new URLSearchParams(location.search);
-  // remember this device only for a plain (unscoped) unlock — a shared
-  // book/chapter link should never leave the recipient's browser able to
-  // browse the rest of the library afterward.
+  // remember this device only for a plain (unscoped) unlock via the master
+  // link/key — a #s/... share link never persists access beyond itself.
   if(ACCESS_TOKEN&&params.get("k")===ACCESS_TOKEN&&!share&&!unlockedOnThisDevice())
     localStorage.setItem("hkr.unlocked","1");
   locked.classList.add("hidden");
@@ -1636,15 +1637,15 @@ function registerServiceWorker(){
 
 /* ================= boot ================= */
 window.addEventListener("hashchange",()=>{
+  const h=decodeURIComponent(location.hash);
+  parseShare(h); // must run before tryEnter() — it reads `share`
   if(!tryEnter()){showLocked();return;}
   const fe=pendingFromEnd;pendingFromEnd=false;
-  const h=decodeURIComponent(location.hash);
   const id=fe?chapterIdFromHash(h):null;
   if(id!=null){
     const i=CHAPTERS.findIndex(c=>c.id===id);
     if(i>=0){if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
       if(ttsActive){if(ttsAutoNav)ttsAutoNav=false;else ttsClose();}
-      parseShare(h);
       hideBars();hidePanel();hideHlPop();showView("reader");renderChapter(i,true);return;}
   }
   route();
