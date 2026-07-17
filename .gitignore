@@ -3,3 +3,8 @@ index.local.html
 
 # Raw source ebooks — keep out of the public Pages build.
 /public/raw-books/
+
+# Site-lock token — kept out of the (public) repo on purpose. Local builds read
+# it from this file; CI reads it from the SITE_ACCESS_TOKEN repo secret instead.
+# See tools/build-reader.py's load_access_token().
+/tools/access-config.json

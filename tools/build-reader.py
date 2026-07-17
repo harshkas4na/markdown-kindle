@@ -209,6 +209,24 @@ def collect_book_chapters(book_dir, book_id, chapters):
     return indices
 
 
+ACCESS_CONFIG = os.path.join(TOOLS, "access-config.json")
+
+
+def load_access_token():
+    """Optional site-lock token, checked in order:
+    1. SITE_ACCESS_TOKEN env var (how CI supplies it, from a repo secret —
+       keeps the token out of the public repo entirely).
+    2. tools/access-config.json ({"token": "..."}) for local builds — gitignored.
+    Absent both = gating disabled, site is fully open (the default)."""
+    env_token = (os.environ.get("SITE_ACCESS_TOKEN") or "").strip()
+    if env_token:
+        return env_token
+    if not os.path.isfile(ACCESS_CONFIG):
+        return None
+    with open(ACCESS_CONFIG, encoding="utf-8") as fh:
+        return (json.load(fh).get("token") or "").strip() or None
+
+
 def build():
     if not os.path.isdir(LIBRARY):
         sys.exit(f"No library/ folder found at {LIBRARY} — nothing to build.")
@@ -281,7 +299,9 @@ def build():
     def embed(obj):
         return json.dumps(obj, ensure_ascii=False).replace("</", "<\\/")
 
-    html = tpl.replace("__LIB_DATA__", embed(sections)).replace("__CHAPTER_DATA__", embed(chapters))
+    html = (tpl.replace("__LIB_DATA__", embed(sections))
+               .replace("__CHAPTER_DATA__", embed(chapters))
+               .replace("__ACCESS_TOKEN__", embed(load_access_token())))
 
     with open(OUT, "w", encoding="utf-8") as fh:
         fh.write(html)
@@ -313,6 +333,9 @@ def build():
     print(f"Wrote {OUT}: {len(sections)} sections, {n_books} books, "
           f"{len(chapters)} chapters, {size_kb} KB")
     print(f"Wrote {SW_OUT} and {MANIFEST_OUT} (offline PWA, cache {OFFLINE_CACHE})")
+    if load_access_token():
+        print("Site lock is ON (tools/access-config.json) — the bare URL shows a lock screen; "
+              "only links containing ?k=<token> (or a browser that already unlocked it) get in.")
     if size_kb > 5 * 1024:
         warn(f"index.html is {size_kb // 1024} MB — page load/parse will start to feel it; "
              "consider splitting rarely-read sections into a second library")

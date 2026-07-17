@@ -142,6 +142,11 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
   border-radius:14px; padding:14px; font-size:15px; font-weight:600; margin-bottom:24px;
   box-shadow:0 4px 14px var(--shadow);}
 .primary:active{transform:scale(.985);}
+.lockbox{max-width:360px; margin:min(30vh,220px) auto 0; text-align:center;}
+.lockmark{font-size:34px; margin-bottom:14px;}
+.lockbox .sub{color:var(--muted); font-size:13.5px; line-height:1.5; margin:0 0 18px;}
+.lockbox .searchbox{text-align:center; margin-bottom:14px;}
+.lockbox #lockErr{min-height:16px; color:var(--accent); margin-top:12px;}
 .chap{display:flex; align-items:center; gap:14px; width:100%; text-align:left;
   background:var(--card); border:1px solid var(--card-line); border-radius:14px;
   padding:13px 16px; margin-bottom:8px;}
@@ -267,7 +272,16 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 </head>
 <body>
 
-<div id="home" class="view"></div>
+<div id="locked" class="view hidden">
+  <div class="lockbox">
+    <div class="lockmark">🔒</div>
+    <p class="sub">This library is private. Open it with a link that includes the key, or enter it below.</p>
+    <input type="password" id="lockInput" class="searchbox" placeholder="Key" autocomplete="off">
+    <button class="primary" id="lockBtn">Unlock</button>
+    <p class="sub" id="lockErr"></p>
+  </div>
+</div>
+<div id="home" class="view hidden"></div>
 <div id="toc" class="view hidden"></div>
 
 <div id="reader" class="hidden mode-page">
@@ -347,6 +361,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
    CHAPTERS = [{id, file, book, part, num, title, md}]  (flat, global indices)   */
 const LIB = __LIB_DATA__;
 const CHAPTERS = __CHAPTER_DATA__;
+const ACCESS_TOKEN = __ACCESS_TOKEN__; // null = site is open to everyone (default)
 const BOOKS = {};
 LIB.forEach(s => s.books.forEach(b => {
   BOOKS[b.id] = b;
@@ -456,7 +471,7 @@ let cur=-1, page=0, pageCount=1, pendingPct=null;
 const htmlCache={};
 
 const content=$("content"),pages=$("pages"),reader=$("reader"),
-      home=$("home"),toc=$("toc");
+      home=$("home"),toc=$("toc"),locked=$("locked");
 
 /* ================= settings application ================= */
 const MARGINS={s:{pad:16,maxw:920},m:{pad:26,maxw:760},l:{pad:40,maxw:620}};
@@ -537,9 +552,16 @@ function route(){
   share=null; // a broken/unknown share link falls back to the full library
   showView("home");renderHome();window.scrollTo(0,0);
 }
-/* copy a share link to the clipboard, with a brief ✓ on the button */
+/* copy a share link to the clipboard, with a brief ✓ on the button.
+   When the site is locked, every generated link carries ?k=<token> so it
+   opens standalone for whoever receives it — they don't need the token
+   separately, and (unless hash is empty, i.e. a full-home link) unlocking
+   via a scoped link does NOT remember the device, so a shared book/chapter
+   link only ever grants that one view, never the whole library. */
 function copyShare(hash,btn){
-  const url=location.href.split("#")[0]+hash;
+  const base=location.href.split("#")[0].split("?")[0];
+  const tokenQS=ACCESS_TOKEN?("?k="+encodeURIComponent(ACCESS_TOKEN)):"";
+  const url=base+tokenQS+hash;
   if(location.protocol==="file:"){
     prompt("You're viewing a local file, so this link only works on this computer. "+
       "Open your live (GitHub Pages) URL and copy the share link from there:",url);
@@ -553,6 +575,51 @@ function copyShare(hash,btn){
   if(navigator.clipboard&&navigator.clipboard.writeText)
     navigator.clipboard.writeText(url).then(done,()=>prompt("Copy this link:",url));
   else prompt("Copy this link:",url);
+}
+
+/* ================= site lock =================
+   ACCESS_TOKEN null -> gating disabled, everyone in (unchanged behavior).
+   Otherwise the bare URL shows the #locked screen. Getting in requires
+   either ?k=<token> in the URL (auto, from a shared/master link) or typing
+   the token into the lock screen. A plain full-home unlock (no #s/... share
+   scope active) is remembered on that device via localStorage; a scoped
+   share link (?k=...#s/b/<id> etc.) is checked fresh every load and never
+   remembered, so it only ever opens the one thing it points to. */
+function unlockedOnThisDevice(){return localStorage.getItem("hkr.unlocked")==="1";}
+function showLocked(msg){
+  locked.classList.remove("hidden");
+  home.classList.add("hidden");toc.classList.add("hidden");reader.classList.add("hidden");
+  document.body.classList.remove("reader-open");
+  if(msg)$("lockErr").textContent=msg;
+}
+function tryEnter(){
+  if(!ACCESS_TOKEN)return true; // gating off
+  if(unlockedOnThisDevice())return true;
+  const params=new URLSearchParams(location.search);
+  return params.get("k")===ACCESS_TOKEN;
+}
+function attemptUnlock(){
+  const val=$("lockInput").value.trim();
+  if(!val){showLocked("Enter the key first.");return;}
+  if(val!==ACCESS_TOKEN){showLocked("That's not it.");$("lockInput").value="";return;}
+  localStorage.setItem("hkr.unlocked","1");
+  locked.classList.add("hidden");
+  boot();
+}
+function boot(){
+  if(!tryEnter()){showLocked();return;}
+  const h=decodeURIComponent(location.hash);
+  parseShare(h);
+  const params=new URLSearchParams(location.search);
+  // remember this device only for a plain (unscoped) unlock — a shared
+  // book/chapter link should never leave the recipient's browser able to
+  // browse the rest of the library afterward.
+  if(ACCESS_TOKEN&&params.get("k")===ACCESS_TOKEN&&!share&&!unlockedOnThisDevice())
+    localStorage.setItem("hkr.unlocked","1");
+  locked.classList.add("hidden");
+  applySettings();
+  route();
+  registerServiceWorker();
 }
 function showView(v){
   home.classList.toggle("hidden",v!=="home");
@@ -589,7 +656,9 @@ function renderHome(){
   const nBooks=Object.keys(BOOKS).length;
   let h=`<div class="lib-top"><div><h1>Library</h1>
     <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
-    <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div>
+    <div style="display:flex;gap:8px;">
+    ${ACCESS_TOKEN?'<button class="icon-btn" id="homeLink" title="Copy a link to the whole library">🔗</button>':''}
+    <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div></div>
     <div class="searchwrap"><input type="search" class="searchbox" id="searchBox"
       placeholder="Search every book…  ( / )" autocomplete="off"></div>
     <div id="sresults" class="hidden"></div>
@@ -623,6 +692,7 @@ function renderHome(){
   home.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
   $("homeTheme").addEventListener("click",()=>{cycleTheme();});
+  if($("homeLink"))$("homeLink").addEventListener("click",()=>copyShare("",$("homeLink")));
   $("btnExport").addEventListener("click",exportData);
   $("btnImport").addEventListener("click",()=>$("importFile").click());
   $("importFile").addEventListener("change",importData);
@@ -1566,6 +1636,7 @@ function registerServiceWorker(){
 
 /* ================= boot ================= */
 window.addEventListener("hashchange",()=>{
+  if(!tryEnter()){showLocked();return;}
   const fe=pendingFromEnd;pendingFromEnd=false;
   const h=decodeURIComponent(location.hash);
   const id=fe?chapterIdFromHash(h):null;
@@ -1578,9 +1649,9 @@ window.addEventListener("hashchange",()=>{
   }
   route();
 });
-applySettings();
-route();
-registerServiceWorker();
+$("lockBtn").addEventListener("click",attemptUnlock);
+$("lockInput").addEventListener("keydown",e=>{if(e.key==="Enter")attemptUnlock();});
+boot();
 </script>
 </body>
 </html>
