@@ -165,6 +165,7 @@ Top-to-bottom map:
 | `renderToc` | Book page: hero, description, Start/Continue button, chapter list grouped by parts, per-chapter % |
 | Reader core (`renderChapter`, `paginate`, `goTo…`, `next/prev`) | CSS-columns pagination, swipe/tap/keys/wheel, scroll mode, progress save/restore. Chapter prev/next is **constrained to the current book** |
 | Aa panel + events | Font/size/spacing/margins/theme/page-turn/layout settings |
+| Text-to-speech (`ttsBuildWords`, `ttsSpeakFrom`, `ttsSpokenWord`, `#ttsBar`) | Wraps the chapter's words in `<span class="tts-w">` (skipping `pre`), speaks sentence-aligned utterances via `speechSynthesis`, tracks the spoken word via `onboundary` (with a timer-estimated fallback for voices that fire none) to drive the highlight + tracker + page/scroll follow. Pause = cancel + remember word (engine `pause()` is unreliable). `ttsSpokenWord` is the pronunciation layer: user dictionary (`hkr.ttsDict`) → expansions → acronym spell-out. Voice picker ranks `getVoices()` quality-first. Click any word to jump the voice there |
 
 ### Everything else
 
@@ -191,6 +192,19 @@ Top-to-bottom map:
   links to a per-book "Highlights" page listing them all.
 - **Bookmarks**: the ⚑ button (or `B`) marks the current page; bookmarks are
   listed on the book's TOC and jump back to the exact spot.
+- **Listen (read aloud)**: the 🔊 button in the reader toolbar starts text-to-speech
+  (Web Speech API) from the current position. A bottom bar gives play/pause, a
+  draggable progress tracker, a voice-speed slider (0.5×–2.5×), and a **voice
+  picker** (English voices ranked quality-first — download "Enhanced"/"Premium"
+  system voices for near-human quality; ☁ marks online voices, whose tracker is
+  estimated because they report no word timings). The word being spoken is
+  highlighted live and the page/scroll position follows it automatically; tap any
+  word to jump the voice there. Utterances are cut at sentence/paragraph ends, so
+  prosody never breaks mid-sentence, and code blocks are skipped. A pronunciation
+  layer speaks acronyms letter-by-letter ("UHI" → "U H I"), expands e.g./i.e./etc.,
+  and the 🗣 button adds custom fixes (e.g. "Uniswap" → "you-nee-swap") to a
+  per-browser dictionary that's included in backups. Reading auto-continues into
+  the next chapter. The 🔊 button hides itself if `speechSynthesis` is unsupported.
 - **TOC filter**: books with 10+ chapters get a filter box on their TOC page.
 - **Sharing**: the ⤴ button on a book's TOC page copies a link that opens *just
   that book* (`#s/b/<bookId>`) — the recipient sees the book's TOC and chapters

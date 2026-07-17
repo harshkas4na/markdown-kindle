@@ -31,7 +31,7 @@ html[data-theme="dark"]{
 }
 /* ---------- base ---------- */
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{margin:0; padding:0; height:100%;}
+html,body{margin:0; padding:0; height:100%; overflow:hidden;}
 body{
   background:var(--bg); color:var(--fg);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -163,7 +163,8 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
   max-width:var(--maxw,760px);
   padding:calc(30px + env(safe-area-inset-top)) var(--pad,24px) calc(34px + env(safe-area-inset-bottom));}
 #pages{position:relative; width:100%; height:100%; overflow:hidden;}
-#reader.mode-scroll #pages{overflow-y:auto; scrollbar-width:thin;}
+#reader.mode-scroll #pages{overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none;}
+#reader.mode-scroll #pages::-webkit-scrollbar{display:none;}
 
 #content{height:100%;
   column-width:var(--pw,320px); column-gap:var(--gap,60px); column-fill:auto;
@@ -174,12 +175,6 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 #reader.mode-scroll #content{height:auto; column-width:auto; columns:auto;
   transform:none !important; padding-bottom:15vh;}
 
-/* subtle book edge shading */
-#pages::before,#pages::after{content:""; position:absolute; top:0; bottom:0; width:26px;
-  z-index:2; pointer-events:none; opacity:.5;}
-#pages::before{left:-1px; background:linear-gradient(90deg,var(--bg),transparent);}
-#pages::after{right:-1px; background:linear-gradient(-90deg,var(--bg),transparent);}
-#reader.mode-scroll #pages::before,#reader.mode-scroll #pages::after{display:none;}
 
 /* ---------- markdown ---------- */
 .md{text-rendering:optimizeLegibility;}
@@ -222,6 +217,16 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .slider-row button{font-size:13px; color:var(--muted); padding:6px; flex-shrink:0;}
 input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 .slider-lbl{font-size:11px; color:var(--muted); text-align:center; margin-top:2px;}
+
+/* ---------- text-to-speech (Listen) ---------- */
+#ttsBar{bottom:0; flex-direction:column; padding:10px 14px calc(12px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);}
+#ttsBar select{flex:1; min-width:0; background:var(--card); color:var(--fg);
+  border:1px solid var(--line); border-radius:9px; padding:7px 8px;
+  font:inherit; font-size:13px; -webkit-appearance:none; appearance:none;}
+#btnListen.on{color:var(--accent);}
+.tts-w.tts-cur{background:color-mix(in srgb,var(--accent) 32%,transparent); border-radius:3px;}
+#content.tts-mode .tts-w:hover{background:var(--code-bg); cursor:pointer; border-radius:3px;}
 
 /* ---------- Aa panel ---------- */
 #scrim{position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.25);}
@@ -279,6 +284,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
     <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)">⚐</button>
     <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter">⤴</button>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)">◑</button>
+    <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud">🔊</button>
     <button class="icon-btn" id="btnAa" title="Display settings">Aa</button>
   </header>
 
@@ -291,6 +297,24 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <button id="btnNextCh" title="Next chapter">Next ⏭</button>
     </div>
     <div class="slider-lbl" id="sliderLbl"></div>
+  </footer>
+
+  <footer id="ttsBar" class="bar hidden">
+    <div class="slider-row">
+      <button class="icon-btn" id="ttsPlay" title="Play / pause reading">▶</button>
+      <input type="range" id="ttsSeek" min="0" max="0" value="0" title="Reading position — drag to jump">
+      <button class="icon-btn" id="ttsClose" title="Stop listening">✕</button>
+    </div>
+    <div class="slider-row" style="margin-top:10px">
+      <span style="font-size:13px;color:var(--muted);min-width:56px">Speed</span>
+      <input type="range" id="ttsRateSlider" min="0.5" max="2.5" step="0.1" value="1" title="Voice speed">
+      <span id="ttsRateVal" style="font-size:13px;color:var(--muted);min-width:40px;text-align:right">1.0×</span>
+    </div>
+    <div class="slider-row" style="margin-top:10px">
+      <span style="font-size:13px;color:var(--muted);min-width:56px">Voice</span>
+      <select id="ttsVoice" title="Choose a voice (☁ = online voice, tracker is estimated)"></select>
+      <button class="icon-btn" id="ttsDictBtn" title="Fix how a word is pronounced">🗣</button>
+    </div>
   </footer>
 
   <div id="scrim" class="hidden"></div>
@@ -421,7 +445,7 @@ const store={
 };
 const prefersDark=matchMedia("(prefers-color-scheme: dark)").matches;
 let S=Object.assign({theme:prefersDark?"dark":"light",font:"serif",fs:18,lh:"1.7",
-  margin:"m",anim:"slide",mode:"page"},store.get("settings",{}));
+  margin:"m",anim:"slide",mode:"page",ttsRate:1},store.get("settings",{}));
 let progress=store.get("progress",{});   // {chapterId:{pct}}
 let last=store.get("last",null);         // {id: chapterId}
 let lastByBook=store.get("lastBook",{}); // {bookId: chapterId} — per-book resume point
@@ -493,6 +517,7 @@ function bookHash(b){return (share&&share.type==="book"?"#s/b/":"#b/")+encodeURI
 function route(){
   const h=decodeURIComponent(location.hash);
   if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
+  if(ttsActive){ if(ttsAutoNav)ttsAutoNav=false; else ttsClose(); }
   hideBars();hidePanel();hideHlPop();
   parseShare(h);
   const chId=chapterIdFromHash(h);
@@ -644,7 +669,7 @@ function renderSearch(q){
 }
 
 /* ================= backup / restore (item 5) ================= */
-const DATA_KEYS=["settings","progress","last","lastBook","highlights","bookmarks"];
+const DATA_KEYS=["settings","progress","last","lastBook","highlights","bookmarks","ttsDict"];
 function exportData(){
   const data={};DATA_KEYS.forEach(k=>data[k]=store.get(k,null));
   const blob=new Blob([JSON.stringify({app:"hkr",exported:new Date().toISOString(),data},null,2)],
@@ -665,7 +690,7 @@ function importData(e){
       S=Object.assign(S,obj.data.settings||{});
       progress=store.get("progress",{});last=store.get("last",null);
       lastByBook=store.get("lastBook",{});highlights=store.get("highlights",{});
-      bookmarks=store.get("bookmarks",[]);
+      bookmarks=store.get("bookmarks",[]);ttsDict=store.get("ttsDict",{});
       applySettings();renderHome();
     }catch(err){alert("Could not read that backup file.");}
   };
@@ -808,6 +833,7 @@ function renderChapter(i,fromEnd){
   cur=i;const c=CHAPTERS[i],b=bookOf(c);
   if(!htmlCache[c.id])htmlCache[c.id]=mdToHtml(c.md);
   content.style.transition="none";content.innerHTML=htmlCache[c.id];
+  ttsWordsFor=-1; // word spans (if any) were just destroyed with the old DOM
   content.querySelectorAll("a[data-int]").forEach(a=>a.addEventListener("click",e=>{
     e.preventDefault();
     if(share&&share.type==="chapter")return; // shared chapter: stay on this chapter
@@ -832,7 +858,247 @@ function renderChapter(i,fromEnd){
     paginate();
     goToPct(pct,false);
     restoreAnim();
+    if(ttsActive&&!ttsResumeAfterRender){ // same-chapter re-render while listening
+      ttsBuildWords();
+      if(ttsWords.length)ttsSetWord(Math.min(ttsIdx,ttsWords.length-1));
+    }
+    if(ttsResumeAfterRender){ttsResumeAfterRender=false;ttsOpen(true);}
   });
+}
+
+/* ================= text-to-speech (Listen) =================
+   Reads the current chapter aloud, word by word, using the Web Speech API.
+   Chapter text is chunked (TTS_CHUNK words/utterance) because some browsers'
+   speech engines stall or drop boundary events on very long utterances. */
+const TTS_OK="speechSynthesis" in window;
+let ttsActive=false, ttsSpeaking=false, ttsWords=[], ttsWordsFor=-1, ttsBreaks=[],
+    ttsIdx=0, ttsChunkBase=0, ttsUtter=null, ttsAutoNav=false, ttsResumeAfterRender=false,
+    ttsTimer=null, ttsBoundarySeen=false, ttsSeekDragging=false, ttsVoiceList=[];
+let ttsDict=store.get("ttsDict",{}); // {word(lowercase): spoken form} — user pronunciation fixes
+
+/* spoken-form preprocessing: the highlight shows the word as written, but the
+   engine is fed this transformed text (browsers ignore SSML, so rewriting the
+   text is the only pronunciation control there is) */
+const TTS_EXPAND={"e.g":"for example","i.e":"that is","etc":"et cetera","vs":"versus","approx":"approximately"};
+const TTS_SAY_AS_WORD=new Set(["NASA","JSON","YAML","REST","RAM","ROM","LASER","RADAR","SIM","CRUD","AJAX","DAO","NATO"]);
+function ttsSpokenWord(w){
+  if(w==="&")return "and";
+  const m=w.match(/^([^A-Za-z0-9]*)(.*?)([^A-Za-z0-9]*)$/);
+  const pre=m[1],core=m[2],suf=m[3];
+  if(!core)return w;
+  const lc=core.toLowerCase();
+  if(ttsDict[lc])return pre+ttsDict[lc]+suf;
+  if(TTS_EXPAND[lc])return pre+TTS_EXPAND[lc]+suf;
+  let am=core.match(/^([A-Z]{2,6})(s)?$/);              // UHI -> "U H I"
+  if(am&&!TTS_SAY_AS_WORD.has(am[1]))
+    return pre+am[1].split("").join(" ")+(am[2]?" s":"")+suf;
+  am=core.match(/^v(\d+)$/i);                            // v4 -> "V 4"
+  if(am)return pre+"V "+am[1]+suf;
+  return w;
+}
+
+/* voice list: English voices ranked quality-first (Premium/Enhanced/Natural on
+   top, novelty voices last); local voices also fire word-boundary events */
+function ttsScoreVoice(v){
+  let s=0;
+  if(/premium/i.test(v.name))s+=5;
+  if(/enhanced/i.test(v.name))s+=4;
+  if(/natural|neural/i.test(v.name))s+=4;
+  if(/google/i.test(v.name))s+=2;
+  if(v.localService)s+=1;
+  if(/eloquence|grandma|grandpa|shelley|flo|sandy|reed|rocko|eddy|albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|junior|ralph|fred|kathy/i.test(v.name))s-=8;
+  return s;
+}
+function ttsLoadVoices(){
+  if(!TTS_OK)return;
+  const all=speechSynthesis.getVoices();
+  if(!all.length)return;
+  let list=all.filter(v=>/^en/i.test(v.lang));
+  if(!list.length)list=all.slice();
+  list.sort((a,b)=>ttsScoreVoice(b)-ttsScoreVoice(a)||a.name.localeCompare(b.name));
+  ttsVoiceList=list;
+  const sel=$("ttsVoice");
+  sel.innerHTML=list.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}${v.localService?"":" ☁"}</option>`).join("");
+  const cv=ttsCurrentVoice();
+  if(cv)sel.value=cv.name;
+}
+function ttsCurrentVoice(){
+  if(!ttsVoiceList.length)ttsLoadVoices();
+  if(S.ttsVoice){const v=ttsVoiceList.find(x=>x.name===S.ttsVoice);if(v)return v;}
+  return ttsVoiceList[0]||null;
+}
+if(TTS_OK)speechSynthesis.onvoiceschanged=ttsLoadVoices;
+
+/* estimated tracker for voices that never fire word-boundary events
+   (Google/network voices): advance on a timer until a real event shows up */
+function ttsStopTimer(){if(ttsTimer){clearTimeout(ttsTimer);ttsTimer=null;}}
+function ttsWordMs(w){
+  const base=60000/(185*S.ttsRate);            // ~185 wpm at 1×
+  return base*Math.min(2.5,Math.max(.6,(w.length+2)/7));
+}
+function ttsStartFallback(end){
+  ttsStopTimer();
+  const tick=()=>{
+    if(!ttsSpeaking||ttsBoundarySeen)return;
+    if(ttsIdx+1>=end)return;                   // chunk edge: wait for onend
+    ttsSetWord(ttsIdx+1);
+    ttsTimer=setTimeout(tick,ttsWordMs(ttsWords[ttsIdx].textContent));
+  };
+  ttsTimer=setTimeout(tick,400+ttsWordMs(ttsWords[ttsIdx]?ttsWords[ttsIdx].textContent:""));
+}
+
+function ttsBuildWords(){
+  ttsWords=[];ttsBreaks=[];
+  const blocks=[];
+  const walker=document.createTreeWalker(content,NodeFilter.SHOW_TEXT);
+  const nodes=[];let n;
+  while(n=walker.nextNode()){
+    if(!n.nodeValue.trim())continue;
+    if(n.parentElement&&n.parentElement.closest("pre"))continue; // don't read code aloud
+    nodes.push(n);
+  }
+  nodes.forEach(node=>{
+    const parent=node.parentNode;
+    const blk=node.parentElement.closest("p,h1,h2,h3,h4,h5,h6,li,blockquote,td,th")||content;
+    const parts=node.nodeValue.split(/(\s+)/);
+    const frag=document.createDocumentFragment();
+    parts.forEach(p=>{
+      if(!p)return;
+      if(/^\s+$/.test(p)){frag.appendChild(document.createTextNode(p));return;}
+      const span=document.createElement("span");
+      span.className="tts-w";span.textContent=p;
+      frag.appendChild(span);ttsWords.push(span);blocks.push(blk);
+    });
+    parent.replaceChild(frag,node);
+  });
+  // break AFTER word i: 2 = end of block (paragraph/heading/cell), 1 = end of sentence
+  ttsBreaks=ttsWords.map((w,i)=>{
+    if(i+1<ttsWords.length&&blocks[i+1]!==blocks[i])return 2;
+    if(/[.!?…]["')\]]*$/.test(w.textContent))return 1;
+    return 0;
+  });
+  ttsWordsFor=cur;
+  $("ttsSeek").max=Math.max(0,ttsWords.length-1);
+}
+function ttsClearCur(){
+  const p=content.querySelector(".tts-w.tts-cur");
+  if(p)p.classList.remove("tts-cur");
+}
+function ttsSetWord(i){
+  if(i<0||i>=ttsWords.length)return;
+  ttsClearCur();
+  ttsIdx=i;
+  const el=ttsWords[i];
+  el.classList.add("tts-cur");
+  if(!ttsSeekDragging)$("ttsSeek").value=i;
+  if(S.mode==="scroll"){
+    const r=el.getBoundingClientRect(),pr=pages.getBoundingClientRect();
+    if(r.top<pr.top+40||r.bottom>pr.bottom-40)el.scrollIntoView({block:"center",behavior:"smooth"});
+  }else{
+    const p=Math.floor(el.offsetLeft/step());
+    if(p!==page)goTo(p,true);
+  }
+}
+function ttsSpeakFrom(i){
+  if(!TTS_OK)return;
+  ttsStopTimer();
+  speechSynthesis.cancel();
+  if(speechSynthesis.paused){try{speechSynthesis.resume();}catch(e){}} // un-stick Chrome's paused state
+  if(!ttsWords.length||i>=ttsWords.length){ttsChapterEnded();return;}
+  ttsChunkBase=i;
+  // one utterance = whole sentences up to ~160 chars (hard cap 320), so prosody
+  // never breaks mid-sentence and pauses land at sentence/paragraph ends
+  let end=i,chars=0;
+  while(end<ttsWords.length){
+    chars+=ttsWords[end].textContent.length+1;
+    end++;
+    if(end>=ttsWords.length)break;
+    if(ttsBreaks[end-1]&&chars>=160)break;
+    if(chars>=320)break;
+  }
+  const chunk=ttsWords.slice(i,end);
+  const spoken=chunk.map((w,k)=>{
+    let s=ttsSpokenWord(w.textContent);
+    if(ttsBreaks[i+k]===2&&!/[.!?…,;:]$/.test(s))s+=".";  // pause after headings/paragraphs
+    return s;
+  });
+  const starts=[];let pos=0;
+  spoken.forEach(s=>{starts.push(pos);pos+=s.length+1;});
+  const u=new SpeechSynthesisUtterance(spoken.join(" "));
+  u.rate=S.ttsRate;
+  const v=ttsCurrentVoice();if(v)u.voice=v;
+  ttsBoundarySeen=false;
+  u.onboundary=e=>{
+    if(ttsUtter!==u)return;
+    if(e.name&&e.name!=="word")return;
+    ttsBoundarySeen=true;ttsStopTimer();
+    let k=0;while(k+1<starts.length&&starts[k+1]<=e.charIndex)k++;
+    ttsSetWord(ttsChunkBase+k);
+  };
+  u.onend=()=>{ttsStopTimer();if(ttsSpeaking&&ttsUtter===u)ttsSpeakFrom(end);};
+  u.onerror=e=>{
+    if(e.error==="interrupted"||e.error==="canceled")return; // our own cancel()
+    if(ttsUtter===u){ttsStopTimer();ttsSpeaking=false;paintTtsPlay();}
+  };
+  ttsUtter=u;
+  ttsSetWord(i);
+  speechSynthesis.speak(u);
+  ttsStartFallback(end);
+}
+function ttsChapterEnded(){
+  const j=siblingChapter(1);
+  if(j!==null){
+    ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
+    nav(chapterHash(CHAPTERS[j]));
+  }else{
+    ttsSpeaking=false;paintTtsPlay();
+  }
+}
+function paintTtsPlay(){$("ttsPlay").textContent=ttsSpeaking?"⏸":"▶";}
+function ttsOpen(autoplay){
+  if(!TTS_OK){alert("Reading aloud isn't supported in this browser.");return;}
+  ttsActive=true;
+  $("btnListen").classList.add("on");
+  $("ttsBar").classList.remove("hidden");
+  $("botbar").classList.add("hidden");
+  content.classList.add("tts-mode");
+  if(ttsWordsFor!==cur)ttsBuildWords();
+  ttsLoadVoices();
+  $("ttsRateSlider").value=S.ttsRate;$("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
+  if(autoplay)ttsPlay();
+}
+function ttsClose(){
+  ttsActive=false;ttsSpeaking=false;
+  ttsStopTimer();
+  if(TTS_OK)speechSynthesis.cancel();
+  ttsClearCur();
+  $("btnListen").classList.remove("on");
+  $("ttsBar").classList.add("hidden");
+  $("botbar").classList.remove("hidden");
+  content.classList.remove("tts-mode");
+  paintTtsPlay();
+}
+/* pause = cancel + remember the word; resume = speak again from that word.
+   The engine's own pause()/resume() is broken on Android and can wedge Chrome. */
+function ttsPlay(){
+  if(!ttsActive)ttsOpen(false);
+  if(ttsWordsFor!==cur)ttsBuildWords();
+  if(!ttsWords.length)return;
+  ttsSpeaking=true;
+  ttsSpeakFrom(Math.min(ttsIdx,ttsWords.length-1));
+  paintTtsPlay();
+}
+function ttsPause(){
+  ttsSpeaking=false;
+  ttsStopTimer();
+  if(TTS_OK)speechSynthesis.cancel();
+  paintTtsPlay();
+}
+function ttsSeekTo(i){
+  if(!ttsWords.length)return;
+  ttsIdx=Math.max(0,Math.min(ttsWords.length-1,i));
+  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  else ttsSetWord(ttsIdx);
 }
 
 /* ================= highlights (marking + popup) ================= */
@@ -1062,6 +1328,49 @@ $("btnPrevCh").addEventListener("click",()=>openSibling(-1,false));
 $("btnNextCh").addEventListener("click",()=>openSibling(1,false));
 $("slider").addEventListener("input",e=>goTo(e.target.value-1,false));
 
+/* Listen (text-to-speech) controls */
+$("btnListen").addEventListener("click",()=>{ttsActive?ttsClose():ttsOpen(true);});
+$("ttsClose").addEventListener("click",ttsClose);
+$("ttsPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
+$("ttsSeek").addEventListener("input",e=>{
+  ttsSeekDragging=true; // stop boundary events yanking the thumb mid-drag
+  ttsClearCur();
+  const el=ttsWords[+e.target.value];
+  if(el)el.classList.add("tts-cur");
+});
+$("ttsSeek").addEventListener("change",e=>{ttsSeekDragging=false;ttsSeekTo(+e.target.value);});
+$("ttsSeek").addEventListener("pointerup",()=>{setTimeout(()=>{ttsSeekDragging=false;},60);});
+$("ttsRateSlider").addEventListener("input",e=>{
+  $("ttsRateVal").textContent=parseFloat(e.target.value).toFixed(1)+"×";
+});
+$("ttsRateSlider").addEventListener("change",e=>{
+  S.ttsRate=parseFloat(e.target.value);store.set("settings",S);
+  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+});
+$("ttsVoice").addEventListener("change",e=>{
+  S.ttsVoice=e.target.value;store.set("settings",S);
+  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  else if(TTS_OK){ // quick preview of the newly chosen voice
+    const u=new SpeechSynthesisUtterance("This voice will read your books.");
+    const v=ttsCurrentVoice();if(v)u.voice=v;
+    u.rate=S.ttsRate;
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  }
+});
+$("ttsDictBtn").addEventListener("click",()=>{
+  const curW=ttsWords[ttsIdx]
+    ?ttsWords[ttsIdx].textContent.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g,""):"";
+  const w=prompt("Fix pronunciation — which word?",curW);
+  if(!w||!w.trim())return;
+  const lc=w.trim().toLowerCase();
+  const p=prompt(`How should “${w.trim()}” be spoken?\nSpell it phonetically (e.g. “Uniswap” → “you-nee-swap”). Leave empty to remove the fix.`,ttsDict[lc]||"");
+  if(p==null)return;
+  if(p.trim())ttsDict[lc]=p.trim();else delete ttsDict[lc];
+  store.set("ttsDict",ttsDict);
+  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+});
+if(!TTS_OK)$("btnListen").style.display="none";
+
 $("fsUp").addEventListener("click",()=>{if(S.fs<26){S.fs++;reflowKeepingPct(applySettings);}});
 $("fsDown").addEventListener("click",()=>{if(S.fs>13){S.fs--;reflowKeepingPct(applySettings);}});
 [["segFont","font"],["segLh","lh"],["segMargin","margin"],["segAnim","anim"],["themeChips","theme"]]
@@ -1086,6 +1395,14 @@ function guardClick(e){
   return true;
 }
 $("pageArea").addEventListener("click",e=>{
+  if(ttsActive){
+    const w=e.target.closest(".tts-w");
+    if(w){
+      const i=ttsWords.indexOf(w);
+      if(i>=0){ttsSpeaking=true;paintTtsPlay();ttsSeekTo(i);}
+      return;
+    }
+  }
   const mk=e.target.closest("mark.hl");
   if(mk){openMarkPop(mk,e.clientX,e.clientY);return;}
   if(!hlPop.classList.contains("hidden")){hideHlPop();return;}
@@ -1175,11 +1492,12 @@ let wheelLock=0;
 document.addEventListener("wheel",e=>{
   if(reader.classList.contains("hidden")||S.mode==="scroll")return;
   if(e.target.closest("#aaPanel")||e.target.closest(".tblwrap"))return;
+  e.preventDefault();
   const now=Date.now();if(now-wheelLock<380)return;
   const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
   if(Math.abs(d)<12)return;
   wheelLock=now;d>0?next():prev();
-},{passive:true});
+},{passive:false});
 
 /* scroll-mode progress */
 let scrollT;
@@ -1252,6 +1570,7 @@ window.addEventListener("hashchange",()=>{
   if(id!=null){
     const i=CHAPTERS.findIndex(c=>c.id===id);
     if(i>=0){if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
+      if(ttsActive){if(ttsAutoNav)ttsAutoNav=false;else ttsClose();}
       parseShare(h);
       hideBars();hidePanel();hideHlPop();showView("reader");renderChapter(i,true);return;}
   }
