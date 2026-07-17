@@ -1,0 +1,5 @@
+{
+  "title": "Go — The Complete Deep Dive",
+  "author": "Study notes, researched & compiled 2026",
+  "description": "The Go programming language from first principles to production: the spec's own vocabulary for types, declarations, and scope; the truth about slices, interfaces, and pointers; the GMP scheduler, channels, and the memory model that make goroutines safe; error handling as a design discipline instead of exceptions; the standard library idioms (io, testing, net/http) that make Go code composable; how to build and ship a real web service; and how production systems like Docker, Kubernetes, and etcd are actually built and maintained in Go. Each chapter opens with a fast overview, then goes deep — and every chapter connects back to the ones before it, the same way the Uniswap deep dive does."
+}
