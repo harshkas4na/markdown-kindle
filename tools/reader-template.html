@@ -31,7 +31,8 @@ html[data-theme="dark"]{
 }
 /* ---------- base ---------- */
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{margin:0; padding:0; height:100%; overflow:hidden;}
+html,body{margin:0; padding:0; height:100%;}
+body.reader-open{overflow:hidden;}
 body{
   background:var(--bg); color:var(--fg);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -557,6 +558,7 @@ function showView(v){
   home.classList.toggle("hidden",v!=="home");
   toc.classList.toggle("hidden",v!=="toc");
   reader.classList.toggle("hidden",v!=="reader");
+  document.body.classList.toggle("reader-open",v==="reader");
   if(v!=="reader")cur=-1;
 }
 
