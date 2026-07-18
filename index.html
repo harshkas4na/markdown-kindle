@@ -274,15 +274,40 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 .ai-inputrow textarea:focus{border-color:var(--accent);}
 #aiSendBtn{width:40px; height:40px; border-radius:12px; font-size:15px; color:var(--accent);}
 
-/* ---------- keyboard help overlay ---------- */
-#helpOverlay{position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.45);
+/* ---------- quick open (⌘K) ---------- */
+#qkOverlay{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.45);
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:min(14vh,120px) 16px 16px;}
+#qkOverlay .card{background:var(--card); border:1px solid var(--card-line); border-radius:16px;
+  width:100%; max-width:560px; max-height:min(70dvh,520px); display:flex; flex-direction:column;
+  box-shadow:0 18px 60px var(--shadow); overflow:hidden;}
+#qkInput{border:none; outline:none; background:transparent; color:var(--fg);
+  font:inherit; font-size:16px; padding:15px 18px; border-bottom:1px solid var(--line); width:100%;}
+#qkList{overflow-y:auto; padding:6px; overscroll-behavior:contain;}
+.qk-item{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:9px 12px; border-radius:10px; font-size:14px;}
+.qk-item .ic{flex-shrink:0; font-size:12px; width:20px; text-align:center; color:var(--muted);}
+.qk-item .t{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.qk-item .b{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; max-width:45%; flex-shrink:0;}
+.qk-item.sel{background:color-mix(in srgb,var(--accent) 14%,transparent);}
+.qk-none{color:var(--muted); font-size:13.5px; padding:14px 12px;}
+@media(max-width:560px){#btnQk{display:none !important;}}
+
+/* ---------- keyboard help & voice help overlays ---------- */
+#helpOverlay,#voiceHelp{position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.45);
   display:flex; align-items:center; justify-content:center; padding:20px;}
-#helpOverlay .card{background:var(--card); border:1px solid var(--card-line); border-radius:18px;
+#helpOverlay .card,#voiceHelp .card{background:var(--card); border:1px solid var(--card-line); border-radius:18px;
   padding:20px 24px; max-width:520px; width:100%; max-height:80dvh; overflow-y:auto;
   box-shadow:0 12px 40px var(--shadow);}
-#helpOverlay h2{font-size:16px; margin:0 0 12px;}
-#helpOverlay h3{font-size:12px; color:var(--muted); text-transform:uppercase;
+#helpOverlay h2,#voiceHelp h2{font-size:16px; margin:0 0 12px;}
+#helpOverlay h3,#voiceHelp h3{font-size:12px; color:var(--muted); text-transform:uppercase;
   letter-spacing:.08em; margin:14px 0 6px;}
+#voiceHelp p{font-size:13px; line-height:1.6; margin:0 0 10px;}
+#voiceHelp p.dim{color:var(--muted); font-size:12.5px;}
+#voiceHelp a{color:var(--accent);}
+#voiceHelp b{font-weight:650;}
+.ai-m .ai-save{display:block; margin-top:7px; font-size:11.5px; color:var(--accent); text-align:left;}
 #helpOverlay .krow{display:flex; justify-content:space-between; gap:14px;
   font-size:13px; padding:3px 0;}
 #helpOverlay kbd{background:var(--code-bg); border:1px solid var(--card-line); border-radius:6px;
@@ -350,6 +375,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   <header id="topbar" class="bar off">
     <button class="icon-btn" id="btnToc" title="Contents (Esc)">☰</button>
     <div class="title" id="barTitle"></div>
+    <button class="icon-btn" id="btnQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>
     <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)">⚐</button>
     <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter">⤴</button>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)">◑</button>
@@ -379,11 +405,15 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <span style="font-size:13px;color:var(--muted);min-width:56px">Speed</span>
       <input type="range" id="ttsRateSlider" min="0.5" max="2.5" step="0.1" value="1" title="Voice speed">
       <span id="ttsRateVal" style="font-size:13px;color:var(--muted);min-width:40px;text-align:right">1.0×</span>
+      <button class="icon-btn" id="ttsSleep" title="Sleep timer — stop reading after 15 / 30 / 60 minutes">⏾</button>
     </div>
     <div class="slider-row" style="margin-top:10px">
       <span style="font-size:13px;color:var(--muted);min-width:56px">Voice</span>
       <select id="ttsVoice" title="Choose a voice (☁ = online voice, tracker is estimated)"></select>
       <button class="icon-btn" id="ttsDictBtn" title="Fix how a word is pronounced">🗣</button>
+    </div>
+    <div class="slider-row" style="margin-top:6px;justify-content:center">
+      <button id="ttsVoiceHelp" style="font-size:12px;color:var(--accent)">⬇ Robotic voice? Get better voices for this device</button>
     </div>
   </footer>
 
@@ -403,6 +433,8 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <input type="password" id="aiTokenInput" class="searchbox" placeholder="hf_… token" autocomplete="off">
       <input type="text" id="aiModelInput" class="searchbox" style="margin-top:8px"
         placeholder="Model (default: Qwen/Qwen2.5-7B-Instruct)" autocomplete="off">
+      <input type="text" id="aiBaseInput" class="searchbox" style="margin-top:8px"
+        placeholder="API base URL (default: HF router — any OpenAI-compatible URL works)" autocomplete="off">
       <button class="primary" id="aiSaveBtn" style="margin:10px 0 0">Save</button>
     </div>
     <div id="aiQuote" class="hidden"></div>
@@ -419,9 +451,15 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
     </div>
   </div>
 
+  <div id="voiceHelp" class="hidden">
+    <div class="card"></div>
+  </div>
+
   <div id="helpOverlay" class="hidden">
     <div class="card">
       <h2>Keyboard shortcuts</h2>
+      <h3>Anywhere</h3>
+      <div class="krow"><span>Quick open — any book or chapter</span><span><kbd>⌘K</kbd> / <kbd>Ctrl K</kbd></span></div>
       <h3>Reading</h3>
       <div class="krow"><span>Next / previous page</span><span><kbd>→</kbd> <kbd>←</kbd> <kbd>Space</kbd></span></div>
       <div class="krow"><span>First / last page</span><span><kbd>Home</kbd> <kbd>End</kbd></span></div>
@@ -460,6 +498,13 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <div class="seg" id="segAnim"><button data-v="slide">Slide</button><button data-v="fade">Fade</button><button data-v="none">None</button></div></div>
     <div class="row"><span class="lbl">Layout</span>
       <div class="seg" id="segMode"><button data-v="page">Pages</button><button data-v="scroll">Scroll</button></div></div>
+  </div>
+</div>
+
+<div id="qkOverlay" class="hidden">
+  <div class="card">
+    <input id="qkInput" type="text" placeholder="Jump to a book or chapter…" autocomplete="off" spellcheck="false">
+    <div id="qkList"></div>
   </div>
 </div>
 
@@ -576,6 +621,9 @@ let last=store.get("last",null);         // {id: chapterId}
 let lastByBook=store.get("lastBook",{}); // {bookId: chapterId} — per-book resume point
 let highlights=store.get("highlights",{});// {chapterId:[{text, note?}]}
 let bookmarks=store.get("bookmarks",[]); // [{ch: chapterId, pct}]
+let vocab=store.get("vocab",[]);         // [{w, def, ch, d}] — words looked up via "Meaning"
+let stats=store.get("stats",{});         // {days:{YYYY-MM-DD:words}, finished:{bookId:date}}
+stats.days=stats.days||{};stats.finished=stats.finished||{};
 let cur=-1, page=0, pageCount=1, pendingPct=null;
 const htmlCache={};
 
@@ -658,6 +706,7 @@ function route(){
     const b=BOOKS[h.slice(3)];
     if(b){showView("toc");renderHighlightsPage(b);window.scrollTo(0,0);return;}
   }
+  if(h==="#v"&&!share){showView("toc");renderVocabPage();window.scrollTo(0,0);return;}
   share=null; // a broken/unknown share link falls back to the full library
   showView("home");renderHome();window.scrollTo(0,0);
 }
@@ -764,9 +813,13 @@ function coverHtml(b){
 /* ================= home (shelves) ================= */
 function renderHome(){
   const nBooks=Object.keys(BOOKS).length;
+  const streak=readingStreak(),todayW=stats.days[todayKey()]||0;
+  const statBits=(streak?` · 🔥 ${streak}-day streak`:"")+
+    (todayW?` · ${Math.max(1,Math.round(todayW/230))} min today`:"");
   let h=`<div class="lib-top"><div><h1>Library</h1>
-    <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
+    <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters${statBits}</p></div>
     <div style="display:flex;gap:8px;">
+    <button class="icon-btn" id="homeQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>
     ${ACCESS_TOKEN?'<button class="icon-btn" id="homeLink" title="Copy a link to the whole library">🔗</button>':''}
     <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div></div>
     <div class="searchwrap"><input type="search" class="searchbox" id="searchBox"
@@ -792,6 +845,7 @@ function renderHome(){
     h+=`</div>`;
   });
   h+=`<div class="tools-row">
+    ${vocab.length?`<button id="btnVocab" title="Words you looked up while reading">🔤 Vocabulary (${vocab.length})</button>`:""}
     <button id="btnExport" title="Download progress, highlights & bookmarks as JSON">⬇ Back up my data</button>
     <button id="btnImport" title="Restore a previously downloaded backup">⬆ Restore backup</button>
     <input type="file" id="importFile" accept="application/json" class="hidden">
@@ -802,7 +856,9 @@ function renderHome(){
   home.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
   $("homeTheme").addEventListener("click",()=>{cycleTheme();});
+  $("homeQk").addEventListener("click",qkOpen);
   if($("homeLink"))$("homeLink").addEventListener("click",()=>copyShare("",$("homeLink")));
+  if($("btnVocab"))$("btnVocab").addEventListener("click",()=>nav("#v"));
   $("btnExport").addEventListener("click",exportData);
   $("btnImport").addEventListener("click",()=>$("importFile").click());
   $("importFile").addEventListener("change",importData);
@@ -851,7 +907,7 @@ function renderSearch(q){
 }
 
 /* ================= backup / restore (item 5) ================= */
-const DATA_KEYS=["settings","progress","last","lastBook","highlights","bookmarks","ttsDict"];
+const DATA_KEYS=["settings","progress","last","lastBook","highlights","bookmarks","ttsDict","vocab","stats"];
 function exportData(){
   const data={};DATA_KEYS.forEach(k=>data[k]=store.get(k,null));
   const blob=new Blob([JSON.stringify({app:"hkr",exported:new Date().toISOString(),data},null,2)],
@@ -873,6 +929,8 @@ function importData(e){
       progress=store.get("progress",{});last=store.get("last",null);
       lastByBook=store.get("lastBook",{});highlights=store.get("highlights",{});
       bookmarks=store.get("bookmarks",[]);ttsDict=store.get("ttsDict",{});
+      vocab=store.get("vocab",[]);
+      stats=store.get("stats",{});stats.days=stats.days||{};stats.finished=stats.finished||{};
       applySettings();renderHome();
     }catch(err){alert("Could not read that backup file.");}
   };
@@ -898,13 +956,14 @@ function renderToc(b){
       ?`<span class="sub" style="color:var(--muted);font-size:12px">Shared from a library</span>`
       :`<button class="icon-btn" id="tocBack" title="Library">‹</button>`}
     <div style="display:flex;gap:8px">
+      ${share?"":'<button class="icon-btn" id="tocQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>'}
       <button class="icon-btn" id="tocShare" title="Copy a link that shares just this book">⤴</button>
       <button class="icon-btn" id="tocTheme" title="Cycle theme">◑</button></div></div>
   <div class="hero">${coverHtml(b)}<div>
     <h1>${esc(b.title)}</h1>
     ${b.author?`<p class="author">${esc(b.author)}</p>`:""}
     <p class="meta">${esc(b.section)} · ${b.chapters.length} chapters · ~${time}
-      ${p>0?` · ${Math.round(p*100)}% read`:""}</p></div></div>`;
+      ${stats.finished[b.id]?` · ✓ finished ${stats.finished[b.id]}`:(p>0?` · ${Math.round(p*100)}% read`:"")}</p></div></div>`;
   if(b.description)h+=`<p class="desc">${esc(b.description)}</p>`;
   h+=`<button class="primary" data-ch="${esc(resume.id)}">${p>0?"Continue reading":"Start reading"} — ${esc(resume.title)}</button>`;
   const nHl=share?0:bookHighlightCount(b); // highlights page is not part of the shared view
@@ -960,14 +1019,58 @@ function renderToc(b){
   if(hlBtn)hlBtn.addEventListener("click",()=>nav("#h/"+encodeURIComponent(b.id)));
   const back=$("tocBack");
   if(back)back.addEventListener("click",()=>nav(""));
+  if($("tocQk"))$("tocQk").addEventListener("click",qkOpen);
   $("tocShare").addEventListener("click",()=>copyShare("#s/b/"+encodeURIComponent(b.id),$("tocShare")));
   $("tocTheme").addEventListener("click",()=>{cycleTheme();});
 }
 
+/* ================= vocabulary book ================= */
+function renderVocabPage(){
+  let h=`<div class="lib-top"><button class="icon-btn" id="vBack" title="Back">‹</button>
+    <button class="icon-btn" id="vTheme" title="Cycle theme">◑</button></div>
+    <h1 style="font-size:22px;margin:18px 4px 4px">🔤 Vocabulary</h1>
+    <p class="sub" style="color:var(--muted);font-size:13px;margin:0 4px 20px">
+      Every word or phrase you looked up with “Meaning” (D) lands here automatically.</p>`;
+  if(!vocab.length)h+=`<p class="snone">Nothing yet — select a word while reading and press D.</p>`;
+  vocab.forEach((v,i)=>{
+    const c=CHAPTERS.find(x=>x.id===v.ch);
+    h+=`<div class="hlcard"><div class="q">${esc(v.w)}</div>
+      <div class="note">${esc(v.def)}</div>
+      <div class="meta"><span>${c?esc(c.title):""}</span><span class="del" data-vdel="${i}">Delete</span></div></div>`;
+  });
+  toc.innerHTML=h;
+  toc.querySelectorAll("[data-vdel]").forEach(el=>el.addEventListener("click",()=>{
+    vocab.splice(+el.dataset.vdel,1);store.set("vocab",vocab);renderVocabPage();
+  }));
+  $("vBack").addEventListener("click",()=>nav(""));
+  $("vTheme").addEventListener("click",()=>{cycleTheme();});
+}
+
 /* ================= per-book highlights & notes page ================= */
+function exportHighlightsMd(b){
+  let md=`# Highlights — ${b.title}${b.author?` (${b.author})`:""}\n`;
+  b.chapters.forEach(i=>{
+    const c=CHAPTERS[i],hls=highlights[c.id]||[];
+    if(!hls.length)return;
+    md+=`\n## ${c.title}\n\n`;
+    hls.forEach(hl=>{
+      md+=`> ${hl.text.replace(/\n+/g," ")}\n`;
+      if(hl.note)md+=`\n${hl.note}\n`;
+      md+="\n";
+    });
+  });
+  const blob=new Blob([md],{type:"text/markdown"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=(b.title.replace(/[^\w\- ]+/g,"").trim()||"book")+" - highlights.md";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
 function renderHighlightsPage(b){
   let h=`<div class="lib-top"><button class="icon-btn" id="hlBack" title="Back">‹</button>
-    <button class="icon-btn" id="hlTheme" title="Cycle theme">◑</button></div>
+    <div style="display:flex;gap:8px">
+    <button class="icon-btn" id="hlExport" title="Download these highlights as a Markdown file">⬇</button>
+    <button class="icon-btn" id="hlTheme" title="Cycle theme">◑</button></div></div>
     <h1 style="font-size:22px;margin:18px 4px 4px">Highlights — ${esc(b.title)}</h1>
     <p class="sub" style="color:var(--muted);font-size:13px;margin:0 4px 20px">Tap a highlight to open it in its chapter.</p>`;
   let any=false;
@@ -998,6 +1101,7 @@ function renderHighlightsPage(b){
     nav("#c/"+encodeURIComponent(ch));
   }));
   $("hlBack").addEventListener("click",()=>nav(bookHash(b)));
+  $("hlExport").addEventListener("click",()=>exportHighlightsMd(b));
   $("hlTheme").addEventListener("click",()=>{cycleTheme();});
 }
 
@@ -1012,7 +1116,15 @@ function siblingChapter(offset){
 }
 function renderChapter(i,fromEnd){
   if(i<0||i>=CHAPTERS.length)return;
+  // park the AI conversation of the chapter being left, restore this one's
+  const prevId=cur>=0?CHAPTERS[cur].id:null;
   cur=i;const c=CHAPTERS[i],b=bookOf(c);
+  if(prevId!==c.id){
+    if(prevId)aiConvos[prevId]={ctx:aiCtx,msgs:aiMsgs};
+    const sv=aiConvos[c.id];
+    aiCtx=sv?sv.ctx:null;aiMsgs=sv?sv.msgs:[];aiLastCtx=null;
+    if(!$("aiPanel").classList.contains("hidden")){paintAiHead();aiRender();}
+  }
   if(!htmlCache[c.id])htmlCache[c.id]=mdToHtml(c.md);
   content.style.transition="none";content.innerHTML=htmlCache[c.id];
   ttsWordsFor=-1; // word spans (if any) were just destroyed with the old DOM
@@ -1029,6 +1141,7 @@ function renderChapter(i,fromEnd){
   $("stTitle").textContent=`${b.title} — ${c.title}`;
   $("barTitle").textContent=c.title;
   const soloCh=!!(share&&share.type==="chapter");
+  $("btnQk").classList.toggle("hidden",!!share);
   $("btnToc").style.visibility=soloCh?"hidden":"";
   $("btnPrevCh").style.visibility=$("btnNextCh").style.visibility=soloCh?"hidden":"";
   last={id:c.id};store.set("last",last);
@@ -1270,11 +1383,25 @@ function ttsOpen(autoplay){
   if(ttsWordsFor!==cur)ttsBuildWords();
   ttsLoadVoices();
   $("ttsRateSlider").value=S.ttsRate;$("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
+  // best-effort lock-screen / media-key controls where the browser supports
+  // Media Session for speech synthesis
+  if("mediaSession" in navigator){
+    try{
+      const c=CHAPTERS[cur],b=c?bookOf(c):null;
+      if(c)navigator.mediaSession.metadata=new MediaMetadata({title:c.title,artist:b?b.title:"",album:"Library"});
+      navigator.mediaSession.setActionHandler("play",()=>{if(!ttsSpeaking)ttsPlay();});
+      navigator.mediaSession.setActionHandler("pause",()=>{if(ttsSpeaking)ttsPause();});
+      navigator.mediaSession.setActionHandler("nexttrack",()=>ttsSentence(1));
+      navigator.mediaSession.setActionHandler("previoustrack",()=>ttsSentence(-1));
+    }catch(e){}
+  }
   if(autoplay)ttsPlay();
 }
 function ttsClose(){
   ttsActive=false;ttsSpeaking=false;
   ttsStopTimer();
+  ttsSleepClear();
+  $("voiceHelp").classList.add("hidden");
   if(TTS_OK)speechSynthesis.cancel();
   ttsClearCur();
   $("btnListen").classList.remove("on");
@@ -1458,13 +1585,16 @@ function openMarkPop(markEl,x,y){
    about the selection using a free Hugging Face model via the OpenAI-compatible
    router endpoint. The token lives only in this browser's localStorage. */
 const AI_DEFAULT_MODEL="Qwen/Qwen2.5-7B-Instruct"; // not gated — works with any HF token that has Inference Providers permission
-let AI=Object.assign({token:"",model:AI_DEFAULT_MODEL},store.get("ai",{}));
+const AI_DEFAULT_BASE="https://router.huggingface.co/v1"; // any OpenAI-compatible endpoint works (Groq, OpenRouter, …)
+let AI=Object.assign({token:"",model:AI_DEFAULT_MODEL,base:AI_DEFAULT_BASE},store.get("ai",{}));
 // migrate away from the old gated default (Llama needs a license acceptance → 403s)
 if(AI.model==="meta-llama/Llama-3.2-3B-Instruct"){AI.model=AI_DEFAULT_MODEL;store.set("ai",AI);}
 let aiCtx=null;      // {text, para} — the selection this conversation is about
 let aiLastCtx=null;  // last selection seen (survives the selection collapsing)
-let aiMsgs=[];       // [{role:"user"|"assistant", content}]
+let aiMsgs=[];       // [{role:"user"|"assistant", content, saved?}]
 let aiBusy=false, aiRenderQueued=false;
+let aiVocabPending=null;    // word being defined via D — logged to vocab on success
+const aiConvos={};          // chapterId -> {ctx, msgs}: conversations survive chapter switches
 
 function selectionContext(){
   const s=selectionInContent();
@@ -1477,20 +1607,67 @@ function selectionContext(){
   if(para===s.text)para="";
   return {text:s.text,para};
 }
-function aiSystemPrompt(){
+function aiChapterExcerpts(q){
+  // keyword-score the question against the other chapters of this book and
+  // return the best 1–2 surrounding excerpts ("ask the book" retrieval)
+  const c=CHAPTERS[cur];if(!c)return "";
+  const b=bookOf(c);
+  const toks=[...new Set(q.toLowerCase().split(/\W+/).filter(w=>w.length>3))];
+  if(!toks.length)return "";
+  const scored=[];
+  b.chapters.forEach(i=>{
+    if(i===cur)return;
+    const ch=CHAPTERS[i],body=ch.md.toLowerCase();
+    let s=0;
+    toks.forEach(t=>{let k=0,p=-1;while((p=body.indexOf(t,p+1))>=0&&k<20)k++;s+=k;});
+    if(s>0)scored.push([s,ch]);
+  });
+  scored.sort((x,y)=>y[0]-x[0]);
+  return scored.slice(0,2).map(([,ch])=>{
+    const body=stripMd(ch.md),bl=body.toLowerCase();
+    let best=0;
+    for(const t of toks){const p=bl.indexOf(t);if(p>=0){best=p;break;}}
+    const st=Math.max(0,best-150),en=Math.min(body.length,best+600);
+    return `From the chapter "${ch.title}" in the same book:\n"""${(st>0?"…":"")+body.slice(st,en)+(en<body.length?"…":"")}"""`;
+  }).join("\n");
+}
+function aiSystemPrompt(q){
   const c=CHAPTERS[cur],b=c?bookOf(c):null;
   let p="You are a friendly reading companion built into an e-book reader. Keep answers short and clear (2–6 sentences unless asked for more). For word meanings, give the meaning as used in this context first, then the general sense.";
-  if(b&&c)p+=`\nThe reader is reading the chapter "${c.title}" from the book "${b.title}"${b.author?" by "+b.author:""}.`;
+  if(b&&c){
+    p+=`\nThe reader is reading the chapter "${c.title}" from the book "${b.title}"${b.author?" by "+b.author:""}.`;
+    const pos=b.chapters.indexOf(cur);
+    const done=b.chapters.filter(i=>chPct(CHAPTERS[i].id)>=.95).length;
+    p+=`\nThis is chapter ${pos+1} of ${b.chapters.length}; the reader has finished ${done} chapter${done===1?"":"s"} of this book, so don't spoil or assume knowledge of later chapters.`;
+    const hls=(highlights[c.id]||[]).slice(0,8);
+    if(hls.length)p+=`\nPassages the reader highlighted in this chapter (they care about these):\n`+
+      hls.map(h=>`- "${h.text.slice(0,200)}"`+(h.note?` (their note: ${h.note.slice(0,120)})`:"")).join("\n");
+  }
   if(aiCtx&&aiCtx.text){
     p+=`\nThey selected this passage:\n"""${aiCtx.text}"""`;
     if(aiCtx.para)p+=`\nIt appears in this paragraph:\n"""${aiCtx.para}"""`;
   }else if(c){
     p+=`\nNo specific passage is selected — their questions are about the chapter. Chapter text (may be truncated):\n"""${c.md.slice(0,6000)}"""`;
   }
+  if(q){
+    const ex=aiChapterExcerpts(q);
+    if(ex)p+=`\nPossibly relevant context from elsewhere in the book:\n${ex}`;
+  }
   return p;
 }
+const AI_CHIPS_SEL=`<button data-q="Explain this simply.">Explain</button>
+  <button data-q="What does this mean here? Give the meaning of any difficult words.">Meaning</button>
+  <button data-q="Summarize this in one or two sentences.">Summarize</button>
+  <button data-q="Explain this like I'm five, with a simple example.">ELI5</button>`;
+const AI_CHIPS_CH=`<button data-q="Summarize this chapter in a few short bullet points.">Summarize chapter</button>
+  <button data-q="What are the key takeaways I should remember from this chapter?">Key takeaways</button>
+  <button data-q="Quiz me: ask me 3 short questions about this chapter, one at a time, and check my answers.">Quiz me</button>
+  <button data-q="How does this chapter connect to what came earlier in the book?">Connect to earlier</button>`;
 function paintAiHead(){
-  $("aiModelLbl").textContent=AI.model;
+  let host="";
+  try{if(AI.base!==AI_DEFAULT_BASE)host=" · "+new URL(AI.base).host;}catch(e){}
+  $("aiModelLbl").textContent=AI.model+host;
+  $("aiChips").innerHTML=(aiCtx&&aiCtx.text)?AI_CHIPS_SEL:AI_CHIPS_CH;
   const q=$("aiQuote");
   if(aiCtx&&aiCtx.text){
     q.textContent="“"+(aiCtx.text.length>220?aiCtx.text.slice(0,220)+"…":aiCtx.text)+"”";
@@ -1505,6 +1682,7 @@ function aiShowSetup(on){
   if(on){
     $("aiTokenInput").value=AI.token;
     $("aiModelInput").value=AI.model;
+    $("aiBaseInput").value=AI.base;
     $("aiTokenInput").focus();
   }
 }
@@ -1514,7 +1692,9 @@ function aiRender(){
     const last=i===aiMsgs.length-1;
     if(m.role==="assistant"&&!m.content&&last&&aiBusy)
       return `<div class="ai-m assistant thinking">Thinking…</div>`;
-    return `<div class="ai-m ${m.role}">${m.role==="assistant"?mdToHtml(m.content):esc(m.content)}</div>`;
+    const save=m.role==="assistant"&&m.content&&!(last&&aiBusy)
+      ?`<button class="ai-save" data-i="${i}">${m.saved?"✓ Saved to notes":"📌 Save as note"}</button>`:"";
+    return `<div class="ai-m ${m.role}">${m.role==="assistant"?mdToHtml(m.content):esc(m.content)}${save}</div>`;
   }).join("");
   box.scrollTop=box.scrollHeight;
 }
@@ -1547,6 +1727,7 @@ function aiClose(){
 function aiDefine(ctx){
   if(!ctx||!ctx.text){aiOpen(ctx);return;}
   const short=ctx.text.length>80?ctx.text.slice(0,80)+"…":ctx.text;
+  if(ctx.text.length<=60)aiVocabPending=ctx.text; // word/short phrase → vocabulary book
   aiOpen(ctx,`What does “${short}” mean here? Give a short, dictionary-style answer.`);
 }
 async function aiSend(q){
@@ -1554,17 +1735,19 @@ async function aiSend(q){
   if(!q||aiBusy)return;
   if(!AI.token){aiShowSetup(true);return;}
   const history=aiMsgs.slice(); // before pushing, for the request body
+  const vocabWord=(aiVocabPending&&q.startsWith("What does"))?aiVocabPending:null;
+  aiVocabPending=null;
   aiMsgs.push({role:"user",content:q});
   const reply={role:"assistant",content:""};
   aiMsgs.push(reply);
   aiBusy=true;aiRender();
   try{
-    const res=await fetch("https://router.huggingface.co/v1/chat/completions",{
+    const res=await fetch(AI.base.replace(/\/+$/,"")+"/chat/completions",{
       method:"POST",
       headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI.token},
       body:JSON.stringify({
         model:AI.model,stream:true,max_tokens:700,
-        messages:[{role:"system",content:aiSystemPrompt()},...history,{role:"user",content:q}]
+        messages:[{role:"system",content:aiSystemPrompt(q)},...history,{role:"user",content:q}]
       })
     });
     if(!res.ok){
@@ -1601,6 +1784,13 @@ async function aiSend(q){
     reply.content=(reply.content?reply.content+"\n\n":"")+"⚠ "+(err.message||"Network error — are you online?");
   }
   aiBusy=false;aiRender();
+  // a completed "Meaning" lookup also lands in the vocabulary book
+  if(vocabWord&&reply.content&&!reply.content.startsWith("⚠")){
+    vocab.unshift({w:vocabWord,def:reply.content.slice(0,600),
+      ch:CHAPTERS[cur]?CHAPTERS[cur].id:"",d:Date.now()});
+    vocab=vocab.slice(0,500);
+    store.set("vocab",vocab);
+  }
 }
 $("btnAsk").addEventListener("click",()=>aiOpen(selectionContext()||aiLastCtx||null));
 $("aiCloseBtn").addEventListener("click",aiClose);
@@ -1608,6 +1798,7 @@ $("aiSettingsBtn").addEventListener("click",()=>aiShowSetup($("aiSetup").classLi
 $("aiSaveBtn").addEventListener("click",()=>{
   AI.token=$("aiTokenInput").value.trim();
   AI.model=$("aiModelInput").value.trim()||AI_DEFAULT_MODEL;
+  AI.base=$("aiBaseInput").value.trim()||AI_DEFAULT_BASE;
   store.set("ai",AI);
   paintAiHead();
   aiShowSetup(false);
@@ -1625,10 +1816,22 @@ $("aiInput").addEventListener("keydown",e=>{
   if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();const v=e.target.value;e.target.value="";aiSend(v);}
   if(e.key==="Escape")aiClose();
 });
-["aiTokenInput","aiModelInput"].forEach(id=>$(id).addEventListener("keydown",e=>{
+["aiTokenInput","aiModelInput","aiBaseInput"].forEach(id=>$(id).addEventListener("keydown",e=>{
   e.stopPropagation();
   if(e.key==="Enter")$("aiSaveBtn").click();
 }));
+$("aiMsgs").addEventListener("click",e=>{
+  const b=e.target.closest(".ai-save");if(!b)return;
+  const m=aiMsgs[+b.dataset.i],c=CHAPTERS[cur];
+  if(!m||!c||m.saved)return;
+  // anchor to the discussed passage when there is one (so it shows highlighted
+  // in the text); otherwise it's a chapter-level note on the highlights page
+  const anchor=(aiCtx&&aiCtx.text)?aiCtx.text:"✦ "+c.title;
+  (highlights[c.id]=highlights[c.id]||[]).push({text:anchor,note:m.content.slice(0,2000)});
+  store.set("highlights",highlights);
+  if(aiCtx&&aiCtx.text)markText(content,anchor,{i:highlights[c.id].length-1,note:m.content});
+  m.saved=true;aiRender();
+});
 
 /* ================= keyboard help overlay ================= */
 function toggleHelp(){$("helpOverlay").classList.toggle("hidden");}
@@ -1675,10 +1878,33 @@ function curPct(){
   }
   return pageCount>1?page/(pageCount-1):1;
 }
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function readingStreak(){
+  let n=0;const d=new Date();
+  if(!stats.days[todayKey()])d.setDate(d.getDate()-1); // streak survives until today ends
+  for(;;){
+    const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    if(!stats.days[k])break;
+    n++;d.setDate(d.getDate()-1);
+  }
+  return n;
+}
 function saveProgress(){
   if(cur<0)return;
-  progress[CHAPTERS[cur].id]={pct:curPct()};
+  const c=CHAPTERS[cur],pct=curPct();
+  const prev=progress[c.id]?progress[c.id].pct:0;
+  progress[c.id]={pct};
   store.set("progress",progress);
+  if(pct>prev){ // forward movement counts toward today's words + streak
+    const k=todayKey();
+    stats.days[k]=(stats.days[k]||0)+Math.round((pct-prev)*c.words);
+    const b=bookOf(c);
+    if(!stats.finished[b.id]&&bookPct(b)>=.95)stats.finished[b.id]=k;
+    store.set("stats",stats);
+  }
 }
 function updateStatus(){
   const c=CHAPTERS[cur];if(!c)return;
@@ -1776,6 +2002,61 @@ $("ttsVoice").addEventListener("change",e=>{
     speechSynthesis.cancel();speechSynthesis.speak(u);
   }
 });
+/* sleep timer: ⏾ cycles Off → 15 → 30 → 60 min, then pauses the voice */
+let ttsSleepMin=0,ttsSleepT=null;
+function paintSleep(){
+  const b=$("ttsSleep");
+  b.textContent=ttsSleepMin?ttsSleepMin+"′":"⏾";
+  b.style.color=ttsSleepMin?"var(--accent)":"";
+}
+function ttsSleepClear(){if(ttsSleepT){clearTimeout(ttsSleepT);ttsSleepT=null;}ttsSleepMin=0;paintSleep();}
+$("ttsSleep").addEventListener("click",()=>{
+  ttsSleepMin=ttsSleepMin===0?15:ttsSleepMin===15?30:ttsSleepMin===30?60:0;
+  if(ttsSleepT){clearTimeout(ttsSleepT);ttsSleepT=null;}
+  if(ttsSleepMin)ttsSleepT=setTimeout(()=>{ttsPause();ttsSleepMin=0;ttsSleepT=null;paintSleep();},ttsSleepMin*60000);
+  paintSleep();
+});
+
+/* "get better voices" guide — quality depends entirely on the device's installed
+   system voices, so point people at the right settings screen per platform */
+function voiceHelpHtml(){
+  const ua=navigator.userAgent;
+  const ios={t:"iPhone / iPad",h:`<p>Open <b>Settings → Accessibility → Spoken Content → Voices → English</b>.
+    Tap a voice — <b>Ava</b>, <b>Zoe</b> and <b>Evan</b> are excellent — and download its
+    <b>Premium</b> (or Enhanced) version (~150–400&nbsp;MB, needs Wi-Fi). Then come back here,
+    reopen the Voice menu, and pick it. It's the same near-human Ava you hear on a Mac.</p>`};
+  const and={t:"Android",h:`<p>Install or update
+    <a href="https://play.google.com/store/apps/details?id=com.google.android.tts" target="_blank" rel="noopener">Speech Recognition &amp; Synthesis (Google)</a>
+    from the Play Store. Then open <b>Settings → System → Languages → Text-to-speech output</b>
+    (Samsung: <b>Settings → General management → Text-to-speech</b>), choose the Google engine,
+    tap its ⚙ and use <b>Install voice data → English</b> to download a higher-quality voice.
+    Restart Chrome afterwards — the new voices appear in the Voice menu. Voices marked ☁ are
+    Google's online voices: they sound good but need a connection.</p>`};
+  const mac={t:"Mac",h:`<p><b>System Settings → Accessibility → Spoken Content → System Voice →
+    Manage Voices…</b> — download <b>Ava (Premium)</b> or any voice labelled Premium/Enhanced,
+    then select it in the Voice menu here.</p>`};
+  const win={t:"Windows",h:`<p><b>Settings → Time &amp; language → Speech → Add voices</b> installs
+    more voices. Microsoft Edge additionally ships very good “Natural” online voices out of the box.</p>`};
+  let order=[ios,and,mac,win];
+  if(/Android/i.test(ua))order=[and,ios,mac,win];
+  else if(/Macintosh/i.test(ua))order=[mac,win,ios,and];
+  else if(/Windows/i.test(ua))order=[win,mac,ios,and];
+  return `<h2>Get better reading voices</h2>
+    <p class="dim">Voices come from your device, not this app — installing one good system voice
+    upgrades the narration everywhere, permanently. Your device first:</p>`
+    +order.map(s=>`<h3>${s.t}</h3>${s.h}`).join("")
+    +`<p class="dim">Tip: in the Voice menu, names containing <b>Premium</b>, <b>Enhanced</b>,
+    <b>Natural</b> or <b>Siri</b> sound best. Tap anywhere outside this card to close.</p>`;
+}
+$("ttsVoiceHelp").addEventListener("click",()=>{
+  const v=$("voiceHelp");
+  v.querySelector(".card").innerHTML=voiceHelpHtml();
+  v.classList.remove("hidden");
+});
+$("voiceHelp").addEventListener("click",e=>{
+  if(!e.target.closest("a")&&!e.target.closest(".card"))$("voiceHelp").classList.add("hidden");
+});
+
 $("ttsDictBtn").addEventListener("click",()=>{
   const curW=ttsWords[ttsIdx]
     ?ttsWords[ttsIdx].textContent.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g,""):"";
@@ -1881,6 +2162,10 @@ $("pageArea").addEventListener("touchend",e=>{
 document.addEventListener("keydown",e=>{
   if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
   if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(!$("voiceHelp").classList.contains("hidden")){
+    if(e.key==="Escape")$("voiceHelp").classList.add("hidden");
+    return;
+  }
   if(!$("helpOverlay").classList.contains("hidden")){
     if(e.key==="Escape"||e.key==="?")toggleHelp();
     return;
@@ -1955,6 +2240,104 @@ window.addEventListener("resize",()=>{
   clearTimeout(rz);
   rz=setTimeout(()=>{reflowKeepingPct(()=>{});},160);
 });
+
+/* ================= quick open (⌘K) =================
+   A command palette that jumps to any book or chapter from any view. It only
+   exists for the real library — share links (#s/...) are scoped views, so the
+   palette (and its shortcut) is disabled there and on the lock screen. */
+const QK_ITEMS=[];
+LIB.forEach(s=>s.books.forEach(b=>{
+  QK_ITEMS.push({type:"book",id:b.id,title:b.title,sub:s.title,
+    key:(b.title+" "+(b.author||"")+" "+s.title).toLowerCase()});
+  b.chapters.forEach(i=>{const c=CHAPTERS[i];
+    QK_ITEMS.push({type:"ch",id:c.id,title:c.title,sub:b.title,
+      key:(c.title+" "+b.title).toLowerCase()});});
+}));
+let qkRes=[],qkSel=0,qkHeads=[];
+function qkScore(it,toks){
+  let s=0;
+  const t=it.title.toLowerCase();
+  for(const q of toks){
+    if(it.key.indexOf(q)<0)return -1;
+    if(t.startsWith(q))s+=3;
+    else if(t.includes(q))s+=2;
+    else s+=1; // matched via author / book / section name only
+  }
+  if(it.type==="head")s+=2;      // headings of the open chapter first,
+  else if(it.type==="book")s+=1; // then books above chapters on ties
+  return s;
+}
+function qkDefaults(){
+  // empty query: continue-reading chapter, this chapter's headings, then all books
+  const out=[],seen=new Set();
+  const push=it=>{const k=it.type+(it.id||it.title);if(!seen.has(k)){seen.add(k);out.push(it);}};
+  if(last){const c=CHAPTERS.find(x=>x.id===last.id);
+    if(c)push({type:"ch",id:c.id,title:c.title,sub:"Continue · "+BOOKS[c.book].title});}
+  qkHeads.forEach(push);
+  QK_ITEMS.filter(x=>x.type==="book").forEach(push);
+  return out.slice(0,30+qkHeads.length);
+}
+function qkFilter(q){
+  const toks=q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!toks.length)return qkDefaults();
+  return qkHeads.concat(QK_ITEMS).map(it=>[qkScore(it,toks),it]).filter(x=>x[0]>=0)
+    .sort((a,b)=>b[0]-a[0]).slice(0,40).map(x=>x[1]);
+}
+function qkRender(){
+  const box=$("qkList");
+  if(!qkRes.length){box.innerHTML=`<div class="qk-none">No books or chapters match.</div>`;return;}
+  box.innerHTML=qkRes.map((it,i)=>`<button class="qk-item ${i===qkSel?"sel":""}" data-i="${i}">
+    <span class="ic">${it.type==="book"?"▤":it.type==="head"?"¶":"§"}</span>
+    <span class="t">${esc(it.title)}</span>
+    <span class="b">${esc(it.sub||"")}</span></button>`).join("");
+  const sel=box.querySelector(".qk-item.sel");
+  if(sel)sel.scrollIntoView({block:"nearest"});
+}
+function qkUpdate(){qkRes=qkFilter($("qkInput").value);qkSel=0;qkRender();}
+function qkGo(it){
+  qkClose();
+  if(it.type==="head"){ // jump within the open chapter
+    if(S.mode==="scroll")pages.scrollTo({top:Math.max(0,it.el.offsetTop-16)});
+    else goTo(Math.floor(it.el.offsetLeft/step()),false);
+    saveProgress();updateStatus();
+    return;
+  }
+  nav(it.type==="book"?"#b/"+encodeURIComponent(it.id):"#c/"+encodeURIComponent(it.id));
+}
+function qkOpen(){
+  if(share)return;                                // share links never get the palette
+  if(!locked.classList.contains("hidden"))return; // nor does the lock screen
+  qkHeads=[];
+  if(cur>=0&&!reader.classList.contains("hidden"))
+    content.querySelectorAll("h2,h3").forEach(el=>{
+      const t=el.textContent.trim();
+      if(t)qkHeads.push({type:"head",el,title:t,sub:"This chapter",key:t.toLowerCase()});
+    });
+  hideHlPop();hidePanel();aiClose();
+  $("qkOverlay").classList.remove("hidden");
+  const inp=$("qkInput");inp.value="";qkUpdate();inp.focus();
+}
+function qkClose(){$("qkOverlay").classList.add("hidden");}
+$("qkOverlay").addEventListener("click",e=>{if(!e.target.closest(".card"))qkClose();});
+$("qkList").addEventListener("click",e=>{
+  const b=e.target.closest(".qk-item");
+  if(b&&qkRes[+b.dataset.i])qkGo(qkRes[+b.dataset.i]);
+});
+$("qkInput").addEventListener("input",qkUpdate);
+$("qkInput").addEventListener("keydown",e=>{
+  e.stopPropagation();
+  if(e.key==="ArrowDown"){e.preventDefault();qkSel=Math.min(qkRes.length-1,qkSel+1);qkRender();}
+  else if(e.key==="ArrowUp"){e.preventDefault();qkSel=Math.max(0,qkSel-1);qkRender();}
+  else if(e.key==="Enter"){e.preventDefault();if(qkRes[qkSel])qkGo(qkRes[qkSel]);}
+  else if(e.key==="Escape")qkClose();
+});
+document.addEventListener("keydown",e=>{
+  if((e.metaKey||e.ctrlKey)&&!e.altKey&&(e.key==="k"||e.key==="K")){
+    e.preventDefault();
+    $("qkOverlay").classList.contains("hidden")?qkOpen():qkClose();
+  }
+},true);
+$("btnQk").addEventListener("click",qkOpen);
 
 /* ================= offline (PWA) =================
    The whole library is embedded in this one document, so caching it makes every

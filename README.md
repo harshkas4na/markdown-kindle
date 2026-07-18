@@ -187,6 +187,19 @@ Top-to-bottom map:
   each book's TOC additionally remembers its own last-read chapter.
 - **Search** (box on Home, or press `/`): full-text search across every chapter,
   with matched snippets; tap a result to open the chapter.
+- **Quick open** (`⌘K`/`Ctrl-K`, or the ⌘ button on Home/TOC/reader): a command
+  palette that jumps straight to any book or chapter by title from any view —
+  arrow keys + Enter to pick. Empty query shows "Continue reading", the open
+  chapter's section headings (¶ — jump within the chapter), then all books.
+  Owner-only: it never appears on `#s/...` share links or the lock screen.
+- **Reading stats**: forward reading progress is tallied per day (words read),
+  shown on Home as a 🔥 day-streak and "min today"; each book records the date
+  you finished it on its TOC page. Included in backups.
+- **Vocabulary book**: every word/short phrase you look up with "Meaning" (`D`)
+  is logged with its AI definition — the 🔤 Vocabulary button at the bottom of
+  Home reviews and prunes the list.
+- **Export highlights**: the ⬇ button on a book's Highlights page downloads all
+  of its highlights + notes as a Markdown file (for Obsidian etc.).
 - **Highlights & notes**: select text in the reader → tap "Highlight" or "＋ Note".
   Tap an existing highlight to view/edit its note or remove it. Each book's TOC
   links to a per-book "Highlights" page listing them all.
@@ -205,6 +218,13 @@ Top-to-bottom map:
   and the 🗣 button adds custom fixes (e.g. "Uniswap" → "you-nee-swap") to a
   per-browser dictionary that's included in backups. Reading auto-continues into
   the next chapter. The 🔊 button hides itself if `speechSynthesis` is unsupported.
+  A ⏾ **sleep timer** (15/30/60 min) pauses the voice automatically, and
+  lock-screen play/pause is wired up via the Media Session API where the browser
+  supports it. Voice quality is a *device* property — the **"Robotic voice? Get
+  better voices"** link under the voice picker opens per-platform instructions
+  (iOS: download Premium voices like Ava under Settings → Accessibility → Spoken
+  Content; Android: install Google's Speech Services and its voice data; also
+  macOS/Windows steps) so phones can sound as good as a Mac.
 - **TOC filter**: books with 10+ chapters get a filter box on their TOC page.
 - **Sharing**: the ⤴ button on a book's TOC page copies a link that opens *just
   that book* (`#s/b/<bookId>`) — the recipient sees the book's TOC and chapters
@@ -215,9 +235,20 @@ Top-to-bottom map:
   Note this is a *view*, not access control: the shared page is the same public
   `index.html`, so the rest of the library is still in its source for anyone who
   looks — fine for sharing notes, not for secrets.
+- **Ask AI** (✦ in the reader, or select text → ✦ Ask / `A`, meanings via `D`):
+  a chat panel answers questions about the selection or the chapter using any
+  OpenAI-compatible API (default: a free Hugging Face model; the ⚙ settings take
+  a token, model and custom base URL — e.g. Groq or OpenRouter — stored only in
+  this browser). The prompt is grounded in your position in the book, your
+  highlights in the chapter, and a keyword-retrieved excerpt from other chapters
+  of the same book ("ask the book"). With no selection the chips offer
+  chapter-level actions (Summarize / Key takeaways / Quiz me / Connect to
+  earlier). Every answer has "📌 Save as note", which files it into the book's
+  highlights; conversations are kept per chapter while the app is open.
 - **Backup**: "⬇ Back up my data" at the bottom of Home downloads progress,
-  highlights, bookmarks and settings as JSON; "⬆ Restore backup" imports it —
-  use this before clearing site data or when switching devices.
+  highlights, bookmarks, vocabulary, reading stats and settings as JSON;
+  "⬆ Restore backup" imports it — use this before clearing site data or when
+  switching devices.
 
 ## Offline mode (PWA)
 
