@@ -114,7 +114,8 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 
 /* ---------- highlight popup ---------- */
 #hlPop{position:fixed; z-index:40; background:var(--card); border:1px solid var(--card-line);
-  border-radius:12px; box-shadow:0 8px 30px var(--shadow); display:flex; gap:2px; padding:4px;}
+  border-radius:12px; box-shadow:0 8px 30px var(--shadow); display:flex; gap:2px; padding:4px;
+  flex-wrap:wrap; max-width:calc(100vw - 16px); justify-content:center;}
 #hlPop button{padding:8px 12px; font-size:13px; border-radius:9px; white-space:nowrap;}
 #hlPop button:active{background:var(--code-bg);}
 
@@ -233,6 +234,59 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 #btnListen.on{color:var(--accent);}
 .tts-w.tts-cur{background:color-mix(in srgb,var(--accent) 32%,transparent); border-radius:3px;}
 #content.tts-mode .tts-w:hover{background:var(--code-bg); cursor:pointer; border-radius:3px;}
+/* while listening, the persistent TTS bar must not cover the page bottom */
+#reader.listening #pageArea{padding-bottom:calc(18px + var(--ttsbar-h,170px));}
+#reader.listening.mode-scroll #content{padding-bottom:calc(8vh + var(--ttsbar-h,170px));}
+
+/* ---------- Ask AI panel ---------- */
+#aiPanel{position:fixed; z-index:31; background:var(--card); border:1px solid var(--card-line);
+  box-shadow:0 12px 40px var(--shadow); border-radius:18px; padding:14px 16px;
+  left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom));
+  width:min(560px, calc(100vw - 24px)); max-height:72dvh; display:flex; flex-direction:column;}
+.ai-head{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+.ai-head .ai-title{font-weight:700; font-size:15px;}
+.ai-head .ai-model{flex:1; font-size:11px; color:var(--muted); overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap;}
+.ai-head .icon-btn{width:34px; height:34px; font-size:15px;}
+#aiSetup{border:1px solid var(--card-line); border-radius:12px; padding:12px; margin-bottom:10px;}
+#aiSetup .ai-note{font-size:12.5px; color:var(--muted); line-height:1.5; margin:0 0 10px;}
+#aiSetup .ai-note a{color:var(--accent);}
+#aiQuote{font-size:12.5px; color:var(--muted); border-left:3px solid var(--accent);
+  padding:2px 0 2px 10px; margin-bottom:10px; max-height:72px; overflow:hidden;
+  font-style:italic; line-height:1.5;}
+#aiChips{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
+#aiChips button{font-size:12px; padding:6px 11px; border-radius:999px;
+  border:1px solid var(--card-line); background:var(--code-bg); color:var(--fg);}
+#aiChips button:active{transform:scale(.96);}
+#aiMsgs{overflow-y:auto; flex:1; min-height:0; display:flex; flex-direction:column; gap:8px;
+  margin-bottom:10px; overscroll-behavior:contain;}
+#aiMsgs:empty{display:none;}
+.ai-m{font-size:13.5px; line-height:1.55; border-radius:12px; padding:8px 12px; max-width:92%;}
+.ai-m.user{align-self:flex-end; background:color-mix(in srgb,var(--accent) 16%,transparent);}
+.ai-m.assistant{align-self:flex-start; background:var(--code-bg);}
+.ai-m.assistant p{margin:0 0 .6em; text-align:left;}
+.ai-m.assistant>*:last-child{margin-bottom:0;}
+.ai-m.assistant.thinking{color:var(--muted);}
+.ai-inputrow{display:flex; gap:8px; align-items:flex-end;}
+.ai-inputrow textarea{flex:1; resize:none; max-height:110px; padding:10px 12px;
+  border-radius:12px; border:1px solid var(--card-line); background:var(--bg); color:var(--fg);
+  font:inherit; font-size:13.5px; outline:none; line-height:1.4;}
+.ai-inputrow textarea:focus{border-color:var(--accent);}
+#aiSendBtn{width:40px; height:40px; border-radius:12px; font-size:15px; color:var(--accent);}
+
+/* ---------- keyboard help overlay ---------- */
+#helpOverlay{position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.45);
+  display:flex; align-items:center; justify-content:center; padding:20px;}
+#helpOverlay .card{background:var(--card); border:1px solid var(--card-line); border-radius:18px;
+  padding:20px 24px; max-width:520px; width:100%; max-height:80dvh; overflow-y:auto;
+  box-shadow:0 12px 40px var(--shadow);}
+#helpOverlay h2{font-size:16px; margin:0 0 12px;}
+#helpOverlay h3{font-size:12px; color:var(--muted); text-transform:uppercase;
+  letter-spacing:.08em; margin:14px 0 6px;}
+#helpOverlay .krow{display:flex; justify-content:space-between; gap:14px;
+  font-size:13px; padding:3px 0;}
+#helpOverlay kbd{background:var(--code-bg); border:1px solid var(--card-line); border-radius:6px;
+  padding:1px 7px; font-size:11.5px; font-family:ui-monospace,Menlo,monospace;}
 
 /* ---------- Aa panel ---------- */
 #scrim{position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.25);}
@@ -299,7 +353,8 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
     <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)">⚐</button>
     <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter">⤴</button>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)">◑</button>
-    <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud">🔊</button>
+    <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud (L)">🔊</button>
+    <button class="icon-btn" id="btnAsk" title="Ask AI — select text then press A, or ask about the chapter">✦</button>
     <button class="icon-btn" id="btnAa" title="Display settings">Aa</button>
   </header>
 
@@ -333,6 +388,60 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   </footer>
 
   <div id="scrim" class="hidden"></div>
+
+  <div id="aiPanel" class="hidden">
+    <div class="ai-head">
+      <span class="ai-title">✦ Ask AI</span>
+      <span class="ai-model" id="aiModelLbl"></span>
+      <button class="icon-btn" id="aiSettingsBtn" title="AI settings — Hugging Face token & model">⚙</button>
+      <button class="icon-btn" id="aiCloseBtn" title="Close (Esc)">✕</button>
+    </div>
+    <div id="aiSetup" class="hidden">
+      <p class="ai-note">Answers come from a free Hugging Face model. Paste a free access token from
+        <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">hf.co/settings/tokens</a>
+        (pick “Read”, or a fine-grained token with “Make calls to Inference Providers” checked — it stays on this device only).</p>
+      <input type="password" id="aiTokenInput" class="searchbox" placeholder="hf_… token" autocomplete="off">
+      <input type="text" id="aiModelInput" class="searchbox" style="margin-top:8px"
+        placeholder="Model (default: Qwen/Qwen2.5-7B-Instruct)" autocomplete="off">
+      <button class="primary" id="aiSaveBtn" style="margin:10px 0 0">Save</button>
+    </div>
+    <div id="aiQuote" class="hidden"></div>
+    <div id="aiChips">
+      <button data-q="Explain this simply.">Explain</button>
+      <button data-q="What does this mean here? Give the meaning of any difficult words.">Meaning</button>
+      <button data-q="Summarize this in one or two sentences.">Summarize</button>
+      <button data-q="Explain this like I'm five, with a simple example.">ELI5</button>
+    </div>
+    <div id="aiMsgs"></div>
+    <div class="ai-inputrow">
+      <textarea id="aiInput" rows="1" placeholder="Ask anything… (Enter to send)"></textarea>
+      <button id="aiSendBtn" title="Send">➤</button>
+    </div>
+  </div>
+
+  <div id="helpOverlay" class="hidden">
+    <div class="card">
+      <h2>Keyboard shortcuts</h2>
+      <h3>Reading</h3>
+      <div class="krow"><span>Next / previous page</span><span><kbd>→</kbd> <kbd>←</kbd> <kbd>Space</kbd></span></div>
+      <div class="krow"><span>First / last page</span><span><kbd>Home</kbd> <kbd>End</kbd></span></div>
+      <div class="krow"><span>Toggle bars · theme · bookmark</span><span><kbd>M</kbd> <kbd>T</kbd> <kbd>B</kbd></span></div>
+      <div class="krow"><span>Font size</span><span><kbd>+</kbd> <kbd>−</kbd></span></div>
+      <div class="krow"><span>Back / close</span><span><kbd>Esc</kbd></span></div>
+      <h3>Ask AI</h3>
+      <div class="krow"><span>Ask about selection (or chapter)</span><span><kbd>A</kbd></span></div>
+      <div class="krow"><span>Word / phrase meaning (instant)</span><span><kbd>D</kbd></span></div>
+      <div class="krow"><span>Send · close</span><span><kbd>Enter</kbd> <kbd>Esc</kbd></span></div>
+      <h3>Listen (audiobook)</h3>
+      <div class="krow"><span>Start / stop listening</span><span><kbd>L</kbd></span></div>
+      <div class="krow"><span>Play / pause</span><span><kbd>Space</kbd> <kbd>K</kbd></span></div>
+      <div class="krow"><span>Previous / next sentence</span><span><kbd>←</kbd> <kbd>→</kbd></span></div>
+      <div class="krow"><span>Slower / faster voice</span><span><kbd>[</kbd> <kbd>]</kbd></span></div>
+      <h3>This help</h3>
+      <div class="krow"><span>Show / hide</span><span><kbd>?</kbd></span></div>
+    </div>
+  </div>
+
   <div id="aaPanel" class="hidden">
     <div class="row"><span class="lbl">Font size</span>
       <div class="stepper"><button id="fsDown">A−</button><span class="val" id="fsVal">18px</span><button id="fsUp">A+</button></div></div>
@@ -1057,6 +1166,23 @@ function ttsClearCur(){
   const p=content.querySelector(".tts-w.tts-cur");
   if(p)p.classList.remove("tts-cur");
 }
+let ttsLastScroll=0;
+function ttsAutoScroll(el){
+  /* keep the spoken word inside a comfortable reading band of the visible
+     area (#pages already sits above the TTS bar thanks to the .listening
+     padding). Scroll only when the word leaves the band, and land it at
+     ~30% from the top so a good chunk of upcoming text is always visible. */
+  const pr=pages.getBoundingClientRect();
+  const r=el.getBoundingClientRect();
+  const bandTop=pr.top+pr.height*0.10, bandBot=pr.top+pr.height*0.75;
+  if(r.top>=bandTop&&r.bottom<=bandBot)return;
+  const target=Math.max(0,pages.scrollTop+(r.top-pr.top)-pr.height*0.30);
+  const now=Date.now();
+  // a smooth scroll that's still animating gets superseded jerkily; use an
+  // instant jump if we scrolled very recently (e.g. while seeking/dragging)
+  pages.scrollTo({top:target,behavior:now-ttsLastScroll<600?"auto":"smooth"});
+  ttsLastScroll=now;
+}
 function ttsSetWord(i){
   if(i<0||i>=ttsWords.length)return;
   ttsClearCur();
@@ -1065,8 +1191,7 @@ function ttsSetWord(i){
   el.classList.add("tts-cur");
   if(!ttsSeekDragging)$("ttsSeek").value=i;
   if(S.mode==="scroll"){
-    const r=el.getBoundingClientRect(),pr=pages.getBoundingClientRect();
-    if(r.top<pr.top+40||r.bottom>pr.bottom-40)el.scrollIntoView({block:"center",behavior:"smooth"});
+    ttsAutoScroll(el);
   }else{
     const p=Math.floor(el.offsetLeft/step());
     if(p!==page)goTo(p,true);
@@ -1135,6 +1260,13 @@ function ttsOpen(autoplay){
   $("ttsBar").classList.remove("hidden");
   $("botbar").classList.add("hidden");
   content.classList.add("tts-mode");
+  // reserve room for the persistent TTS bar so it never covers the page
+  // bottom, then repaginate/rescroll to the same reading position
+  reader.style.setProperty("--ttsbar-h",$("ttsBar").offsetHeight+"px");
+  if(!reader.classList.contains("listening")){
+    reader.classList.add("listening");
+    reflowKeepingPct(()=>{});
+  }
   if(ttsWordsFor!==cur)ttsBuildWords();
   ttsLoadVoices();
   $("ttsRateSlider").value=S.ttsRate;$("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
@@ -1149,6 +1281,10 @@ function ttsClose(){
   $("ttsBar").classList.add("hidden");
   $("botbar").classList.remove("hidden");
   content.classList.remove("tts-mode");
+  if(reader.classList.contains("listening")){
+    reader.classList.remove("listening");
+    if(cur>=0)reflowKeepingPct(()=>{});
+  }
   paintTtsPlay();
 }
 /* pause = cancel + remember the word; resume = speak again from that word.
@@ -1172,6 +1308,32 @@ function ttsSeekTo(i){
   ttsIdx=Math.max(0,Math.min(ttsWords.length-1,i));
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
   else ttsSetWord(ttsIdx);
+}
+/* jump by sentence (ttsBreaks: 1 = sentence end, 2 = block end) */
+function ttsSentence(dir){
+  if(!ttsWords.length)return;
+  let i=ttsIdx;
+  if(dir>0){
+    while(i<ttsWords.length-1&&!ttsBreaks[i])i++;
+    i=Math.min(ttsWords.length-1,i+1);
+  }else{
+    let s=i;
+    while(s>0&&!ttsBreaks[s-1])s--;
+    if(i-s<3){ // near a sentence start: go to the previous sentence instead
+      let p=s-1;
+      while(p>0&&!ttsBreaks[p-1])p--;
+      s=Math.max(0,p);
+    }
+    i=s;
+  }
+  ttsSeekTo(i);
+}
+function ttsNudgeRate(d){
+  S.ttsRate=Math.round(Math.min(2.5,Math.max(0.5,S.ttsRate+d))*10)/10;
+  store.set("settings",S);
+  $("ttsRateSlider").value=S.ttsRate;
+  $("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
+  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
 }
 
 /* ================= highlights (marking + popup) ================= */
@@ -1258,6 +1420,7 @@ function maybeShowSelectionPop(){
   if(reader.classList.contains("hidden"))return;
   const s=selectionInContent();
   if(!s){return;}
+  aiLastCtx=selectionContext(); // remember for the A / D shortcuts
   const rect=s.sel.getRangeAt(0).getBoundingClientRect();
   showHlPop(rect.left+rect.width/2,rect.top,[
     ["✎ Highlight",()=>saveHighlight(s.text)],
@@ -1265,6 +1428,8 @@ function maybeShowSelectionPop(){
       const note=prompt("Note for this highlight:");
       if(note!=null)saveHighlight(s.text,note.trim()||undefined);
     }],
+    ["✦ Ask",()=>aiOpen(selectionContext()||aiLastCtx)],
+    ["Aa Meaning",()=>aiDefine(selectionContext()||aiLastCtx)],
   ]);
 }
 function openMarkPop(markEl,x,y){
@@ -1288,6 +1453,187 @@ function openMarkPop(markEl,x,y){
   }]);
   showHlPop(x,y,btns);
 }
+/* ================= Ask AI (Hugging Face) =================
+   Select text → ✦ Ask (or press A / D) → a small chat panel answers questions
+   about the selection using a free Hugging Face model via the OpenAI-compatible
+   router endpoint. The token lives only in this browser's localStorage. */
+const AI_DEFAULT_MODEL="Qwen/Qwen2.5-7B-Instruct"; // not gated — works with any HF token that has Inference Providers permission
+let AI=Object.assign({token:"",model:AI_DEFAULT_MODEL},store.get("ai",{}));
+// migrate away from the old gated default (Llama needs a license acceptance → 403s)
+if(AI.model==="meta-llama/Llama-3.2-3B-Instruct"){AI.model=AI_DEFAULT_MODEL;store.set("ai",AI);}
+let aiCtx=null;      // {text, para} — the selection this conversation is about
+let aiLastCtx=null;  // last selection seen (survives the selection collapsing)
+let aiMsgs=[];       // [{role:"user"|"assistant", content}]
+let aiBusy=false, aiRenderQueued=false;
+
+function selectionContext(){
+  const s=selectionInContent();
+  if(!s)return null;
+  let node=s.sel.anchorNode;
+  if(node&&node.nodeType===3)node=node.parentElement;
+  const blk=node&&node.closest?node.closest("p,h1,h2,h3,h4,li,blockquote,td,th"):null;
+  let para=blk?blk.textContent.replace(/\s+/g," ").trim():"";
+  if(para.length>1200)para=para.slice(0,1200)+"…";
+  if(para===s.text)para="";
+  return {text:s.text,para};
+}
+function aiSystemPrompt(){
+  const c=CHAPTERS[cur],b=c?bookOf(c):null;
+  let p="You are a friendly reading companion built into an e-book reader. Keep answers short and clear (2–6 sentences unless asked for more). For word meanings, give the meaning as used in this context first, then the general sense.";
+  if(b&&c)p+=`\nThe reader is reading the chapter "${c.title}" from the book "${b.title}"${b.author?" by "+b.author:""}.`;
+  if(aiCtx&&aiCtx.text){
+    p+=`\nThey selected this passage:\n"""${aiCtx.text}"""`;
+    if(aiCtx.para)p+=`\nIt appears in this paragraph:\n"""${aiCtx.para}"""`;
+  }else if(c){
+    p+=`\nNo specific passage is selected — their questions are about the chapter. Chapter text (may be truncated):\n"""${c.md.slice(0,6000)}"""`;
+  }
+  return p;
+}
+function paintAiHead(){
+  $("aiModelLbl").textContent=AI.model;
+  const q=$("aiQuote");
+  if(aiCtx&&aiCtx.text){
+    q.textContent="“"+(aiCtx.text.length>220?aiCtx.text.slice(0,220)+"…":aiCtx.text)+"”";
+    q.classList.remove("hidden");
+  }else{
+    q.classList.add("hidden");
+    q.textContent="";
+  }
+}
+function aiShowSetup(on){
+  $("aiSetup").classList.toggle("hidden",!on);
+  if(on){
+    $("aiTokenInput").value=AI.token;
+    $("aiModelInput").value=AI.model;
+    $("aiTokenInput").focus();
+  }
+}
+function aiRender(){
+  const box=$("aiMsgs");
+  box.innerHTML=aiMsgs.map((m,i)=>{
+    const last=i===aiMsgs.length-1;
+    if(m.role==="assistant"&&!m.content&&last&&aiBusy)
+      return `<div class="ai-m assistant thinking">Thinking…</div>`;
+    return `<div class="ai-m ${m.role}">${m.role==="assistant"?mdToHtml(m.content):esc(m.content)}</div>`;
+  }).join("");
+  box.scrollTop=box.scrollHeight;
+}
+function aiRenderSoon(){
+  if(aiRenderQueued)return;
+  aiRenderQueued=true;
+  requestAnimationFrame(()=>{aiRenderQueued=false;aiRender();});
+}
+function aiOpen(ctx,autoQ){
+  if(reader.classList.contains("hidden"))return;
+  hideHlPop();hidePanel();
+  // a different selection starts a fresh conversation
+  const newText=ctx?ctx.text:"";
+  const oldText=aiCtx?aiCtx.text:"";
+  if(ctx!==undefined&&newText!==oldText)aiMsgs=[];
+  if(ctx!==undefined)aiCtx=ctx;
+  $("aiPanel").classList.remove("hidden");
+  $("scrim").classList.remove("hidden");
+  paintAiHead();
+  aiShowSetup(!AI.token);
+  aiRender();
+  if(autoQ&&AI.token)aiSend(autoQ);
+  else if(AI.token)$("aiInput").focus();
+}
+function aiClose(){
+  $("aiPanel").classList.add("hidden");
+  if($("aaPanel").classList.contains("hidden"))$("scrim").classList.add("hidden");
+  const sel=window.getSelection();if(sel)sel.removeAllRanges();
+}
+function aiDefine(ctx){
+  if(!ctx||!ctx.text){aiOpen(ctx);return;}
+  const short=ctx.text.length>80?ctx.text.slice(0,80)+"…":ctx.text;
+  aiOpen(ctx,`What does “${short}” mean here? Give a short, dictionary-style answer.`);
+}
+async function aiSend(q){
+  q=(q||"").trim();
+  if(!q||aiBusy)return;
+  if(!AI.token){aiShowSetup(true);return;}
+  const history=aiMsgs.slice(); // before pushing, for the request body
+  aiMsgs.push({role:"user",content:q});
+  const reply={role:"assistant",content:""};
+  aiMsgs.push(reply);
+  aiBusy=true;aiRender();
+  try{
+    const res=await fetch("https://router.huggingface.co/v1/chat/completions",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI.token},
+      body:JSON.stringify({
+        model:AI.model,stream:true,max_tokens:700,
+        messages:[{role:"system",content:aiSystemPrompt()},...history,{role:"user",content:q}]
+      })
+    });
+    if(!res.ok){
+      let detail="";
+      try{const j=await res.json();detail=(j.error&&(j.error.message||j.error))||j.message||"";}catch(e){}
+      let msg="Request failed ("+res.status+")."+(detail?" "+detail:"");
+      if(res.status===401)msg="Invalid token — open ⚙ and check your Hugging Face token.";
+      else if(res.status===403)msg=`Not allowed (403). Two usual causes: ① the model “${AI.model}” is gated (Llama/Gemma models need you to accept their license on the model's page at huggingface.co first) — easiest fix: set the model in ⚙ to ${AI_DEFAULT_MODEL}, which is not gated; ② your token is missing the “Make calls to Inference Providers” permission — create a new fine-grained token with that box checked.`+(detail?" (HF says: "+detail+")":"");
+      else if(res.status===402||res.status===429)msg="Free quota exhausted for now — try again later or pick another model in ⚙.";
+      else if(res.status===404)msg=`Model “${AI.model}” not found or not available — try another in ⚙.`;
+      throw new Error(msg);
+    }
+    const rd=res.body.getReader(),dec=new TextDecoder();
+    let buf="";
+    for(;;){
+      const {done,value}=await rd.read();
+      if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n");buf=lines.pop();
+      for(const ln of lines){
+        const t=ln.trim();
+        if(!t.startsWith("data:"))continue;
+        const d=t.slice(5).trim();
+        if(!d||d==="[DONE]")continue;
+        try{
+          const j=JSON.parse(d);
+          const delta=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
+          if(delta){reply.content+=delta;aiRenderSoon();}
+        }catch(e){}
+      }
+    }
+    if(!reply.content)reply.content="_(no answer — try again or pick another model in ⚙)_";
+  }catch(err){
+    reply.content=(reply.content?reply.content+"\n\n":"")+"⚠ "+(err.message||"Network error — are you online?");
+  }
+  aiBusy=false;aiRender();
+}
+$("btnAsk").addEventListener("click",()=>aiOpen(selectionContext()||aiLastCtx||null));
+$("aiCloseBtn").addEventListener("click",aiClose);
+$("aiSettingsBtn").addEventListener("click",()=>aiShowSetup($("aiSetup").classList.contains("hidden")));
+$("aiSaveBtn").addEventListener("click",()=>{
+  AI.token=$("aiTokenInput").value.trim();
+  AI.model=$("aiModelInput").value.trim()||AI_DEFAULT_MODEL;
+  store.set("ai",AI);
+  paintAiHead();
+  aiShowSetup(false);
+  if(AI.token)$("aiInput").focus();
+});
+$("aiChips").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-q]");
+  if(b)aiSend(b.dataset.q);
+});
+$("aiSendBtn").addEventListener("click",()=>{
+  const v=$("aiInput").value;$("aiInput").value="";aiSend(v);
+});
+$("aiInput").addEventListener("keydown",e=>{
+  e.stopPropagation();
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();const v=e.target.value;e.target.value="";aiSend(v);}
+  if(e.key==="Escape")aiClose();
+});
+["aiTokenInput","aiModelInput"].forEach(id=>$(id).addEventListener("keydown",e=>{
+  e.stopPropagation();
+  if(e.key==="Enter")$("aiSaveBtn").click();
+}));
+
+/* ================= keyboard help overlay ================= */
+function toggleHelp(){$("helpOverlay").classList.toggle("hidden");}
+$("helpOverlay").addEventListener("click",toggleHelp);
+
 function restoreAnim(){requestAnimationFrame(()=>{content.style.transition="";});}
 function paginate(){
   if(S.mode==="scroll"){pageCount=1;updateStatus();return;}
@@ -1396,7 +1742,7 @@ $("btnShare").addEventListener("click",()=>{
 });
 $("btnAa").addEventListener("click",showPanel);
 $("btnTheme").addEventListener("click",cycleTheme);
-$("scrim").addEventListener("click",hidePanel);
+$("scrim").addEventListener("click",()=>{hidePanel();aiClose();});
 $("btnPrevCh").addEventListener("click",()=>openSibling(-1,false));
 $("btnNextCh").addEventListener("click",()=>openSibling(1,false));
 $("slider").addEventListener("input",e=>goTo(e.target.value-1,false));
@@ -1533,7 +1879,12 @@ $("pageArea").addEventListener("touchend",e=>{
 
 /* keyboard */
 document.addEventListener("keydown",e=>{
-  if(e.target.tagName==="INPUT")return;
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(!$("helpOverlay").classList.contains("hidden")){
+    if(e.key==="Escape"||e.key==="?")toggleHelp();
+    return;
+  }
   if(reader.classList.contains("hidden")){
     if(e.key==="Escape"&&!toc.classList.contains("hidden")&&!share)nav("");
     if(e.key==="/"&&!home.classList.contains("hidden")){
@@ -1541,11 +1892,28 @@ document.addEventListener("keydown",e=>{
     }
     return;
   }
+  const aiOn=!$("aiPanel").classList.contains("hidden");
   switch(e.key){
     case "b":case "B":toggleBookmark();break;
-    case "ArrowRight":case "PageDown":next();break;
-    case "ArrowLeft":case "PageUp":prev();break;
-    case " ":e.preventDefault();e.shiftKey?prev():next();break;
+    case "ArrowRight":case "PageDown":
+      if(ttsActive&&e.key==="ArrowRight")ttsSentence(1);else next();break;
+    case "ArrowLeft":case "PageUp":
+      if(ttsActive&&e.key==="ArrowLeft")ttsSentence(-1);else prev();break;
+    case " ":e.preventDefault();
+      if(ttsActive){ttsSpeaking?ttsPause():ttsPlay();}
+      else e.shiftKey?prev():next();
+      break;
+    case "k":case "K":
+      if(ttsActive){ttsSpeaking?ttsPause():ttsPlay();}break;
+    case "l":case "L":ttsActive?ttsClose():ttsOpen(true);break;
+    case "[":if(ttsActive)ttsNudgeRate(-0.1);break;
+    case "]":if(ttsActive)ttsNudgeRate(0.1);break;
+    case "a":case "A":aiOpen(selectionContext()||aiLastCtx||null);break;
+    case "d":case "D":{
+      const c=selectionContext()||aiLastCtx;
+      if(c&&c.text)aiDefine(c);else aiOpen(null);
+      break;}
+    case "?":toggleHelp();break;
     case "Home":goTo(0);break;
     case "End":goTo(pageCount-1);break;
     case "m":case "M":toggleBars();break;
@@ -1553,7 +1921,8 @@ document.addEventListener("keydown",e=>{
     case "+":case "=":$("fsUp").click();break;
     case "-":$("fsDown").click();break;
     case "Escape":
-      if(!$("aaPanel").classList.contains("hidden"))hidePanel();
+      if(aiOn)aiClose();
+      else if(!$("aaPanel").classList.contains("hidden"))hidePanel();
       else if(barsOn)hideBars();
       else backToToc();
       break;
