@@ -26,6 +26,9 @@ python3 tools/new-book.py books "Deep Work" --author "Cal Newport" \
 
 python3 tools/import-book.py --serve    # import UI on :8081 — paste text or drop
                                         # files, preview chapters, add to library
+
+cp mybook.epub public/epub/             # drop an .epub you own in the folder...
+python3 tools/epub-import.py            # ...and it becomes a book in the reader
 ```
 
 That is the entire workflow. There are no other build steps or dependencies
@@ -124,6 +127,42 @@ mix of bulk and per-chapter files works. Content before the first chapter become
 a "Front Matter" chapter, and every written chapter gets a `# Title` H1 if it
 lacks one.
 
+## Importing EPUBs (the `public/epub/` drop folder)
+
+Format-shift an ebook you own into the reader by dropping the `.epub` into
+`public/epub/` and running the converter:
+
+```bash
+python3 tools/epub-import.py            # convert everything new in public/epub/
+python3 tools/epub-import.py --watch    # keep watching: converts on drop
+python3 tools/epub-import.py --dry-run  # print the chapter plan, write nothing
+python3 tools/epub-import.py book.epub  # convert one file, wherever it lives
+```
+
+For each file it reads the epub's own metadata (title, author, description) and
+spine order, splits it into chapters using the table of contents — including
+books that ship as one giant XHTML file whose chapters are only `#anchor`
+targets — converts each chapter to markdown, writes
+`library/NN-epub/NN-<book>/` with a `book.json`, then rebuilds `index.html`.
+Cover pages, blank pages and nav documents are dropped (`--min-words`, default
+30), and so are images, which the reader does not render.
+
+Converted books land on their own **EPUB** shelf (`library/NN-epub/`, created on
+first import), so a drop is never skipped because you already have that title
+somewhere else in the library — it just gets its own folder. Use
+`--section <name>` to file them elsewhere (fuzzy-matched, created if missing).
+
+Other flags: `--force` (import a file again), `--interval <secs>` (poll rate for
+`--watch`), `--dir <path>` (watch a different folder), `--no-build`.
+
+Imported files — and files that failed to convert — are remembered in
+`public/epub/.imported.json`, so re-running only picks up what is new and
+`--watch` never retries the same file in a loop. The `.epub` files and that log
+are gitignored; only the converted markdown in `library/` is committed.
+
+To convert a *single chapter* out of an epub instead, `tools/epub-to-markdown.py`
+takes one XHTML item and writes one markdown file.
+
 **Formatting raw text with an LLM:** `tools/FORMAT-PROMPT.md` is a ready-made
 prompt (also behind the 🪄 box in the import UI, with a copy button). Paste it
 into any AI model together with your raw text — book dump, article, lecture
@@ -173,7 +212,9 @@ Top-to-bottom map:
 - `library/` — all content (structure above).
 - Content helpers in `tools/`: `new-book.py` (scaffold stubs), `import-book.py` +
   `importer.html` + `FORMAT-PROMPT.md` (import pasted/uploaded text — see
-  "Importing content"), `epub-to-markdown.py` (convert a chapter of an EPUB you own).
+  "Importing content"), `epub-import.py` (convert whole EPUBs dropped in
+  `public/epub/` — see "Importing EPUBs"), `epub-to-markdown.py` (one chapter of
+  an EPUB you own).
 - Reading progress lives in the *browser's* localStorage, not in this repo —
   clearing site data or switching devices resets it.
 

@@ -20,8 +20,9 @@ import re
 import zipfile
 from pathlib import Path
 
-BLOCK_RE = re.compile(r"<(p|h[1-6]|blockquote)\b([^>]*)>(.*?)</\1>", re.S)
+BLOCK_RE = re.compile(r"<(p|h[1-6]|blockquote|li|pre)\b([^>]*)>(.*?)</\1>", re.S)
 CLASS_RE = re.compile(r'class="([^"]*)"')
+HEAD_RE = re.compile(r"^h[1-6]$")
 
 
 def inline(fragment: str) -> str:
@@ -46,10 +47,14 @@ def convert(xhtml: str, title: str | None, number: int | None) -> str:
             continue
         cls_m = CLASS_RE.search(attrs)
         cls = cls_m.group(1) if cls_m else ""
-        if tag[0] == "h":
+        if HEAD_RE.match(tag):
             blocks.append((f"h{tag[1]}", text))
         elif tag == "blockquote" or cls in ("Q", "QAtt"):
             blocks.append(("quote", text))
+        elif tag == "li":
+            blocks.append(("li", text))
+        elif tag == "pre":
+            blocks.append(("pre", text))
         else:
             blocks.append(("p", text))
 
@@ -66,6 +71,16 @@ def convert(xhtml: str, title: str | None, number: int | None) -> str:
             if lines and lines[-1] != "":
                 lines.append("")
             lines.append("> " + text.replace("\n", "\n> "))
+        elif kind == "li":
+            if prev != "li" and lines and lines[-1] != "":
+                lines.append("")
+            lines.append("- " + text.replace("\n", " "))
+        elif kind == "pre":
+            if lines and lines[-1] != "":
+                lines.append("")
+            lines.append("```")
+            lines.append(text)
+            lines.append("```")
         elif kind.startswith("h"):
             if lines and lines[-1] != "":
                 lines.append("")

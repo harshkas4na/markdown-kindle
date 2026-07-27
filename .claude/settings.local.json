@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:atriumacademy.notion.site)",
+      "WebFetch(domain:harshkasana.xyz)"
+    ]
+  }
+}
