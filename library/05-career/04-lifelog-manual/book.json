@@ -1,0 +1,5 @@
+{
+  "title": "Lifelog: The Operator's Manual",
+  "author": "Field notes for Harsh Kasana",
+  "description": "How the log that keeps every other system honest actually works and how to run it — the append-only stream in ~/.lifelog, why a cursor beats a timestamp, what only you can capture and what records itself, how decay stops skills.md from lying about you, and the sync loop that turns fourteen months of commits into a profile you didn't have to remember."
+}
