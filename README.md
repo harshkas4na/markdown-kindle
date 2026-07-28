@@ -278,9 +278,17 @@ Top-to-bottom map:
   looks — fine for sharing notes, not for secrets.
 - **Ask AI** (✦ in the reader, or select text → ✦ Ask / `A`, meanings via `D`):
   a chat panel answers questions about the selection or the chapter using any
-  OpenAI-compatible API (default: a free Hugging Face model; the ⚙ settings take
-  a token, model and custom base URL — e.g. Groq or OpenRouter — stored only in
-  this browser). The prompt is grounded in your position in the book, your
+  OpenAI-compatible API. ⚙ picks a **provider** — Hugging Face, Google Gemini,
+  Groq, OpenRouter (free `:free` models incl. Grok and Kimi), Cerebras, xAI,
+  Mistral, Together, a local **Ollama**/**LM Studio** server, or a custom base
+  URL — plus a model from a curated list, from the provider's live `/models`
+  list (↻), or typed by hand. Keys are stored per provider in this browser only,
+  so several can be set up at once: with "auto-switch" on, a rate-limited or
+  failed provider silently rolls over to the next one that is configured, and
+  the answer notes which one served it. Local providers need CORS allowed —
+  e.g. `OLLAMA_ORIGINS='*' ollama serve` — and a fine-tuned model of your own
+  plugs in the same way (`ollama create my-reader -f Modelfile`).
+  The prompt is grounded in your position in the book, your
   highlights in the chapter, and a keyword-retrieved excerpt from other chapters
   of the same book ("ask the book"). With no selection the chips offer
   chapter-level actions (Summarize / Key takeaways / Quiz me / Connect to

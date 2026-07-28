@@ -251,6 +251,16 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 #aiSetup{border:1px solid var(--card-line); border-radius:12px; padding:12px; margin-bottom:10px;}
 #aiSetup .ai-note{font-size:12.5px; color:var(--muted); line-height:1.5; margin:0 0 10px;}
 #aiSetup .ai-note a{color:var(--accent);}
+#aiSetup .ai-row{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+#aiSetup .ai-row label{font-size:12.5px; color:var(--muted); min-width:58px;}
+#aiSetup .ai-sel{flex:1; min-width:0; padding:9px 10px; border-radius:10px; font:inherit;
+  font-size:13px; border:1px solid var(--card-line); background:var(--bg); color:var(--fg);}
+#aiSetup .ai-row .icon-btn{width:34px; height:34px; font-size:14px; flex:none;}
+#aiSetup .ai-check{display:flex; align-items:center; gap:7px; font-size:12.5px;
+  color:var(--muted); line-height:1.4; margin-top:10px;}
+#aiSetup .ai-check input{flex:none; width:15px; height:15px; accent-color:var(--accent);}
+#aiSetup .ai-keyed{font-size:11.5px; color:var(--muted); margin-top:6px; line-height:1.5;}
+#aiSetup .ai-keyed:empty{display:none;}
 #aiQuote{font-size:12.5px; color:var(--muted); border-left:3px solid var(--accent);
   padding:2px 0 2px 10px; margin-bottom:10px; max-height:72px; overflow:hidden;
   font-style:italic; line-height:1.5;}
@@ -267,6 +277,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 .ai-m.assistant p{margin:0 0 .6em; text-align:left;}
 .ai-m.assistant>*:last-child{margin-bottom:0;}
 .ai-m.assistant.thinking{color:var(--muted);}
+.ai-via{font-size:11px; color:var(--muted); margin-top:6px;}
 .ai-inputrow{display:flex; gap:8px; align-items:flex-end;}
 .ai-inputrow textarea{flex:1; resize:none; max-height:110px; padding:10px 12px;
   border-radius:12px; border:1px solid var(--card-line); background:var(--bg); color:var(--fg);
@@ -423,18 +434,28 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
     <div class="ai-head">
       <span class="ai-title">✦ Ask AI</span>
       <span class="ai-model" id="aiModelLbl"></span>
-      <button class="icon-btn" id="aiSettingsBtn" title="AI settings — Hugging Face token & model">⚙</button>
+      <button class="icon-btn" id="aiSettingsBtn" title="AI settings — provider, key & model">⚙</button>
       <button class="icon-btn" id="aiCloseBtn" title="Close (Esc)">✕</button>
     </div>
     <div id="aiSetup" class="hidden">
-      <p class="ai-note">Answers come from a free Hugging Face model. Paste a free access token from
-        <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">hf.co/settings/tokens</a>
-        (pick “Read”, or a fine-grained token with “Make calls to Inference Providers” checked — it stays on this device only).</p>
-      <input type="password" id="aiTokenInput" class="searchbox" placeholder="hf_… token" autocomplete="off">
-      <input type="text" id="aiModelInput" class="searchbox" style="margin-top:8px"
-        placeholder="Model (default: Qwen/Qwen2.5-7B-Instruct)" autocomplete="off">
-      <input type="text" id="aiBaseInput" class="searchbox" style="margin-top:8px"
-        placeholder="API base URL (default: HF router — any OpenAI-compatible URL works)" autocomplete="off">
+      <div class="ai-row">
+        <label for="aiProviderSel">Provider</label>
+        <select id="aiProviderSel" class="ai-sel"></select>
+      </div>
+      <p class="ai-note" id="aiProviderNote"></p>
+      <input type="password" id="aiTokenInput" class="searchbox" placeholder="API key" autocomplete="off">
+      <div class="ai-row" style="margin-top:8px">
+        <label for="aiModelSel">Model</label>
+        <select id="aiModelSel" class="ai-sel"></select>
+        <button class="icon-btn" id="aiModelsBtn" title="Load the live model list from this provider">↻</button>
+      </div>
+      <input type="text" id="aiModelInput" class="searchbox hidden" style="margin-top:8px"
+        placeholder="Model id, exactly as the provider spells it" autocomplete="off">
+      <input type="text" id="aiBaseInput" class="searchbox hidden" style="margin-top:8px"
+        placeholder="API base URL — any OpenAI-compatible endpoint" autocomplete="off">
+      <label class="ai-check"><input type="checkbox" id="aiFallbackChk">
+        Auto-switch to another set-up provider when this one is rate-limited</label>
+      <div id="aiKeyed" class="ai-keyed"></div>
       <button class="primary" id="aiSaveBtn" style="margin:10px 0 0">Save</button>
     </div>
     <div id="aiQuote" class="hidden"></div>
@@ -1580,15 +1601,111 @@ function openMarkPop(markEl,x,y){
   }]);
   showHlPop(x,y,btns);
 }
-/* ================= Ask AI (Hugging Face) =================
+/* ================= Ask AI =================
    Select text → ✦ Ask (or press A / D) → a small chat panel answers questions
-   about the selection using a free Hugging Face model via the OpenAI-compatible
-   router endpoint. The token lives only in this browser's localStorage. */
-const AI_DEFAULT_MODEL="Qwen/Qwen2.5-7B-Instruct"; // not gated — works with any HF token that has Inference Providers permission
-const AI_DEFAULT_BASE="https://router.huggingface.co/v1"; // any OpenAI-compatible endpoint works (Groq, OpenRouter, …)
-let AI=Object.assign({token:"",model:AI_DEFAULT_MODEL,base:AI_DEFAULT_BASE},store.get("ai",{}));
-// migrate away from the old gated default (Llama needs a license acceptance → 403s)
-if(AI.model==="meta-llama/Llama-3.2-3B-Instruct"){AI.model=AI_DEFAULT_MODEL;store.set("ai",AI);}
+   about the selection. Every provider below speaks the same OpenAI-compatible
+   /chat/completions dialect, so one code path drives all of them; a provider is
+   just a base URL, a key and a list of model ids. Keys are kept per provider in
+   this browser's localStorage only, so you can set up several and let the panel
+   fall back to the next one when a free tier runs out of quota.
+
+   Model ids drift as providers retire and add models — the ↻ button in ⚙ reloads
+   the live list from the provider's /models endpoint, and "Custom…" always lets
+   you type an id by hand. */
+const AI_PROVIDERS={
+  hf:{name:"Hugging Face (router)", base:"https://router.huggingface.co/v1",
+    keyUrl:"https://huggingface.co/settings/tokens", keyLbl:"hf.co/settings/tokens",
+    keyHint:"hf_… token",
+    note:"Free tier, small monthly credit. Use a “Read” token, or a fine-grained one with “Make calls to Inference Providers” checked.",
+    models:["Qwen/Qwen2.5-7B-Instruct","Qwen/Qwen3-8B","meta-llama/Llama-3.1-8B-Instruct",
+      "mistralai/Mistral-7B-Instruct-v0.3","HuggingFaceTB/SmolLM3-3B",
+      "deepseek-ai/DeepSeek-V3-0324","moonshotai/Kimi-K2-Instruct","zai-org/GLM-4.5"]},
+  gemini:{name:"Google Gemini", base:"https://generativelanguage.googleapis.com/v1beta/openai",
+    keyUrl:"https://aistudio.google.com/apikey", keyLbl:"aistudio.google.com/apikey",
+    keyHint:"AIza… API key",
+    note:"Generous free tier and the most capable free option here. Paste an AI Studio key.",
+    models:["gemini-2.5-flash","gemini-2.5-flash-lite","gemini-2.5-pro","gemini-2.0-flash"]},
+  groq:{name:"Groq", base:"https://api.groq.com/openai/v1",
+    keyUrl:"https://console.groq.com/keys", keyLbl:"console.groq.com/keys",
+    keyHint:"gsk_… key",
+    note:"Very fast, free tier with per-minute limits. Hosts Kimi K2 and the open gpt-oss models.",
+    models:["llama-3.3-70b-versatile","llama-3.1-8b-instant","openai/gpt-oss-120b",
+      "openai/gpt-oss-20b","moonshotai/kimi-k2-instruct","qwen/qwen3-32b",
+      "deepseek-r1-distill-llama-70b"]},
+  openrouter:{name:"OpenRouter (free models)", base:"https://openrouter.ai/api/v1",
+    keyUrl:"https://openrouter.ai/keys", keyLbl:"openrouter.ai/keys",
+    keyHint:"sk-or-… key",
+    note:"One key, hundreds of models. Ids ending in “:free” cost nothing — this is the widest safety net when other tiers are exhausted.",
+    models:["x-ai/grok-4-fast:free","deepseek/deepseek-chat-v3.1:free","deepseek/deepseek-r1:free",
+      "moonshotai/kimi-k2:free","qwen/qwen3-235b-a22b:free","meta-llama/llama-3.3-70b-instruct:free",
+      "google/gemma-3-27b-it:free","mistralai/mistral-small-3.2-24b-instruct:free"]},
+  cerebras:{name:"Cerebras", base:"https://api.cerebras.ai/v1",
+    keyUrl:"https://cloud.cerebras.ai/", keyLbl:"cloud.cerebras.ai",
+    keyHint:"csk-… key",
+    note:"Fastest tokens/sec of the free tiers, daily request cap.",
+    models:["llama-3.3-70b","llama3.1-8b","qwen-3-235b-a22b-instruct","gpt-oss-120b"]},
+  xai:{name:"xAI (Grok)", base:"https://api.x.ai/v1",
+    keyUrl:"https://console.x.ai/", keyLbl:"console.x.ai",
+    keyHint:"xai-… key",
+    note:"Grok direct from xAI. Paid, but a separate quota pool from everything else.",
+    models:["grok-4-fast-non-reasoning","grok-4-fast-reasoning","grok-3-mini"]},
+  mistral:{name:"Mistral", base:"https://api.mistral.ai/v1",
+    keyUrl:"https://console.mistral.ai/api-keys", keyLbl:"console.mistral.ai/api-keys",
+    keyHint:"API key",
+    note:"Free experiment tier; small models are quick and good at plain explanation.",
+    models:["mistral-small-latest","open-mistral-nemo","mistral-large-latest"]},
+  together:{name:"Together AI", base:"https://api.together.xyz/v1",
+    keyUrl:"https://api.together.ai/settings/api-keys", keyLbl:"api.together.ai",
+    keyHint:"API key",
+    note:"Free credit on signup; ids ending in “-Free” stay free.",
+    models:["meta-llama/Llama-3.3-70B-Instruct-Turbo-Free","deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+      "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"]},
+  ollama:{name:"Ollama (this machine)", base:"http://localhost:11434/v1", local:true,
+    keyUrl:"https://ollama.com/download", keyLbl:"ollama.com/download",
+    note:"Runs on your own machine — no key, no rate limit, works offline. Install Ollama, then <code>ollama pull qwen2.5:7b</code>. A model you fine-tuned yourself goes here too: <code>ollama create my-reader -f Modelfile</code>. Serve it to this page with <code>OLLAMA_ORIGINS='*' ollama serve</code>.",
+    models:["qwen2.5:7b","llama3.2:3b","gemma3:4b","phi4-mini","mistral:7b","qwen2.5:3b"]},
+  lmstudio:{name:"LM Studio (this machine)", base:"http://localhost:1234/v1", local:true,
+    keyUrl:"https://lmstudio.ai/", keyLbl:"lmstudio.ai",
+    note:"Local too — load a model in LM Studio and start its server (Developer tab). Any GGUF you fine-tuned works. Use ↻ to list what's loaded.",
+    models:[]},
+  custom:{name:"Custom endpoint…", base:"", custom:true,
+    note:"Any other OpenAI-compatible <code>/chat/completions</code> URL — a self-hosted vLLM, llama.cpp server, a proxy of your own.",
+    models:[]}
+};
+const AI_DEFAULT_PROVIDER="hf";
+const AI_DEFAULT_BASE=AI_PROVIDERS.hf.base;
+let AI=Object.assign({provider:AI_DEFAULT_PROVIDER,keys:{},models:{},bases:{},setup:{},fallback:true},store.get("ai",{}));
+(function migrateAI(){
+  // older versions stored a single {token, model, base} pair aimed at HF
+  const old=store.get("ai",{});
+  if(old&&old.token!==undefined&&!old.keys){
+    const p=(old.base&&old.base!==AI_DEFAULT_BASE)?"custom":"hf";
+    AI={provider:p,keys:{[p]:old.token||""},models:{},bases:{},setup:{[p]:true},fallback:true};
+    if(old.model&&old.model!=="meta-llama/Llama-3.2-3B-Instruct")AI.models[p]=old.model;
+    if(p==="custom")AI.bases.custom=old.base;
+    store.set("ai",AI);
+  }
+  AI.keys=AI.keys||{};AI.models=AI.models||{};AI.bases=AI.bases||{};AI.setup=AI.setup||{};
+  if(!AI_PROVIDERS[AI.provider])AI.provider=AI_DEFAULT_PROVIDER;
+})();
+function aiProv(id){return AI_PROVIDERS[id||AI.provider]||AI_PROVIDERS[AI_DEFAULT_PROVIDER];}
+function aiBaseOf(id){id=id||AI.provider;return (AI.bases[id]||aiProv(id).base||"").replace(/\/+$/,"");}
+function aiModelOf(id){id=id||AI.provider;return AI.models[id]||aiProv(id).models[0]||"";}
+function aiKeyOf(id){return AI.keys[id||AI.provider]||"";}
+// keyless providers (local servers, custom endpoints) can't be judged by "has a
+// key", so they only count once the user has actually saved them in ⚙
+function aiReady(id){
+  id=id||AI.provider;
+  const p=aiProv(id);
+  if(!aiBaseOf(id)||!aiModelOf(id))return false;
+  return (p.local||p.custom)?!!AI.setup[id]:!!aiKeyOf(id);
+}
+// providers to try, in order: the chosen one first, then any other that is set up
+function aiChain(){
+  const ids=[AI.provider];
+  if(AI.fallback)Object.keys(AI_PROVIDERS).forEach(id=>{if(id!==AI.provider&&aiReady(id))ids.push(id);});
+  return ids.filter(aiReady);
+}
 let aiCtx=null;      // {text, para} — the selection this conversation is about
 let aiLastCtx=null;  // last selection seen (survives the selection collapsing)
 let aiMsgs=[];       // [{role:"user"|"assistant", content, saved?}]
@@ -1664,9 +1781,8 @@ const AI_CHIPS_CH=`<button data-q="Summarize this chapter in a few short bullet 
   <button data-q="Quiz me: ask me 3 short questions about this chapter, one at a time, and check my answers.">Quiz me</button>
   <button data-q="How does this chapter connect to what came earlier in the book?">Connect to earlier</button>`;
 function paintAiHead(){
-  let host="";
-  try{if(AI.base!==AI_DEFAULT_BASE)host=" · "+new URL(AI.base).host;}catch(e){}
-  $("aiModelLbl").textContent=AI.model+host;
+  const id=aiChain()[0];
+  $("aiModelLbl").textContent=id?aiModelOf(id)+" · "+aiProv(id).name:"not set up — press ⚙";
   $("aiChips").innerHTML=(aiCtx&&aiCtx.text)?AI_CHIPS_SEL:AI_CHIPS_CH;
   const q=$("aiQuote");
   if(aiCtx&&aiCtx.text){
@@ -1677,24 +1793,80 @@ function paintAiHead(){
     q.textContent="";
   }
 }
+const AI_CUSTOM_MODEL="__custom__";
+function aiFillModels(id,list){
+  const sel=$("aiModelSel"),cur=aiModelOf(id);
+  const models=(list&&list.length)?list:aiProv(id).models;
+  const opts=[...new Set(models.concat(cur&&models.indexOf(cur)<0?[cur]:[]))];
+  sel.innerHTML=opts.map(m=>`<option value="${esc(m)}"${m===cur?" selected":""}>${esc(m)}</option>`).join("")
+    +`<option value="${AI_CUSTOM_MODEL}"${(!cur||opts.indexOf(cur)<0)?" selected":""}>Custom…</option>`;
+  aiSyncModelInput();
+}
+function aiSyncModelInput(){
+  const custom=$("aiModelSel").value===AI_CUSTOM_MODEL;
+  $("aiModelInput").classList.toggle("hidden",!custom);
+  if(custom&&!$("aiModelInput").value)$("aiModelInput").value=aiModelOf($("aiProviderSel").value);
+}
+function aiPaintSetup(id){
+  const p=aiProv(id);
+  $("aiProviderSel").value=id;
+  let note=p.note||"";
+  if(p.keyUrl)note+=` Key: <a href="${p.keyUrl}" target="_blank" rel="noopener">${esc(p.keyLbl||p.keyUrl)}</a>.`;
+  note+=" It stays on this device only.";
+  $("aiProviderNote").innerHTML=note;
+  const tok=$("aiTokenInput");
+  tok.classList.toggle("hidden",!!p.local);
+  tok.placeholder=p.keyHint||"API key";
+  tok.value=aiKeyOf(id);
+  $("aiBaseInput").classList.toggle("hidden",!(p.custom||p.local));
+  $("aiBaseInput").value=AI.bases[id]||p.base||"";
+  $("aiModelInput").value="";
+  aiFillModels(id,null);
+  $("aiFallbackChk").checked=!!AI.fallback;
+  const others=Object.keys(AI_PROVIDERS).filter(o=>o!==id&&aiReady(o));
+  $("aiKeyed").innerHTML=others.length
+    ?"Also set up, used as backup: "+others.map(o=>esc(AI_PROVIDERS[o].name)).join(", ")
+    :"Set up a second provider to get automatic failover when this one is rate-limited.";
+}
 function aiShowSetup(on){
   $("aiSetup").classList.toggle("hidden",!on);
   if(on){
-    $("aiTokenInput").value=AI.token;
-    $("aiModelInput").value=AI.model;
-    $("aiBaseInput").value=AI.base;
-    $("aiTokenInput").focus();
+    $("aiProviderSel").innerHTML=Object.entries(AI_PROVIDERS)
+      .map(([id,p])=>`<option value="${id}">${esc(p.name)}${aiReady(id)&&id!==AI.provider?" ✓":""}</option>`).join("");
+    aiPaintSetup(AI.provider);
+    (aiProv().local?$("aiModelSel"):$("aiTokenInput")).focus();
   }
+}
+// ask the provider what it actually serves right now — model lists go stale fast
+async function aiLoadModels(){
+  const id=$("aiProviderSel").value,btn=$("aiModelsBtn");
+  const base=($("aiBaseInput").value.trim()||aiProv(id).base).replace(/\/+$/,"");
+  const key=$("aiTokenInput").value.trim();
+  if(!base)return;
+  btn.textContent="…";btn.disabled=true;
+  try{
+    const res=await fetch(base+"/models",{headers:key?{"Authorization":"Bearer "+key}:{}});
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const j=await res.json();
+    const list=(j.data||j.models||[]).map(m=>m.id||m.name).filter(Boolean).sort();
+    if(!list.length)throw new Error("empty list");
+    aiFillModels(id,list);
+    $("aiKeyed").textContent=`Loaded ${list.length} models from ${new URL(base).host}.`;
+  }catch(e){
+    $("aiKeyed").textContent="Could not load the list ("+e.message+") — the curated ids still work, or type one under Custom…";
+  }
+  btn.textContent="↻";btn.disabled=false;
 }
 function aiRender(){
   const box=$("aiMsgs");
   box.innerHTML=aiMsgs.map((m,i)=>{
     const last=i===aiMsgs.length-1;
     if(m.role==="assistant"&&!m.content&&last&&aiBusy)
-      return `<div class="ai-m assistant thinking">Thinking…</div>`;
+      return `<div class="ai-m assistant thinking">${m.via?esc(m.via):"Thinking…"}</div>`;
     const save=m.role==="assistant"&&m.content&&!(last&&aiBusy)
       ?`<button class="ai-save" data-i="${i}">${m.saved?"✓ Saved to notes":"📌 Save as note"}</button>`:"";
-    return `<div class="ai-m ${m.role}">${m.role==="assistant"?mdToHtml(m.content):esc(m.content)}${save}</div>`;
+    const via=m.role==="assistant"&&m.via?`<div class="ai-via">↳ ${esc(m.via)}</div>`:"";
+    return `<div class="ai-m ${m.role}">${m.role==="assistant"?mdToHtml(m.content):esc(m.content)}${via}${save}</div>`;
   }).join("");
   box.scrollTop=box.scrollHeight;
 }
@@ -1714,10 +1886,12 @@ function aiOpen(ctx,autoQ){
   $("aiPanel").classList.remove("hidden");
   $("scrim").classList.remove("hidden");
   paintAiHead();
-  aiShowSetup(!AI.token);
+  const usable=aiChain().length>0;
+  aiShowSetup(!usable);
   aiRender();
-  if(autoQ&&AI.token)aiSend(autoQ);
-  else if(AI.token)$("aiInput").focus();
+  if(!usable)return;
+  if(autoQ)aiSend(autoQ);
+  else $("aiInput").focus();
 }
 function aiClose(){
   $("aiPanel").classList.add("hidden");
@@ -1730,10 +1904,65 @@ function aiDefine(ctx){
   if(ctx.text.length<=60)aiVocabPending=ctx.text; // word/short phrase → vocabulary book
   aiOpen(ctx,`What does “${short}” mean here? Give a short, dictionary-style answer.`);
 }
+/* one attempt against one provider; streams into `reply` and throws on failure.
+   Throws with .started set when tokens already arrived, so the caller knows not
+   to restart the answer somewhere else. */
+async function aiAttempt(id,messages,reply){
+  const p=aiProv(id),model=aiModelOf(id),key=aiKeyOf(id);
+  const started={v:false};
+  let res;
+  try{
+    res=await fetch(aiBaseOf(id)+"/chat/completions",{
+      method:"POST",
+      headers:Object.assign({"Content-Type":"application/json"},key?{"Authorization":"Bearer "+key}:{}),
+      body:JSON.stringify({model,stream:true,max_tokens:700,messages})
+    });
+  }catch(e){
+    throw new Error(p.local
+      ?`${p.name} is not answering — is the server running, and started with CORS allowed (e.g. OLLAMA_ORIGINS='*' ollama serve)?`
+      :`Network error reaching ${p.name} — are you online?`);
+  }
+  if(!res.ok){
+    let detail="";
+    try{const j=await res.json();detail=(j.error&&(j.error.message||j.error))||j.message||"";}catch(e){}
+    if(typeof detail!=="string")detail=JSON.stringify(detail);
+    let msg=`${p.name}: request failed (${res.status}).`+(detail?" "+detail:"");
+    if(res.status===401)msg=`${p.name}: key rejected (401) — check it in ⚙.`;
+    else if(res.status===403)msg=`${p.name}: not allowed (403). Usually a gated model (accept its licence on the provider's page) or a key missing the inference permission.`+(detail?" ("+detail+")":"");
+    else if(res.status===402||res.status===429)msg=`${p.name}: out of free quota / rate-limited for now.`;
+    else if(res.status===404)msg=`${p.name}: model “${model}” not found — pick another in ⚙ (↻ lists what it serves).`;
+    throw new Error(msg);
+  }
+  const rd=res.body.getReader(),dec=new TextDecoder();
+  let buf="";
+  for(;;){
+    const {done,value}=await rd.read();
+    if(done)break;
+    buf+=dec.decode(value,{stream:true});
+    const lines=buf.split("\n");buf=lines.pop();
+    for(const ln of lines){
+      const t=ln.trim();
+      if(!t.startsWith("data:"))continue;
+      const d=t.slice(5).trim();
+      if(!d||d==="[DONE]")continue;
+      try{
+        const j=JSON.parse(d);
+        const delta=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
+        if(delta){reply.content+=delta;started.v=true;aiRenderSoon();}
+      }catch(e){}
+    }
+  }
+  if(!reply.content){
+    const err=new Error(`${p.name}: replied with nothing.`);
+    err.started=started.v;
+    throw err;
+  }
+}
 async function aiSend(q){
   q=(q||"").trim();
   if(!q||aiBusy)return;
-  if(!AI.token){aiShowSetup(true);return;}
+  const chain=aiChain();
+  if(!chain.length){aiShowSetup(true);return;}
   const history=aiMsgs.slice(); // before pushing, for the request body
   const vocabWord=(aiVocabPending&&q.startsWith("What does"))?aiVocabPending:null;
   aiVocabPending=null;
@@ -1741,47 +1970,26 @@ async function aiSend(q){
   const reply={role:"assistant",content:""};
   aiMsgs.push(reply);
   aiBusy=true;aiRender();
-  try{
-    const res=await fetch(AI.base.replace(/\/+$/,"")+"/chat/completions",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI.token},
-      body:JSON.stringify({
-        model:AI.model,stream:true,max_tokens:700,
-        messages:[{role:"system",content:aiSystemPrompt(q)},...history,{role:"user",content:q}]
-      })
-    });
-    if(!res.ok){
-      let detail="";
-      try{const j=await res.json();detail=(j.error&&(j.error.message||j.error))||j.message||"";}catch(e){}
-      let msg="Request failed ("+res.status+")."+(detail?" "+detail:"");
-      if(res.status===401)msg="Invalid token — open ⚙ and check your Hugging Face token.";
-      else if(res.status===403)msg=`Not allowed (403). Two usual causes: ① the model “${AI.model}” is gated (Llama/Gemma models need you to accept their license on the model's page at huggingface.co first) — easiest fix: set the model in ⚙ to ${AI_DEFAULT_MODEL}, which is not gated; ② your token is missing the “Make calls to Inference Providers” permission — create a new fine-grained token with that box checked.`+(detail?" (HF says: "+detail+")":"");
-      else if(res.status===402||res.status===429)msg="Free quota exhausted for now — try again later or pick another model in ⚙.";
-      else if(res.status===404)msg=`Model “${AI.model}” not found or not available — try another in ⚙.`;
-      throw new Error(msg);
-    }
-    const rd=res.body.getReader(),dec=new TextDecoder();
-    let buf="";
-    for(;;){
-      const {done,value}=await rd.read();
-      if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split("\n");buf=lines.pop();
-      for(const ln of lines){
-        const t=ln.trim();
-        if(!t.startsWith("data:"))continue;
-        const d=t.slice(5).trim();
-        if(!d||d==="[DONE]")continue;
-        try{
-          const j=JSON.parse(d);
-          const delta=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
-          if(delta){reply.content+=delta;aiRenderSoon();}
-        }catch(e){}
+  const messages=[{role:"system",content:aiSystemPrompt(q)},...history,{role:"user",content:q}];
+  const errs=[];
+  for(let n=0;n<chain.length;n++){
+    const id=chain[n];
+    try{
+      await aiAttempt(id,messages,reply);
+      reply.via=(n>0)?"answered by "+aiProv(id).name+" · "+aiModelOf(id):"";
+      break;
+    }catch(err){
+      errs.push(err.message||"Unknown error");
+      if(err.started||n===chain.length-1){
+        reply.via="";
+        reply.content=(reply.content?reply.content+"\n\n":"")+"⚠ "+errs.join("\n\n⚠ ")
+          +(chain.length===1?"\n\nTip: set up a second provider in ⚙ so answers fall back automatically.":"");
+        break;
       }
+      reply.content="";              // clean slate for the next provider
+      reply.via="trying "+aiProv(chain[n+1]).name+"…";
+      aiRenderSoon();
     }
-    if(!reply.content)reply.content="_(no answer — try again or pick another model in ⚙)_";
-  }catch(err){
-    reply.content=(reply.content?reply.content+"\n\n":"")+"⚠ "+(err.message||"Network error — are you online?");
   }
   aiBusy=false;aiRender();
   // a completed "Meaning" lookup also lands in the vocabulary book
@@ -1796,14 +2004,34 @@ $("btnAsk").addEventListener("click",()=>aiOpen(selectionContext()||aiLastCtx||n
 $("aiCloseBtn").addEventListener("click",aiClose);
 $("aiSettingsBtn").addEventListener("click",()=>aiShowSetup($("aiSetup").classList.contains("hidden")));
 $("aiSaveBtn").addEventListener("click",()=>{
-  AI.token=$("aiTokenInput").value.trim();
-  AI.model=$("aiModelInput").value.trim()||AI_DEFAULT_MODEL;
-  AI.base=$("aiBaseInput").value.trim()||AI_DEFAULT_BASE;
+  const id=$("aiProviderSel").value,p=aiProv(id);
+  AI.provider=id;
+  AI.keys[id]=$("aiTokenInput").value.trim();
+  const sel=$("aiModelSel").value;
+  AI.models[id]=(sel===AI_CUSTOM_MODEL?$("aiModelInput").value.trim():sel)||p.models[0]||"";
+  const base=$("aiBaseInput").value.trim();
+  if(base&&base!==p.base)AI.bases[id]=base;else delete AI.bases[id];
+  AI.setup[id]=true;
+  AI.fallback=$("aiFallbackChk").checked;
   store.set("ai",AI);
   paintAiHead();
   aiShowSetup(false);
-  if(AI.token)$("aiInput").focus();
+  if(aiReady())$("aiInput").focus();
 });
+// switching provider saves what's on screen first, so keys aren't lost mid-edit
+$("aiProviderSel").addEventListener("change",e=>{
+  const prev=AI.provider,p=aiProv(prev);
+  if(!$("aiTokenInput").classList.contains("hidden"))AI.keys[prev]=$("aiTokenInput").value.trim();
+  const sel=$("aiModelSel").value;
+  const m=(sel===AI_CUSTOM_MODEL?$("aiModelInput").value.trim():sel);
+  if(m)AI.models[prev]=m;
+  const b=$("aiBaseInput").value.trim();
+  if(b&&b!==p.base)AI.bases[prev]=b;
+  store.set("ai",AI);
+  aiPaintSetup(e.target.value);
+});
+$("aiModelSel").addEventListener("change",aiSyncModelInput);
+$("aiModelsBtn").addEventListener("click",aiLoadModels);
 $("aiChips").addEventListener("click",e=>{
   const b=e.target.closest("button[data-q]");
   if(b)aiSend(b.dataset.q);
@@ -1816,7 +2044,7 @@ $("aiInput").addEventListener("keydown",e=>{
   if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();const v=e.target.value;e.target.value="";aiSend(v);}
   if(e.key==="Escape")aiClose();
 });
-["aiTokenInput","aiModelInput","aiBaseInput"].forEach(id=>$(id).addEventListener("keydown",e=>{
+["aiTokenInput","aiModelInput","aiBaseInput","aiModelSel","aiProviderSel"].forEach(id=>$(id).addEventListener("keydown",e=>{
   e.stopPropagation();
   if(e.key==="Enter")$("aiSaveBtn").click();
 }));
