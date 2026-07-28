@@ -1807,8 +1807,11 @@ function aiSyncModelInput(){
   $("aiModelInput").classList.toggle("hidden",!custom);
   if(custom&&!$("aiModelInput").value)$("aiModelInput").value=aiModelOf($("aiProviderSel").value);
 }
+let aiEditing=AI.provider; // provider whose values the ⚙ fields currently show —
+                           // not AI.provider, which only moves on Save
 function aiPaintSetup(id){
   const p=aiProv(id);
+  aiEditing=id;
   $("aiProviderSel").value=id;
   let note=p.note||"";
   if(p.keyUrl)note+=` Key: <a href="${p.keyUrl}" target="_blank" rel="noopener">${esc(p.keyLbl||p.keyUrl)}</a>.`;
@@ -2018,15 +2021,21 @@ $("aiSaveBtn").addEventListener("click",()=>{
   aiShowSetup(false);
   if(aiReady())$("aiInput").focus();
 });
-// switching provider saves what's on screen first, so keys aren't lost mid-edit
+// switching provider parks what's on screen under the provider being edited, so
+// a half-typed key isn't lost — the fields belong to aiEditing, not AI.provider
 $("aiProviderSel").addEventListener("change",e=>{
-  const prev=AI.provider,p=aiProv(prev);
-  if(!$("aiTokenInput").classList.contains("hidden"))AI.keys[prev]=$("aiTokenInput").value.trim();
+  const prev=aiEditing,p=aiProv(prev);
+  if(!$("aiTokenInput").classList.contains("hidden")){
+    const k=$("aiTokenInput").value.trim();
+    if(k)AI.keys[prev]=k;
+  }
   const sel=$("aiModelSel").value;
   const m=(sel===AI_CUSTOM_MODEL?$("aiModelInput").value.trim():sel);
   if(m)AI.models[prev]=m;
-  const b=$("aiBaseInput").value.trim();
-  if(b&&b!==p.base)AI.bases[prev]=b;
+  if(!$("aiBaseInput").classList.contains("hidden")){
+    const b=$("aiBaseInput").value.trim();
+    if(b&&b!==p.base)AI.bases[prev]=b;
+  }
   store.set("ai",AI);
   aiPaintSetup(e.target.value);
 });

@@ -285,9 +285,9 @@ Top-to-bottom map:
   list (↻), or typed by hand. Keys are stored per provider in this browser only,
   so several can be set up at once: with "auto-switch" on, a rate-limited or
   failed provider silently rolls over to the next one that is configured, and
-  the answer notes which one served it. Local providers need CORS allowed —
-  e.g. `OLLAMA_ORIGINS='*' ollama serve` — and a fine-tuned model of your own
-  plugs in the same way (`ollama create my-reader -f Modelfile`).
+  the answer notes which one served it. The local options are wired up but
+  nothing is installed yet — see [TODO.md](TODO.md) for the local-model and
+  fine-tuning setup.
   The prompt is grounded in your position in the book, your
   highlights in the chapter, and a keyword-retrieved excerpt from other chapters
   of the same book ("ask the book"). With no selection the chips offer
