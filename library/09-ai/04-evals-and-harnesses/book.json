@@ -1,0 +1,5 @@
+{
+  "title": "Evals and Harnesses",
+  "author": "Study notes, researched & compiled 2026",
+  "description": "The widest gap and the highest bar. Thirteen dossiers name evals, and in seven of them the seat exists to build them — golden sets, prompt unit tests, offline checks, online A/Bs, eval harnesses and guardrails an autonomous agent can be trusted behind. This book builds the thing: why a suite of cases that should pass measures nothing, how to construct a golden set and who labels it, deterministic scorers before judges, LLM-as-judge with its three biases and how to measure the judge itself, sample sizes and when a difference is real, per-slice reporting and the aggregate that lies, the regression gate in CI, evaluating retrieval and agent trajectories, online evaluation where offline cannot see, drift, and the ninety-day plan the dossiers already promised seven companies."
+}

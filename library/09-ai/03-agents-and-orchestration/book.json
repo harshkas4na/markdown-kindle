@@ -1,0 +1,5 @@
+{
+  "title": "Agents, Tools and Orchestration",
+  "author": "Study notes, researched & compiled 2026",
+  "description": "Twenty of forty-four companies in the application corpus are building agents, which makes this the second-largest topic and the one with the widest gap between what is claimed and what is understood. The agent loop written from scratch before any framework touches it; tool design, where the description fails more often than the code; ReAct, plan-and-execute and reflection, with the honest case against each; state, memory and context that grows without bound; what LangChain is and is not; LangGraph as a state machine with checkpoints; human-in-the-loop as architecture rather than a prompt; multi-agent systems and the cost you always pay; MCP; and how to debug a run that went wrong at step nine."
+}

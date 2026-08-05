@@ -1,0 +1,5 @@
+{
+  "title": "LLM Foundations for Engineers",
+  "author": "Study notes, researched & compiled 2026",
+  "description": "The model facts that change how you build, and no more than that. What a token really is and why your JSON costs three times what your prose does; what the model is doing when it produces the next one; why context is quadratic in attention and linear in your bill; how sampling works and why temperature 0 is not determinism; what an embedding is and why two models' embeddings are mutually unintelligible; how to get JSON you can parse without a try/except around it; prompting treated as version-controlled engineering rather than folklore; and the arithmetic of cost, latency and model choice that every downstream architecture decision quietly depends on."
+}

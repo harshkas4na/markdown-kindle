@@ -1,0 +1,5 @@
+{
+  "title": "RAG in Production",
+  "author": "Study notes, researched & compiled 2026",
+  "description": "The most-demanded skill in the whole application corpus, taken from a demo pipeline to a system with numbers on it. Parsing and ingestion, where more RAG projects die than anywhere else; chunking as the decision that quietly caps your ceiling; embedding models and the migration you cannot undo; HNSW, IVF and what ef_search really trades; pgvector versus a dedicated store; hybrid search and reciprocal rank fusion; cross-encoder reranking and what it costs in p95; query rewriting, HyDE and multi-query; context assembly and citations; and the chapter the others exist for, measuring retrieval separately from generation so that 'it hallucinated' becomes a component and a number."
+}
