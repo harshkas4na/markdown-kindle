@@ -1,0 +1,5 @@
+{
+  "title": "The Agent Forgets",
+  "author": "Built and written 2026-08-30",
+  "description": "Every Claude session on this machine started from zero and ended by throwing everything away. Two hundred and forty-six of them, ninety hours in job-ops alone, and not one line survived. This is the book about the thing built to stop that: a git-shaped, append-only store of what the agent learned, why the git shape is a real answer rather than an aesthetic one, the admission rule that keeps it from becoming a transcript copy, the three guards that stop it lying to the next session, and the measurement it agreed to be judged on before a line of it was written."
+}
