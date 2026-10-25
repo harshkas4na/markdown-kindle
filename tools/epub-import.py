@@ -29,8 +29,8 @@ public/epub/.imported.json, keyed by name + size + mtime, so re-running is safe,
 only picks up what is new, and --watch never retries the same file in a loop.
 Use --force to import a file again.
 
-Nothing is fetched from outside the .epub. Images are dropped because the
-reader does not render them (see tools/build-reader.py).
+Nothing is fetched from outside the .epub. Images are dropped on this Python
+path (the in-browser importer on the Home screen keeps small figures).
 """
 import html
 import importlib.util
@@ -112,10 +112,19 @@ def read_package(z):
     for node in pkg:
         kind = _tag(node)
         if kind == "metadata":
+            creators = []
             for m in node:
                 t = _tag(m)
-                if t in ("title", "creator", "description") and t not in meta:
+                if t == "title" and "title" not in meta:
                     meta[t] = _text(m)
+                elif t == "creator":
+                    name = _text(m)
+                    if name:
+                        creators.append(name)
+                elif t in ("description", "language") and t not in meta:
+                    meta[t] = _text(m)
+            if creators:
+                meta["creator"] = ", ".join(creators)
         elif kind == "manifest":
             for it in node:
                 if _tag(it) == "item" and it.get("href"):
@@ -125,7 +134,7 @@ def read_package(z):
         elif kind == "spine":
             toc_id = node.get("toc")
             for ref in node:
-                if _tag(ref) == "itemref" and ref.get("idref"):
+                if _tag(ref) == "itemref" and ref.get("idref") and ref.get("linear", "yes") != "no":
                     spine.append(ref.get("idref"))
     return meta, base, manifest, spine, toc_id
 
@@ -167,7 +176,17 @@ def toc_entries(z, manifest, toc_id):
             continue
         base = posixpath.dirname(toc)
         if toc == nav:
-            for a in doc.iter():
+            toc_nav = None
+            for el in doc.iter():
+                if _tag(el) != "nav":
+                    continue
+                kind = (el.get("{http://www.idpf.org/2007/ops}type")
+                        or el.get("epub:type") or "")
+                if "toc" in kind.split() or toc_nav is None:
+                    toc_nav = el
+                    if "toc" in kind.split():
+                        break
+            for a in (toc_nav if toc_nav is not None else doc).iter():
                 if _tag(a) == "a" and a.get("href"):
                     add(base, a.get("href"), _text(a))
         else:
@@ -198,7 +217,9 @@ def anchor_split(xhtml, entries):
     for frag, title in entries:
         if not frag:
             continue
-        m = re.search(r"""<[^>]*\b(?:id|name)\s*=\s*["']%s["']""" % re.escape(frag), body)
+        m = re.search(
+            r"""<[^>]*\b(?:id|name|xml:id)\s*=\s*(?:["']%s["']|%s\b)""" % (re.escape(frag), re.escape(frag)),
+            body)
         if m:
             start = body.rfind("<", 0, m.end())
             cuts.append((start if start >= 0 else m.start(), title))
@@ -259,9 +280,22 @@ def strip_heading(md, title):
     return md
 
 
+TOC_PAGE_RE = re.compile(r"^(contents|table of contents|document outline|toc|navigation)$", re.I)
+
+
+def is_encrypted(z):
+    try:
+        z.getinfo("META-INF/encryption.xml")
+        return True
+    except KeyError:
+        return False
+
+
 def read_epub(path, min_words=30):
     """-> (meta, [{'title', 'md'}]) — one entry per detected chapter."""
     with zipfile.ZipFile(path) as z:
+        if is_encrypted(z):
+            raise EpubError("DRM-locked (Apple Books / Kindle / Adobe) — export a DRM-free EPUB")
         meta, _, manifest, spine, toc_id = read_package(z)
         toc = toc_entries(z, manifest, toc_id)
 
@@ -287,6 +321,8 @@ def read_epub(path, min_words=30):
                     continue  # cover, blank page, copyright stub...
                 title = (piece_title or whole_doc_title or first_heading(md)
                          or first_line_title(md) or imp.prettify(stem))
+                if TOC_PAGE_RE.match(title.strip()) and words(md) < 1500:
+                    continue
                 docs.append({"title": title.strip(), "md": md})
 
     if not docs:
@@ -360,7 +396,8 @@ def import_epub(path, section_q=DEFAULT_SECTION, min_words=30, dry_run=False):
                                                                else section_q.strip().title())
     folder = imp.write_book(section, title, plan,
                             author=plain(meta.get("creator")),
-                            description=plain(meta.get("description")))
+                            description=plain(meta.get("description")),
+                            lang=plain(meta.get("language")))
     return {"title": title, "author": plain(meta.get("creator")), "plan": plan,
             "book_id": f"{section}/{folder}", "folder": f"library/{section}/{folder}"}
 
@@ -393,7 +430,9 @@ def scan_once(drop_dir, section, min_words, force, dry_run, build, quiet=False, 
             why = str(e) if isinstance(e, (EpubError, imp.ImportError_)) \
                 else f"unreadable epub: {type(e).__name__}: {e}"
             print(f"  ! skipped — {why}")
-            if not dry_run:  # remember the failure so --watch stops retrying it
+            # Remember permanent failures so --watch does not retry them.
+            # Incomplete copies (BadZipFile mid-drop) must be retryable.
+            if not dry_run and not isinstance(e, (zipfile.BadZipFile, OSError)):
                 state[fp] = {"error": why, "at": time.strftime("%Y-%m-%d %H:%M:%S")}
                 save_state(drop_dir, state)
             continue
@@ -491,7 +530,7 @@ def main():
     if opts.get("watch"):
         watch(drop_dir, float(opts.get("interval", 3)), **common)
     else:
-        scan_once(drop_dir, **common)
+        scan_once(drop_dir, settle=2, **common)
 
 
 if __name__ == "__main__":

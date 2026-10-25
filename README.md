@@ -20,6 +20,8 @@ open index.html                         # or serve it, or push to GitHub Pages
 
 python3 tools/build-reader.py --serve   # dev mode: serve on :8080 and rebuild
                                         # automatically whenever library/ changes
+python3 tools/build-reader.py --serve --lan   # same, reachable from your phone
+                                              # on the local network
 
 python3 tools/new-book.py books "Deep Work" --author "Cal Newport" \
     --chapters "Intro,Focus,Rituals"    # scaffold a new book with chapter stubs
@@ -38,8 +40,10 @@ so GitHub Pages never serves a stale build.
 
 The build prints `!` warnings for content the reader can't display well:
 chapters missing a `# Title` H1, duplicate `NN-` prefixes in one folder,
-images/footnotes (unsupported), lists nested deeper than one level, and an
-oversized `index.html` (>5 MB).
+missing image files, lists nested deeper than one level, and an oversized
+`index.html` (>8 MB). Images in the markdown *do* render; footnotes render as
+superscripts. The Python EPUB path still drops images — import on the Home
+screen (or a phone) keeps small figures.
 
 ## How content is structured (READ THIS BEFORE ADDING ANYTHING)
 
@@ -127,10 +131,23 @@ mix of bulk and per-chapter files works. Content before the first chapter become
 a "Front Matter" chapter, and every written chapter gets a `# Title` H1 if it
 lacks one.
 
-## Importing EPUBs (the `public/epub/` drop folder)
+## Importing EPUBs
 
-Format-shift an ebook you own into the reader by dropping the `.epub` into
-`public/epub/` and running the converter:
+There are two paths. The recommended one on a phone is the in-browser importer.
+
+**On your iPhone or any browser (no computer, no upload):** open the live reader
+→ **📥 Import a book** → pick a DRM-free `.epub` from Files or iCloud Drive.
+Conversion happens on the device and the book appears on the **On this device**
+shelf (IndexedDB). Apple Books / Kindle store files are DRM-locked and will
+fail with a clear error. This book stays on that browser — use **Back up my
+data** before switching phones, or **Export as Markdown** on the book's TOC
+page to drop it into the repo later.
+
+Android / desktop PWAs can also **Share → Library** or drag-drop onto the
+shelves. iOS has no Web Share Target, so the Files picker is the path.
+
+**On a computer (writes into `library/` for every device):** drop the `.epub`
+into `public/epub/` and run the converter:
 
 ```bash
 python3 tools/epub-import.py            # convert everything new in public/epub/
@@ -174,7 +191,7 @@ replies before uploading; the markers make the seams harmless.
 
 Only two source files matter for the reader app itself:
 
-### `tools/build-reader.py` — the compiler (~170 lines)
+### `tools/build-reader.py` — the compiler
 
 Walks `library/`, applies the routing rules above, and injects two JSON blobs into
 the template, replacing these placeholders:
@@ -246,26 +263,24 @@ Top-to-bottom map:
   links to a per-book "Highlights" page listing them all.
 - **Bookmarks**: the ⚑ button (or `B`) marks the current page; bookmarks are
   listed on the book's TOC and jump back to the exact spot.
-- **Listen (read aloud)**: the 🔊 button in the reader toolbar starts text-to-speech
-  (Web Speech API) from the current position. A bottom bar gives play/pause, a
-  draggable progress tracker, a voice-speed slider (0.5×–2.5×), and a **voice
-  picker** (English voices ranked quality-first — download "Enhanced"/"Premium"
-  system voices for near-human quality; ☁ marks online voices, whose tracker is
-  estimated because they report no word timings). The word being spoken is
-  highlighted live and the page/scroll position follows it automatically; tap any
-  word to jump the voice there. Utterances are cut at sentence/paragraph ends, so
-  prosody never breaks mid-sentence, and code blocks are skipped. A pronunciation
-  layer speaks acronyms letter-by-letter ("UHI" → "U H I"), expands e.g./i.e./etc.,
+- **Listen (read aloud)**: the 🔊 button starts **Kokoro Heart**, the same neural
+  voice the screen tutor uses — not the robotic iPhone voice. The model downloads
+  once (~90 MB) into this browser and then works offline. Bella, Nicole, Michael,
+  Emma and George are in the same download. The phone's own voices stay in the
+  picker under "This device" (☁ marks online system voices). Books tagged with a
+  non-English language start on the device voice, because Kokoro here is English.
+  A bottom bar gives play/pause, a tracker, speed (0.5×–2.5×) and the voice
+  picker. The word being spoken is highlighted and the page follows it; tap a
+  word to jump there. Sentences are spoken whole, and the next sentence is made
+  while the current one plays. Code blocks are skipped. A pronunciation layer
+  speaks acronyms letter-by-letter ("UHI" → "U H I"), expands e.g./i.e./etc.,
   and the 🗣 button adds custom fixes (e.g. "Uniswap" → "you-nee-swap") to a
-  per-browser dictionary that's included in backups. Reading auto-continues into
-  the next chapter. The 🔊 button hides itself if `speechSynthesis` is unsupported.
-  A ⏾ **sleep timer** (15/30/60 min) pauses the voice automatically, and
-  lock-screen play/pause is wired up via the Media Session API where the browser
-  supports it. Voice quality is a *device* property — the **"Robotic voice? Get
-  better voices"** link under the voice picker opens per-platform instructions
-  (iOS: download Premium voices like Ava under Settings → Accessibility → Spoken
-  Content; Android: install Google's Speech Services and its voice data; also
-  macOS/Windows steps) so phones can sound as good as a Mac.
+  per-browser dictionary that's included in backups. Reading continues into the
+  next chapter. A ⏾ **sleep timer** (5/15/30/60 min) pauses the voice, and
+  lock-screen controls use the audio element (this is real audio, so iOS can
+  keep it going with the screen off — the old Web Speech path could not).
+  **About voices** explains the one-time download and, if you prefer them, how
+  to install a Premium system voice.
 - **TOC filter**: books with 10+ chapters get a filter box on their TOC page.
 - **Sharing**: the ⤴ button on a book's TOC page copies a link that opens *just
   that book* (`#s/b/<bookId>`) — the recipient sees the book's TOC and chapters

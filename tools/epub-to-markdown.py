@@ -4,8 +4,8 @@ markdown format — a small XHTML->Markdown transform in the spirit of pandoc or
 Calibre, for format-shifting your own books into the reader.
 
 It reads a single XHTML item straight out of the .epub zip and writes markdown.
-Nothing is fetched or embedded from outside the file. Images are dropped because
-the reader does not render them (see tools/build-reader.py).
+Nothing is fetched or embedded from outside the file. Images are dropped on
+this Python path (the in-browser importer keeps small figures as data URLs).
 
 Usage:
     python3 tools/epub-to-markdown.py \
@@ -20,9 +20,10 @@ import re
 import zipfile
 from pathlib import Path
 
-BLOCK_RE = re.compile(r"<(p|h[1-6]|blockquote|li|pre)\b([^>]*)>(.*?)</\1>", re.S)
-CLASS_RE = re.compile(r'class="([^"]*)"')
+BLOCK_RE = re.compile(r"<(p|h[1-6]|blockquote|li|pre|div)\b([^>]*)>(.*?)</\1>", re.S)
+CLASS_RE = re.compile(r"""class\s*=\s*["']([^"']*)["']""", re.I)
 HEAD_RE = re.compile(r"^h[1-6]$")
+PARA_CLASS_RE = re.compile(r"\b(para|paragraph|ptext|noindent|indent|text)\b", re.I)
 
 
 def inline(fragment: str) -> str:
@@ -36,12 +37,15 @@ def inline(fragment: str) -> str:
 
 
 def convert(xhtml: str, title: str | None, number: int | None) -> str:
-    body = re.search(r"<body[^>]*>(.*)</body>", xhtml, re.S)
+    body = re.search(r"<body[^>]*>(.*)</body>", xhtml, re.S | re.I)
     body = body.group(1) if body else xhtml
+    body = body.replace("\r\n", "\n").replace("\r", "\n")
 
     blocks: list[tuple[str, str]] = []  # (kind, text)
     for m in BLOCK_RE.finditer(body):
-        tag, attrs, inner = m.group(1), m.group(2), m.group(3)
+        tag, attrs, inner = m.group(1).lower(), m.group(2), m.group(3)
+        if tag == "div" and re.search(r"<(?:p|h[1-6]|div|blockquote|ul|ol|li|table|pre)\b", inner, re.I):
+            continue  # container — inner blocks are picked up on their own
         text = inline(inner)
         if not text:
             continue
@@ -49,12 +53,14 @@ def convert(xhtml: str, title: str | None, number: int | None) -> str:
         cls = cls_m.group(1) if cls_m else ""
         if HEAD_RE.match(tag):
             blocks.append((f"h{tag[1]}", text))
-        elif tag == "blockquote" or cls in ("Q", "QAtt"):
+        elif tag == "blockquote" or cls in ("Q", "QAtt") or re.search(r"\b(q|quote|epigraph)\b", cls, re.I):
             blocks.append(("quote", text))
         elif tag == "li":
             blocks.append(("li", text))
         elif tag == "pre":
             blocks.append(("pre", text))
+        elif tag == "div" and not PARA_CLASS_RE.search(cls):
+            continue
         else:
             blocks.append(("p", text))
 
@@ -102,7 +108,7 @@ def main() -> None:
     args = ap.parse_args()
 
     with zipfile.ZipFile(args.epub) as z:
-        xhtml = z.read(args.item).decode("utf-8")
+        xhtml = z.read(args.item).decode("utf-8", "replace")
     md = convert(xhtml, args.title, args.number)
     args.out.write_text(md, encoding="utf-8")
     # Report metadata only — never echo the converted body.

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#fafaf7">
@@ -23,11 +23,23 @@ html[data-theme="sepia"]{
   --card:#f9f2e2; --card-line:rgba(75,58,42,.10); --shadow:rgba(75,58,42,.12);
   --code-bg:rgba(75,58,42,.08);
 }
+html[data-theme="gray"]{
+  --bg:#2b2d31; --fg:#d7d8d4; --muted:#8b8d88; --accent:#d9a65c;
+  --bar-bg:rgba(43,45,49,.96); --bar-fg:#d7d8d4; --line:rgba(255,255,255,.10);
+  --card:#34373c; --card-line:rgba(255,255,255,.07); --shadow:rgba(0,0,0,.35);
+  --code-bg:rgba(255,255,255,.07);
+}
 html[data-theme="dark"]{
   --bg:#111113; --fg:#cfcfc9; --muted:#6e6e68; --accent:#d29a4f;
   --bar-bg:rgba(17,17,19,.96); --bar-fg:#cfcfc9; --line:rgba(255,255,255,.10);
   --card:#1a1a1d; --card-line:rgba(255,255,255,.07); --shadow:rgba(0,0,0,.5);
   --code-bg:rgba(255,255,255,.08);
+}
+html[data-theme="black"]{
+  --bg:#000000; --fg:#bdbdb7; --muted:#5f5f5a; --accent:#c9924a;
+  --bar-bg:rgba(0,0,0,.96); --bar-fg:#bdbdb7; --line:rgba(255,255,255,.12);
+  --card:#0e0e10; --card-line:rgba(255,255,255,.08); --shadow:rgba(0,0,0,.7);
+  --code-bg:rgba(255,255,255,.09);
 }
 /* ---------- base ---------- */
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -46,6 +58,47 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .icon-btn{width:42px; height:42px; border-radius:12px; display:flex; align-items:center;
   justify-content:center; font-size:19px; border:1px solid var(--line); flex-shrink:0;}
 .icon-btn:active{transform:scale(.94);}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--accent); outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; scroll-behavior:auto !important;}
+}
+
+/* ---------- toast (update available, import done, ...) ---------- */
+#toast{position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%);
+  z-index:80; background:var(--fg); color:var(--bg); border-radius:14px; padding:11px 16px;
+  font-size:13.5px; display:flex; align-items:center; gap:14px; box-shadow:0 10px 30px var(--shadow);
+  max-width:calc(100vw - 32px); animation:toastin .25s ease;}
+#toast button{color:var(--accent); font-weight:600; font-size:13.5px; white-space:nowrap;}
+#toast .x{opacity:.6; font-weight:400;}
+@keyframes toastin{from{opacity:0; transform:translate(-50%,10px);} to{opacity:1; transform:translate(-50%,0);}}
+
+/* ---------- bottom sheet (notes, pronunciation, confirmations) ---------- */
+#sheetScrim{position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.35);}
+#sheet{position:fixed; z-index:71; left:50%; transform:translateX(-50%);
+  bottom:calc(14px + env(safe-area-inset-bottom) + var(--kb,0px)); width:min(520px, calc(100vw - 20px));
+  max-height:min(80dvh, calc(100dvh - 28px - var(--kb,0px))); overflow-y:auto;}
+  background:var(--card); border:1px solid var(--card-line); border-radius:18px; padding:16px;
+  box-shadow:0 14px 44px var(--shadow); display:flex; flex-direction:column; gap:10px;}
+#sheet h3{margin:0; font-size:15px;}
+#sheet .q{font-size:13px; color:var(--muted); line-height:1.5; border-left:3px solid var(--accent);
+  padding-left:10px; max-height:90px; overflow:auto;}
+#sheet textarea,#sheet input{width:100%; font:inherit; font-size:16px; padding:10px 12px; border-radius:12px;
+  border:1px solid var(--card-line); background:var(--bg); color:var(--fg); outline:none; resize:vertical;}
+#sheet textarea:focus,#sheet input:focus{border-color:var(--accent);}
+#sheet .btns{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;}
+#sheet .btns button{padding:9px 14px; border-radius:11px; border:1px solid var(--card-line); font-size:13.5px;}
+#sheet .btns button.go{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600;}
+#sheet .btns button.danger{color:#c0392b;}
+#sheet .colors{display:flex; gap:8px;}
+#sheet .colors button{width:30px; height:30px; border-radius:50%; border:2px solid transparent;}
+#sheet .colors button.on{border-color:var(--fg);}
+.hc-y{background:#f6d35b;} .hc-g{background:#8fd18f;} .hc-b{background:#8dc5f0;} .hc-p{background:#f3a6c8;}
+html[data-theme="dark"] .hc-y,html[data-theme="black"] .hc-y{background:#b89a2e;}
+html[data-theme="dark"] .hc-g,html[data-theme="black"] .hc-g{background:#4f9a4f;}
+html[data-theme="dark"] .hc-b,html[data-theme="black"] .hc-b{background:#3f87b8;}
+html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;}
 
 /* ---------- home (shelves) ---------- */
 .lib-top{display:flex; justify-content:space-between; align-items:center; gap:10px;}
@@ -69,8 +122,13 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .continue .t{font-size:17px; font-weight:600; margin:6px 0 4px;}
 .continue .p{font-size:13px; color:var(--muted);}
 .section-h{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.09em;
-  color:var(--muted); margin:26px 4px 12px;}
+  color:var(--muted); margin:26px 4px 12px; display:flex; align-items:baseline; gap:10px;}
+.section-h .cnt{font-weight:500; letter-spacing:0; text-transform:none; font-size:12px; opacity:.8;}
 .shelf{display:grid; grid-template-columns:repeat(auto-fill,minmax(138px,1fr)); gap:16px 14px;}
+.shelf.row{display:flex; overflow-x:auto; gap:14px; padding:4px 4px 10px; scroll-snap-type:x proximity;
+  scrollbar-width:none; margin:0 -4px;}
+.shelf.row::-webkit-scrollbar{display:none;}
+.shelf.row .bookcard{flex:0 0 118px; scroll-snap-align:start;}
 .bookcard{text-align:left; display:flex; flex-direction:column; gap:7px;}
 .bookcard:active .cover{transform:scale(.97);}
 .cover{position:relative; aspect-ratio:2/3; border-radius:10px; padding:14px 12px 18px 16px;
@@ -78,19 +136,47 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
   box-shadow:0 5px 16px var(--shadow); transition:transform .15s ease;}
 .cover::before{content:""; position:absolute; top:0; bottom:0; left:0; width:7px;
   background:rgba(255,255,255,.16); border-right:1px solid rgba(0,0,0,.15);}
+.cover.img{padding:0;}
+.cover.img::before{display:none;}
+.cover.img img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;}
+.cover.img .bt,.cover.img .ba{display:none;}
 .cover .bt{font-size:14.5px; font-weight:700; line-height:1.3; letter-spacing:-.01em;
   display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
   text-shadow:0 1px 2px rgba(0,0,0,.25);}
 .cover .ba{margin-top:auto; font-size:11px; opacity:.85; overflow:hidden;
   text-overflow:ellipsis; white-space:nowrap;}
-.cover .bar{position:absolute; left:0; right:0; bottom:0; height:4px; background:rgba(0,0,0,.25);}
+.cover .bar{position:absolute; left:0; right:0; bottom:0; height:4px; background:rgba(0,0,0,.25); z-index:1;}
 .cover .bar i{display:block; height:100%; background:#fff; opacity:.9;}
+.cover .badge{position:absolute; top:8px; right:8px; z-index:1; font-size:10px; font-weight:700;
+  background:rgba(0,0,0,.45); color:#fff; border-radius:6px; padding:2px 6px; letter-spacing:.04em;}
 .bookcard .cap{font-size:11.5px; color:var(--muted); padding:0 2px;}
 .bookcard .cap.done{color:var(--accent);}
+.statline{color:var(--muted); font-size:13px; margin:-14px 4px 20px; display:flex; gap:14px; flex-wrap:wrap;}
+.statline button{color:var(--accent); font-size:13px;}
+.heat{display:grid; grid-auto-flow:column; grid-template-rows:repeat(7,12px); gap:3px; margin:12px 4px 6px;
+  overflow-x:auto; padding-bottom:4px;}
+.heat i{display:block; width:12px; height:12px; border-radius:3px; background:var(--code-bg);}
+.heat i.l1{background:color-mix(in srgb,var(--accent) 30%,transparent);}
+.heat i.l2{background:color-mix(in srgb,var(--accent) 55%,transparent);}
+.heat i.l3{background:color-mix(in srgb,var(--accent) 80%,transparent);}
+.heat i.l4{background:var(--accent);}
+.statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:8px 4px 18px;}
+.statgrid .st{background:var(--card); border:1px solid var(--card-line); border-radius:12px; padding:12px 14px;}
+.statgrid .st b{display:block; font-size:20px; letter-spacing:-.02em;}
+.statgrid .st span{font-size:12px; color:var(--muted);}
+.hint{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--card-line);
+  border-radius:14px; padding:12px 14px; margin:0 4px 20px; font-size:13px; line-height:1.5; color:var(--muted);}
+.hint b{color:var(--fg);}
+.hint button{color:var(--muted); font-size:16px; margin-left:auto; flex-shrink:0;}
+.dropzone{outline:3px dashed var(--accent); outline-offset:-12px;}
+.impbar{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--card-line);
+  border-radius:12px; padding:10px 14px; margin:0 4px 18px; font-size:13px; color:var(--muted);}
+.impbar .spin{width:13px; height:13px; border-radius:50%; border:2px solid var(--card-line);
+  border-top-color:var(--accent); display:inline-block; animation:offspin .7s linear infinite; flex-shrink:0;}
 
 /* ---------- search ---------- */
 .searchbox{width:100%; padding:11px 14px; border-radius:12px; border:1px solid var(--card-line);
-  background:var(--card); color:var(--fg); font:inherit; font-size:14px; outline:none;
+  background:var(--card); color:var(--fg); font:inherit; font-size:16px; outline:none;
   -webkit-appearance:none; transition:border-color .15s;}
 .searchbox:focus{border-color:var(--accent);}
 .searchwrap{margin:0 4px 20px;}
@@ -104,6 +190,14 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
   color:inherit; border-radius:3px; padding:0 1px;}
 .md mark.hl.noted{border-bottom:2px dotted var(--accent); cursor:pointer;}
 .md mark.hl{cursor:pointer;}
+.md mark.hl.c-y{background:color-mix(in srgb,#f6d35b 55%,transparent);}
+.md mark.hl.c-g{background:color-mix(in srgb,#8fd18f 55%,transparent);}
+.md mark.hl.c-b{background:color-mix(in srgb,#8dc5f0 55%,transparent);}
+.md mark.hl.c-p{background:color-mix(in srgb,#f3a6c8 55%,transparent);}
+.md mark.hl.flash{animation:hlflash 1.4s ease;}
+@keyframes hlflash{0%,60%{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 45%,transparent);} 100%{box-shadow:none;}}
+.hlcard .q.c-y{border-left-color:#e0b93a;} .hlcard .q.c-g{border-left-color:#5fae5f;}
+.hlcard .q.c-b{border-left-color:#4f9fd8;} .hlcard .q.c-p{border-left-color:#d8679b;}
 .snone{color:var(--muted); font-size:14px; margin:8px 4px;}
 
 /* ---------- home tools row (export / import) ---------- */
@@ -187,6 +281,16 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .md{text-rendering:optimizeLegibility;}
 .md>*:first-child{margin-top:0;}
 .md p{margin:0 0 1em; text-align:justify; hyphens:auto; -webkit-hyphens:auto;}
+#content.align-left .md p,.align-left .md p{text-align:left; hyphens:manual; -webkit-hyphens:manual;}
+.md img{max-width:100%; max-height:70vh; height:auto; display:block; margin:0 auto 1em;
+  border-radius:8px; break-inside:avoid; -webkit-column-break-inside:avoid;}
+.md figure{margin:0 0 1em;}
+.md figcaption,.md .imgcap{font-size:.8em; color:var(--muted); text-align:center; margin:-.5em 0 1em;}
+.md sup{font-size:.7em; line-height:0; vertical-align:super;}
+.md del{opacity:.65;}
+.md .task{list-style:none; margin-left:-1.2em;}
+.md .task input{margin-right:.5em; accent-color:var(--accent); pointer-events:none;}
+.md h2,.md h3{break-after:avoid; -webkit-column-break-after:avoid;}
 .md h1{font-size:1.5em; line-height:1.28; margin:0 0 .9em; letter-spacing:-.015em; text-align:left;}
 .md h2{font-size:1.22em; line-height:1.3; margin:1.5em 0 .6em; letter-spacing:-.01em;}
 .md h3{font-size:1.05em; margin:1.3em 0 .5em;}
@@ -200,8 +304,7 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .md li{margin:0 0 .45em;}
 .md blockquote{border-left:3px solid var(--accent); margin:0 0 1em; padding:.1em 0 .1em 1em; color:var(--muted);}
 .md hr{border:none; height:1px; background:var(--line); margin:1.6em auto; width:55%;}
-.md .tblwrap{margin:0 0 1.2em; max-width:100%;}
-#reader.mode-scroll .md .tblwrap{overflow-x:auto;}
+.md .tblwrap{margin:0 0 1.2em; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 .md table{border-collapse:collapse; width:100%; font-size:.78em; line-height:1.45;}
 .md th,.md td{border:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top;}
 .md th{background:var(--code-bg); font-weight:600;}
@@ -213,10 +316,15 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
   display:flex; align-items:center; gap:8px;
   transition:transform .28s ease, opacity .28s ease;}
 #topbar{top:0; padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
-  border-bottom:1px solid var(--line);}
+  border-bottom:1px solid var(--line); flex-wrap:wrap;}
 #topbar.off{transform:translateY(-110%); opacity:0; pointer-events:none;}
 #topbar .title{flex:1; font-size:14px; font-weight:600; text-align:center;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;}
+@media(max-width:560px){
+  #topbar{gap:6px;}
+  #topbar .title{order:10; flex:1 0 100%; font-size:13px; padding:2px 4px 0;}
+  .icon-btn{width:38px; height:38px; font-size:17px;}
+}
 #botbar{bottom:0; padding:10px 14px calc(12px + env(safe-area-inset-bottom));
   border-top:1px solid var(--line); flex-direction:column;}
 #botbar.off{transform:translateY(110%); opacity:0; pointer-events:none;}
@@ -232,8 +340,12 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   border:1px solid var(--line); border-radius:9px; padding:7px 8px;
   font:inherit; font-size:13px; -webkit-appearance:none; appearance:none;}
 #btnListen.on{color:var(--accent);}
-.tts-w.tts-cur{background:color-mix(in srgb,var(--accent) 32%,transparent); border-radius:3px;}
+.tts-w.tts-sent{background:color-mix(in srgb,var(--accent) 11%,transparent);}
+.tts-w.tts-cur{background:color-mix(in srgb,var(--accent) 38%,transparent); border-radius:3px;}
 #content.tts-mode .tts-w:hover{background:var(--code-bg); cursor:pointer; border-radius:3px;}
+#ttsBar .mini{font-size:12px; color:var(--muted); padding:6px 9px; border-radius:9px; border:1px solid var(--line);}
+#ttsBar .mini.on{color:var(--accent); border-color:var(--accent);}
+#ttsBar optgroup{font-style:normal; font-weight:600; color:var(--muted);}
 /* while listening, the persistent TTS bar must not cover the page bottom */
 #reader.listening #pageArea{padding-bottom:calc(18px + var(--ttsbar-h,170px));}
 #reader.listening.mode-scroll #content{padding-bottom:calc(8vh + var(--ttsbar-h,170px));}
@@ -241,8 +353,10 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 /* ---------- Ask AI panel ---------- */
 #aiPanel{position:fixed; z-index:31; background:var(--card); border:1px solid var(--card-line);
   box-shadow:0 12px 40px var(--shadow); border-radius:18px; padding:14px 16px;
-  left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom));
-  width:min(560px, calc(100vw - 24px)); max-height:72dvh; display:flex; flex-direction:column;}
+  left:50%; transform:translateX(-50%);
+  bottom:calc(16px + env(safe-area-inset-bottom) + var(--kb,0px));
+  width:min(560px, calc(100vw - 24px)); max-height:min(72dvh, calc(100dvh - 32px - var(--kb,0px)));
+  display:flex; flex-direction:column;}
 .ai-head{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
 .ai-head .ai-title{font-weight:700; font-size:15px;}
 .ai-head .ai-model{flex:1; font-size:11px; color:var(--muted); overflow:hidden;
@@ -281,7 +395,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 .ai-inputrow{display:flex; gap:8px; align-items:flex-end;}
 .ai-inputrow textarea{flex:1; resize:none; max-height:110px; padding:10px 12px;
   border-radius:12px; border:1px solid var(--card-line); background:var(--bg); color:var(--fg);
-  font:inherit; font-size:13.5px; outline:none; line-height:1.4;}
+  font:inherit; font-size:16px; outline:none; line-height:1.4;}
 .ai-inputrow textarea:focus{border-color:var(--accent);}
 #aiSendBtn{width:40px; height:40px; border-radius:12px; font-size:15px; color:var(--accent);}
 
@@ -303,7 +417,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   white-space:nowrap; max-width:45%; flex-shrink:0;}
 .qk-item.sel{background:color-mix(in srgb,var(--accent) 14%,transparent);}
 .qk-none{color:var(--muted); font-size:13.5px; padding:14px 12px;}
-@media(max-width:560px){#btnQk{display:none !important;}}
+@media(max-width:560px){#btnQk{width:38px;}}
 
 /* ---------- keyboard help & voice help overlays ---------- */
 #helpOverlay,#voiceHelp{position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.45);
@@ -328,8 +442,9 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 #scrim{position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.25);}
 #aaPanel{position:fixed; z-index:30; background:var(--card); border:1px solid var(--card-line);
   box-shadow:0 12px 40px var(--shadow); border-radius:18px; padding:18px;
-  left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom));
-  width:min(420px, calc(100vw - 24px)); max-height:76dvh; overflow-y:auto;}
+  left:50%; transform:translateX(-50%);
+  bottom:calc(16px + env(safe-area-inset-bottom) + var(--kb,0px));
+  width:min(420px, calc(100vw - 24px)); max-height:min(76dvh, calc(100dvh - 32px - var(--kb,0px))); overflow-y:auto;}
 .row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;}
 .row:last-child{margin-bottom:0;}
 .row .lbl{font-size:13px; color:var(--muted); min-width:74px;}
@@ -339,12 +454,16 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 .stepper{display:flex; align-items:center; gap:4px; flex:1; justify-content:flex-end;}
 .stepper button{width:44px; height:36px; border:1px solid var(--line); border-radius:10px; font-size:16px;}
 .stepper .val{min-width:52px; text-align:center; font-size:14px; font-variant-numeric:tabular-nums;}
-.theme-chips{display:flex; gap:8px; flex:1; justify-content:flex-end;}
-.theme-chips button{width:44px; height:36px; border-radius:10px; border:2px solid var(--line); font-size:12px; font-weight:600;}
+.theme-chips{display:flex; gap:6px; flex:1; justify-content:flex-end; flex-wrap:wrap;}
+.theme-chips button{width:40px; height:34px; border-radius:10px; border:2px solid var(--line); font-size:12px; font-weight:600;}
 .theme-chips button.on{border-color:var(--accent);}
 .chip-light{background:#fafaf7; color:#1c1c1a;}
 .chip-sepia{background:#f3ead7; color:#4b3a2a;}
+.chip-gray{background:#2b2d31; color:#d7d8d4;}
 .chip-dark{background:#111113; color:#cfcfc9;}
+.chip-black{background:#000; color:#bdbdb7;}
+#rowCols{display:none;}
+@media (min-width:760px){#rowCols{display:flex;}}
 
 /* ---------- desktop niceties ---------- */
 @media (min-width:900px){
@@ -365,7 +484,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 <div id="locked" class="view hidden">
   <div class="lockbox">
     <div class="lockmark">🔒</div>
-    <p class="sub">This library is private. Open it with a link that includes the key, or enter it below.</p>
+    <p class="sub" id="lockHint">This library is private. Open it with a link that includes the key, or enter it below.</p>
     <input type="password" id="lockInput" class="searchbox" placeholder="Key" autocomplete="off">
     <button class="primary" id="lockBtn">Unlock</button>
     <p class="sub" id="lockErr"></p>
@@ -384,15 +503,15 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   <div id="statusBot" class="status"><span id="stInfo"></span></div>
 
   <header id="topbar" class="bar off">
-    <button class="icon-btn" id="btnToc" title="Contents (Esc)">☰</button>
+    <button class="icon-btn" id="btnToc" title="Contents (Esc)" aria-label="Contents">☰</button>
     <div class="title" id="barTitle"></div>
-    <button class="icon-btn" id="btnQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>
-    <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)">⚐</button>
-    <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter">⤴</button>
-    <button class="icon-btn" id="btnTheme" title="Cycle theme (T)">◑</button>
-    <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud (L)">🔊</button>
-    <button class="icon-btn" id="btnAsk" title="Ask AI — select text then press A, or ask about the chapter">✦</button>
-    <button class="icon-btn" id="btnAa" title="Display settings">Aa</button>
+    <button class="icon-btn" id="btnQk" title="Quick open — jump to any book or chapter (⌘K)" aria-label="Quick open">⌘</button>
+    <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)" aria-label="Bookmark">⚐</button>
+    <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter" aria-label="Share chapter">⤴</button>
+    <button class="icon-btn" id="btnTheme" title="Cycle theme (T)" aria-label="Cycle theme">◑</button>
+    <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud (L)" aria-label="Listen">🔊</button>
+    <button class="icon-btn" id="btnAsk" title="Ask AI — select text then press A, or ask about the chapter" aria-label="Ask AI">✦</button>
+    <button class="icon-btn" id="btnAa" title="Display settings" aria-label="Display settings">Aa</button>
   </header>
 
   <div id="hlPop" class="hidden"></div>
@@ -416,17 +535,22 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <span style="font-size:13px;color:var(--muted);min-width:56px">Speed</span>
       <input type="range" id="ttsRateSlider" min="0.5" max="2.5" step="0.1" value="1" title="Voice speed">
       <span id="ttsRateVal" style="font-size:13px;color:var(--muted);min-width:40px;text-align:right">1.0×</span>
-      <button class="icon-btn" id="ttsSleep" title="Sleep timer — stop reading after 15 / 30 / 60 minutes">⏾</button>
+      <button class="icon-btn" id="ttsSleep" title="Sleep timer — stop reading after 5 / 15 / 30 / 60 minutes">⏾</button>
     </div>
     <div class="slider-row" style="margin-top:10px">
       <span style="font-size:13px;color:var(--muted);min-width:56px">Voice</span>
-      <select id="ttsVoice" title="Choose a voice (☁ = online voice, tracker is estimated)"></select>
+      <select id="ttsVoice" title="Heart is the built-in Kokoro voice. Device voices are listed underneath."></select>
       <button class="icon-btn" id="ttsDictBtn" title="Fix how a word is pronounced">🗣</button>
     </div>
-    <div class="slider-row" style="margin-top:6px;justify-content:center">
-      <button id="ttsVoiceHelp" style="font-size:12px;color:var(--accent)">⬇ Robotic voice? Get better voices for this device</button>
+    <div class="slider-row" style="margin-top:8px;justify-content:center;gap:8px;flex-wrap:wrap">
+      <button class="mini" id="ttsSaveSent" title="Save the sentence being read as a highlight (S)">✎ Keep this sentence</button>
+      <button class="mini" id="ttsSkipHead" title="Skip headings, captions and tables while reading">Skip headings</button>
+      <button id="ttsVoiceHelp" style="font-size:12px;color:var(--accent)">About voices</button>
     </div>
+    <div id="ttsKokoroNote" class="hidden" style="font-size:12px;color:var(--muted);text-align:center;margin-top:6px"></div>
   </footer>
+  <audio id="keepAlive" loop preload="auto" playsinline style="display:none"></audio>
+  <audio id="ttsAudio" preload="auto" playsinline style="display:none"></audio>
 
   <div id="scrim" class="hidden"></div>
 
@@ -483,9 +607,11 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <div class="krow"><span>Quick open — any book or chapter</span><span><kbd>⌘K</kbd> / <kbd>Ctrl K</kbd></span></div>
       <h3>Reading</h3>
       <div class="krow"><span>Next / previous page</span><span><kbd>→</kbd> <kbd>←</kbd> <kbd>Space</kbd></span></div>
+      <div class="krow"><span>Next / previous chapter</span><span><kbd>N</kbd> <kbd>P</kbd></span></div>
       <div class="krow"><span>First / last page</span><span><kbd>Home</kbd> <kbd>End</kbd></span></div>
       <div class="krow"><span>Toggle bars · theme · bookmark</span><span><kbd>M</kbd> <kbd>T</kbd> <kbd>B</kbd></span></div>
       <div class="krow"><span>Font size</span><span><kbd>+</kbd> <kbd>−</kbd></span></div>
+      <div class="krow"><span>Highlight selection · add note</span><span><kbd>H</kbd> <kbd>Shift H</kbd></span></div>
       <div class="krow"><span>Back / close</span><span><kbd>Esc</kbd></span></div>
       <h3>Ask AI</h3>
       <div class="krow"><span>Ask about selection (or chapter)</span><span><kbd>A</kbd></span></div>
@@ -496,6 +622,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <div class="krow"><span>Play / pause</span><span><kbd>Space</kbd> <kbd>K</kbd></span></div>
       <div class="krow"><span>Previous / next sentence</span><span><kbd>←</kbd> <kbd>→</kbd></span></div>
       <div class="krow"><span>Slower / faster voice</span><span><kbd>[</kbd> <kbd>]</kbd></span></div>
+      <div class="krow"><span>Keep the spoken sentence as a highlight</span><span><kbd>S</kbd></span></div>
       <h3>This help</h3>
       <div class="krow"><span>Show / hide</span><span><kbd>?</kbd></span></div>
     </div>
@@ -510,17 +637,28 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <div class="seg" id="segLh"><button data-v="1.5">Tight</button><button data-v="1.7">Normal</button><button data-v="1.95">Loose</button></div></div>
     <div class="row"><span class="lbl">Margins</span>
       <div class="seg" id="segMargin"><button data-v="s">Narrow</button><button data-v="m">Medium</button><button data-v="l">Wide</button></div></div>
+    <div class="row"><span class="lbl">Align</span>
+      <div class="seg" id="segAlign"><button data-v="justify">Justify</button><button data-v="left">Left</button></div></div>
     <div class="row"><span class="lbl">Theme</span>
       <div class="theme-chips" id="themeChips">
-        <button class="chip-light" data-v="light">A</button>
-        <button class="chip-sepia" data-v="sepia">A</button>
-        <button class="chip-dark" data-v="dark">A</button></div></div>
+        <button class="chip-light" data-v="light" title="Light">A</button>
+        <button class="chip-sepia" data-v="sepia" title="Sepia">A</button>
+        <button class="chip-gray" data-v="gray" title="Gray">A</button>
+        <button class="chip-dark" data-v="dark" title="Dark">A</button>
+        <button class="chip-black" data-v="black" title="Black (OLED)">A</button></div></div>
     <div class="row"><span class="lbl">Page turn</span>
       <div class="seg" id="segAnim"><button data-v="slide">Slide</button><button data-v="fade">Fade</button><button data-v="none">None</button></div></div>
     <div class="row"><span class="lbl">Layout</span>
       <div class="seg" id="segMode"><button data-v="page">Pages</button><button data-v="scroll">Scroll</button></div></div>
+    <div class="row" id="rowCols"><span class="lbl">Columns</span>
+      <div class="seg" id="segCols"><button data-v="1">One</button><button data-v="2">Two</button></div></div>
   </div>
 </div>
+
+<div id="sheetScrim" class="hidden"></div>
+<div id="sheet" class="hidden" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
+<input type="file" id="importFile" accept=".epub,application/epub+zip,.md,.markdown,.txt,text/markdown,text/plain,application/octet-stream" multiple class="hidden">
+<input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
 
 <div id="qkOverlay" class="hidden">
   <div class="card">
@@ -529,37 +667,73 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
   </div>
 </div>
 
+<script type="application/json" id="chapterData">__CHAPTER_DATA__</script>
 <script>
 "use strict";
 /* ================= data =================
-   LIB      = [{id, title, books:[{id, title, author, description, chapters:[chIdx…]}]}]
-   CHAPTERS = [{id, file, book, part, num, title, md}]  (flat, global indices)   */
+   LIB      = [{id, title, books:[{id, title, author, description, cover?, lang?, chapters:[chIdx…]}]}]
+   CHAPTERS = [{id, file, book, part, num, title, words, md}]  (flat, global indices)
+   The chapter blob is parsed with JSON.parse from a <script type=application/json>
+   block: for a multi-megabyte literal that is markedly faster than having the JS
+   parser read it as an object literal, and it keeps the markdown out of the JS
+   tokenizer entirely. */
 const LIB = __LIB_DATA__;
-const CHAPTERS = __CHAPTER_DATA__;
-const ACCESS_TOKEN = __ACCESS_TOKEN__; // null = site is open to everyone (default)
+const CHAPTERS = JSON.parse(document.getElementById("chapterData").textContent);
+const ACCESS_HASH = __ACCESS_HASH__;   // sha256 hex of the site key; null = open to everyone
+const BUILD_ID = "__BUILD_ID__";
+const OFFLINE_CACHE = "__OFFLINE_CACHE__";
+const SHARE_INBOX = "__SHARE_INBOX__";
 const BOOKS = {};
-LIB.forEach(s => s.books.forEach(b => {
-  BOOKS[b.id] = b;
-  b.section = s.title;
-  b.words = 0;
-}));
-CHAPTERS.forEach(c => {
-  c.words = c.md.split(/\s+/).length;
-  BOOKS[c.book].words += c.words;
-});
+function indexLibrary(){
+  // (re)build the lookup tables after LIB/CHAPTERS change (boot, local imports)
+  for(const k in BOOKS)delete BOOKS[k];
+  LIB.forEach(s => s.books.forEach(b => {
+    BOOKS[b.id] = b;
+    b.section = s.title;
+    b.sectionId = s.id;
+    b.words = 0;
+  }));
+  CHAPTERS.forEach((c, i) => {
+    c.idx = i;
+    if(c.words == null) c.words = (c.md.match(/\S+/g) || []).length;
+    if(BOOKS[c.book]) BOOKS[c.book].words += c.words;
+  });
+}
+indexLibrary();
+const chapterIndex = id => { const c = CHAPTERS.find(x => x.id === id); return c ? c.idx : -1; };
+const chapterById = id => CHAPTERS.find(x => x.id === id) || null;
 
 /* ================= tiny markdown renderer ================= */
-function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function safeUrl(u){
+  // only http(s), mailto, relative paths and image data: URLs may become hrefs/srcs
+  if(/^(https?:|mailto:)/i.test(u))return u;
+  if(/^data:image\//i.test(u))return u;
+  if(/^[a-z][a-z0-9+.-]*:/i.test(u))return "";   // javascript:, vbscript:, …
+  return u;
+}
 function inline(s){
-  const codes=[];
+  const codes=[],lits=[];
+  // backslash escapes (\* \_ \[ \# …) become literal characters
+  s=s.replace(/\\([\\`*_{}\[\]()#+\-.!~>|])/g,(m,c)=>{lits.push(esc(c));return "\u0001"+(lits.length-1)+"\u0001";});
   s=esc(s);
-  s=s.replace(/`([^`]+)`/g,(m,c)=>{codes.push(c);return ""+(codes.length-1)+"";});
+  s=s.replace(/`([^`]+)`/g,(m,c)=>{codes.push(c);return "\u0000"+(codes.length-1)+"\u0000";});
+  // images first so the link rule below doesn't eat the leading "!"
+  s=s.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\)/g,(m,alt,u,title)=>{
+    const src=safeUrl(u);if(!src)return alt;
+    return `<img src="${src}" alt="${alt}" loading="lazy" decoding="async"${title?` title="${title}"`:""}>`;});
   s=s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,(m,t,u)=>{
-    if(/^https?:/i.test(u)) return `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
-    return `<a href="${u}" data-int="1">${t}</a>`;});
-  s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
-  s=s.replace(/(^|[\s(])\*([^*\n]+)\*/g,"$1<em>$2</em>");
-  s=s.replace(/(\d+)/g,(m,i)=>`<code>${codes[+i]}</code>`);
+    const href=safeUrl(u);if(!href)return t;
+    if(/^(https?:|mailto:)/i.test(href)) return `<a href="${href}" target="_blank" rel="noopener">${t}</a>`;
+    return `<a href="${href}" data-int="1">${t}</a>`;});
+  s=s.replace(/\[\^([^\]]+)\]/g,'<sup class="fn">$1</sup>');          // footnote refs → superscript
+  s=s.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g,"<strong>$2</strong>");
+  s=s.replace(/(^|[\s(>])\*(?=\S)([^*\n]+?\S)\*/g,"$1<em>$2</em>");
+  s=s.replace(/(^|[\s(>])_(?=\S)([^_\n]+?\S)_(?![A-Za-z0-9])/g,"$1<em>$2</em>");
+  s=s.replace(/~~(?=\S)([^~]+?\S)~~/g,"<del>$1</del>");
+  s=s.replace(/\u0000(\d+)\u0000/g,(m,i)=>`<code>${codes[+i]}</code>`);
+  s=s.replace(/\u0001(\d+)\u0001/g,(m,i)=>lits[+i]);
   return s;
 }
 function mdToHtml(md){
@@ -569,14 +743,17 @@ function mdToHtml(md){
   let pbuf=[];
   while(i<lines.length){
     let ln=lines[i];
-    if(/^```/.test(ln)){flushP(pbuf);let code=[];i++;
-      while(i<lines.length&&!/^```/.test(lines[i])){code.push(lines[i]);i++;}
-      i++;out.push("<pre><code>"+esc(code.join("\n"))+"</code></pre>");continue;}
+    const fence=ln.match(/^\s*(`{3,}|~{3,})\s*([\w+-]*)/);
+    if(fence){flushP(pbuf);let code=[];i++;const f=fence[1][0];
+      while(i<lines.length&&!new RegExp("^\\s*"+(f==="`"?"`{3,}":"~{3,}")+"\\s*$").test(lines[i])){code.push(lines[i]);i++;}
+      i++;out.push(`<pre><code${fence[2]?` class="lang-${esc(fence[2])}"`:""}>`+esc(code.join("\n"))+"</code></pre>");continue;}
     let t=ln.trim();
     if(t===""){flushP(pbuf);i++;continue;}
-    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t)){flushP(pbuf);out.push("<hr>");i++;continue;}
-    let h=t.match(/^(#{1,6})\s+(.*)/);
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t.replace(/\s/g,""))&&/^[-*_\s]+$/.test(t)){flushP(pbuf);out.push("<hr>");i++;continue;}
+    if(/^<!--[\s\S]*?-->$/.test(t)){i++;continue;}                   // importer markers / comments
+    let h=t.match(/^(#{1,6})\s+(.*?)\s*#*$/);
     if(h){flushP(pbuf);const l=h[1].length;out.push(`<h${l}>`+inline(h[2])+`</h${l}>`);i++;continue;}
+    if(/^!\[[^\]]*\]\([^)]+\)\s*$/.test(t)){flushP(pbuf);out.push(`<figure>${inline(t)}</figure>`);i++;continue;}
     if(/^>/.test(t)){flushP(pbuf);let q=[];
       while(i<lines.length&&/^\s*>/.test(lines[i])){q.push(lines[i].replace(/^\s*>\s?/,""));i++;}
       out.push("<blockquote>"+mdToHtml(q.join("\n"))+"</blockquote>");continue;}
@@ -597,10 +774,13 @@ function splitRow(r){
 function renderTable(rows){
   if(rows.length<2) return "<p>"+inline(rows.join(" "))+"</p>";
   const head=splitRow(rows[0]);
-  let body=rows.slice(/^\s*\|?[\s:|-]+\|?\s*$/.test(rows[1])?2:1);
+  const hasAlign=/^\s*\|?[\s:|-]+\|?\s*$/.test(rows[1]);
+  const align=hasAlign?splitRow(rows[1]).map(c=>/^:-+:$/.test(c)?"center":/-+:$/.test(c)?"right":""):[];
+  const al=i=>align[i]?` style="text-align:${align[i]}"`:"";
+  let body=rows.slice(hasAlign?2:1);
   let h="<div class='tblwrap'><table><thead><tr>";
-  head.forEach(c=>h+="<th>"+inline(c)+"</th>");h+="</tr></thead><tbody>";
-  body.forEach(r=>{h+="<tr>";splitRow(r).forEach(c=>h+="<td>"+inline(c)+"</td>");h+="</tr>";});
+  head.forEach((c,i)=>h+=`<th${al(i)}>`+inline(c)+"</th>");h+="</tr></thead><tbody>";
+  body.forEach(r=>{h+="<tr>";splitRow(r).forEach((c,i)=>h+=`<td${al(i)}>`+inline(c)+"</td>");h+="</tr>";});
   return h+"</tbody></table></div>";
 }
 function parseList(lines,i){
@@ -621,7 +801,9 @@ function parseList(lines,i){
     if(stack.length===0){open(ord);prevIndent=indent;}
     else if(indent>prevIndent){html=html.replace(/<\/li>$/,"");open(ord);prevIndent=indent;}
     else if(indent<prevIndent&&stack.length>1){close();html+="</li>";prevIndent=indent;}
-    html+="<li>"+inline(m[3])+"</li>";
+    const task=m[3].match(/^\[([ xX])\]\s+(.*)$/);   // GitHub-style task list items
+    if(task)html+=`<li class="task"><input type="checkbox" disabled${task[1]!==" "?" checked":""}>${inline(task[2])}</li>`;
+    else html+="<li>"+inline(m[3])+"</li>";
     i++;
   }
   while(stack.length)close();
@@ -632,37 +814,113 @@ function parseList(lines,i){
 const $=id=>document.getElementById(id);
 const store={
   get(k,d){try{const v=localStorage.getItem("hkr."+k);return v?JSON.parse(v):d;}catch(e){return d;}},
-  set(k,v){try{localStorage.setItem("hkr."+k,JSON.stringify(v));}catch(e){}}
+  set(k,v){
+    try{localStorage.setItem("hkr."+k,JSON.stringify(v));}
+    catch(e){
+      if(!store._full&&/quota|full/i.test(String(e.name||"")+e.message)){
+        store._full=true;
+        try{toast("Storage is full — back up your data or delete an imported book.");}catch(x){}
+      }
+    }
+  }
 };
 const prefersDark=matchMedia("(prefers-color-scheme: dark)").matches;
+const prefersReduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let S=Object.assign({theme:prefersDark?"dark":"light",font:"serif",fs:18,lh:"1.7",
-  margin:"m",anim:"slide",mode:"page",ttsRate:1},store.get("settings",{}));
+  margin:"m",anim:prefersReduce?"none":"slide",mode:"page",align:"justify",cols:"1",ttsRate:1,ttsSkipHead:false},
+  store.get("settings",{}));
 let progress=store.get("progress",{});   // {chapterId:{pct}}
 let last=store.get("last",null);         // {id: chapterId}
-let lastByBook=store.get("lastBook",{}); // {bookId: chapterId} — per-book resume point
-let highlights=store.get("highlights",{});// {chapterId:[{text, note?}]}
+let lastByBook=store.get("lastBook",{}); // {bookId:{id: chapterId, t: ms}} — per-book resume point
+// older builds stored a bare chapter id per book; lift those into objects
+Object.keys(lastByBook).forEach(k=>{if(typeof lastByBook[k]==="string")lastByBook[k]={id:lastByBook[k],t:0};});
+let highlights=store.get("highlights",{});// {chapterId:[{text, note?, c?: "y"|"g"|"b"|"p", t?}]}
 let bookmarks=store.get("bookmarks",[]); // [{ch: chapterId, pct}]
-let vocab=store.get("vocab",[]);         // [{w, def, ch, d}] — words looked up via "Meaning"
-let stats=store.get("stats",{});         // {days:{YYYY-MM-DD:words}, finished:{bookId:date}}
-stats.days=stats.days||{};stats.finished=stats.finished||{};
+let vocab=store.get("vocab",[]);         // [{w, def, ch, d, via?}] — words looked up via "Meaning"
+let stats=store.get("stats",{});         // {days:{YYYY-MM-DD:words}, finished:{bookId:date}, secs:{YYYY-MM-DD:seconds}}
+stats.days=stats.days||{};stats.finished=stats.finished||{};stats.secs=stats.secs||{};
+let ui=store.get("ui",{});               // small dismissible hints etc.
 let cur=-1, page=0, pageCount=1, pendingPct=null;
 const htmlCache={};
 
 const content=$("content"),pages=$("pages"),reader=$("reader"),
       home=$("home"),toc=$("toc"),locked=$("locked");
 
+/* ================= toast & bottom sheet (replace alert/prompt) ================= */
+let toastT=null;
+function toast(msg,action,fn,ms){
+  const old=$("toast");if(old)old.remove();
+  const el=document.createElement("div");el.id="toast";
+  el.innerHTML=`<span>${esc(msg)}</span>${action?`<button class="go">${esc(action)}</button>`:""}<button class="x" title="Dismiss">✕</button>`;
+  document.body.appendChild(el);
+  el.querySelector(".x").addEventListener("click",()=>el.remove());
+  if(action)el.querySelector(".go").addEventListener("click",()=>{el.remove();fn&&fn();});
+  clearTimeout(toastT);
+  if(ms!==0)toastT=setTimeout(()=>{if(el.isConnected)el.remove();},ms||(action?9000:3200));
+}
+/* sheet({title, quote?, value?, multiline?, placeholder?, colors?, color?, ok?, danger?})
+   -> Promise<{value, color} | null>   (null = cancelled) */
+let sheetResolve=null;
+function sheet(o){
+  return new Promise(res=>{
+    closeSheet(null);
+    sheetResolve=res;
+    const el=$("sheet");
+    let color=o.color||"y";
+    el.innerHTML=`<h3 id="sheetTitle">${esc(o.title||"")}</h3>
+      ${o.quote?`<div class="q">${esc(o.quote)}</div>`:""}
+      ${o.colors?`<div class="colors">${["y","g","b","p"].map(c=>`<button class="hc-${c}${c===color?" on":""}" data-c="${c}" title="Colour"></button>`).join("")}</div>`:""}
+      ${o.multiline===false?`<input id="sheetIn" type="text" value="${esc(o.value||"")}" placeholder="${esc(o.placeholder||"")}" autocomplete="off">`
+        :o.noInput?"":`<textarea id="sheetIn" rows="3" placeholder="${esc(o.placeholder||"")}">${esc(o.value||"")}</textarea>`}
+      ${o.hint?`<div class="q" style="border:none;padding:0">${o.hint}</div>`:""}
+      <div class="btns">
+        ${o.danger?`<button class="danger" data-act="danger">${esc(o.danger)}</button>`:""}
+        <button data-act="cancel">Cancel</button>
+        <button class="go" data-act="ok">${esc(o.ok||"Save")}</button></div>`;
+    el.classList.remove("hidden");$("sheetScrim").classList.remove("hidden");
+    const inp=el.querySelector("#sheetIn");
+    el.querySelectorAll(".colors button").forEach(b=>b.addEventListener("click",()=>{
+      color=b.dataset.c;el.querySelectorAll(".colors button").forEach(x=>x.classList.toggle("on",x===b));}));
+    el.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{
+      const act=b.dataset.act;
+      if(act==="cancel")closeSheet(null);
+      else if(act==="danger")closeSheet({danger:true,value:inp?inp.value:"",color});
+      else closeSheet({value:inp?inp.value.trim():"",color});
+    }));
+    if(inp){inp.focus();inp.addEventListener("keydown",e=>{
+      e.stopPropagation();
+      if(e.key==="Escape")closeSheet(null);
+      if(e.key==="Enter"&&(o.multiline===false||e.metaKey||e.ctrlKey)){e.preventDefault();closeSheet({value:inp.value.trim(),color});}
+    });}
+    el.addEventListener("keydown",e=>e.stopPropagation());
+  });
+}
+function closeSheet(result){
+  const el=$("sheet");
+  if(el.classList.contains("hidden")&&!sheetResolve)return;
+  el.classList.add("hidden");$("sheetScrim").classList.add("hidden");el.innerHTML="";
+  const r=sheetResolve;sheetResolve=null;if(r)r(result);
+}
+$("sheetScrim").addEventListener("click",()=>closeSheet(null));
+function confirmSheet(title,ok,danger){
+  return sheet({title,noInput:true,ok:ok||"OK",danger}).then(r=>!!r);
+}
+
 /* ================= settings application ================= */
 const MARGINS={s:{pad:16,maxw:920},m:{pad:26,maxw:760},l:{pad:40,maxw:620}};
+const THEME_COLORS={light:"#fafaf7",sepia:"#f3ead7",gray:"#2b2d31",dark:"#111113",black:"#000000"};
+function twoCols(){return S.cols==="2"&&S.mode==="page"&&innerWidth>=760;}
 function applySettings(){
+  if(!THEME_COLORS[S.theme])S.theme="light";
   document.documentElement.dataset.theme=S.theme;
-  document.querySelector('meta[name="theme-color"]').content=
-    S.theme==="dark"?"#111113":S.theme==="sepia"?"#f3ead7":"#fafaf7";
+  document.querySelector('meta[name="theme-color"]').content=THEME_COLORS[S.theme];
   content.classList.toggle("serif",S.font==="serif");
+  content.classList.toggle("align-left",S.align==="left");
   content.style.setProperty("--fs",S.fs+"px");
   content.style.setProperty("--lh",S.lh);
   const m=MARGINS[S.margin];
   $("pageArea").style.setProperty("--pad",m.pad+"px");
-  $("pageArea").style.setProperty("--maxw",m.maxw+"px");
+  $("pageArea").style.setProperty("--maxw",(twoCols()?Math.round(m.maxw*1.7):m.maxw)+"px");
   content.classList.remove("anim-slide","anim-fade");
   if(S.anim==="slide")content.classList.add("anim-slide");
   if(S.anim==="fade")content.classList.add("anim-fade");
@@ -673,8 +931,9 @@ function applySettings(){
 function syncPanel(){
   $("fsVal").textContent=S.fs+"px";
   const sync=(id,val)=>{[...$(id).children].forEach(b=>b.classList.toggle("on",b.dataset.v===String(val)));};
-  sync("segFont",S.font);sync("segLh",S.lh);sync("segMargin",S.margin);
-  sync("segAnim",S.anim);sync("segMode",S.mode);sync("themeChips",S.theme);
+  sync("segFont",S.font);sync("segLh",S.lh);sync("segMargin",S.margin);sync("segAlign",S.align);
+  sync("segAnim",S.anim);sync("segMode",S.mode);sync("segCols",S.cols);sync("themeChips",S.theme);
+  $("rowCols").style.display=S.mode==="page"&&innerWidth>=760?"flex":"none";
 }
 
 /* ================= routing =================
@@ -711,7 +970,7 @@ function bookHash(b){return (share&&share.type==="book"?"#s/b/":"#b/")+encodeURI
 function route(){
   const h=decodeURIComponent(location.hash);
   if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
-  if(ttsActive){ if(ttsAutoNav)ttsAutoNav=false; else ttsClose(); }
+  if(ttsActive){ if(ttsAutoNav||ttsResumeAfterRender)ttsAutoNav=false; else ttsClose(); }
   hideBars();hidePanel();hideHlPop();
   parseShare(h);
   const chId=chapterIdFromHash(h);
@@ -728,6 +987,7 @@ function route(){
     if(b){showView("toc");renderHighlightsPage(b);window.scrollTo(0,0);return;}
   }
   if(h==="#v"&&!share){showView("toc");renderVocabPage();window.scrollTo(0,0);return;}
+  if(h==="#stats"&&!share){showView("toc");renderStatsPage();window.scrollTo(0,0);return;}
   share=null; // a broken/unknown share link falls back to the full library
   showView("home");renderHome();window.scrollTo(0,0);
 }
@@ -736,70 +996,116 @@ function route(){
    always-open links by design, same as before the site lock existed. The
    key is only added for a non-share link (currently just the empty-hash
    "copy whole library" link from the home screen's 🔗 button). */
-function copyShare(hash,btn){
+async function copyShare(hash,btn){
   const base=location.href.split("#")[0].split("?")[0];
   const isShareLink=hash.startsWith("#s/");
-  const tokenQS=(ACCESS_TOKEN&&!isShareLink)?("?k="+encodeURIComponent(ACCESS_TOKEN)):"";
+  let tokenQS="";
+  if(ACCESS_HASH&&!isShareLink){
+    let key=siteKey();
+    if(!key){
+      const r=await sheet({title:"Library key",multiline:false,placeholder:"The key this library is locked with",
+        hint:"The link needs the key so the recipient skips the lock screen. It is remembered on this device.",ok:"Use key"});
+      if(!r||!r.value)return;
+      if(await sha256Hex(r.value)!==ACCESS_HASH){toast("That key doesn't match this library.");return;}
+      key=r.value;localStorage.setItem("hkr.key",key);
+    }
+    tokenQS="?k="+encodeURIComponent(key);
+  }
   const url=base+tokenQS+hash;
   if(location.protocol==="file:"){
-    prompt("You're viewing a local file, so this link only works on this computer. "+
-      "Open your live (GitHub Pages) URL and copy the share link from there:",url);
+    sheet({title:"Links need the live URL",value:url,hint:"You're viewing a local file, so this link only works on this computer. Open your live (GitHub Pages) URL and copy the share link from there.",ok:"OK"});
     return;
   }
   const done=()=>{
-    if(!btn)return;
-    const t=btn.textContent;btn.textContent="✓";
-    setTimeout(()=>{btn.textContent=t;},1200);
+    if(btn){const t=btn.textContent;btn.textContent="✓";setTimeout(()=>{btn.textContent=t;},1200);}
+    toast("Link copied");
   };
+  const manual=()=>sheet({title:"Copy this link",value:url,ok:"Done"});
   if(navigator.clipboard&&navigator.clipboard.writeText)
-    navigator.clipboard.writeText(url).then(done,()=>prompt("Copy this link:",url));
-  else prompt("Copy this link:",url);
+    navigator.clipboard.writeText(url).then(done,manual);
+  else manual();
 }
 
 /* ================= site lock =================
-   ACCESS_TOKEN null -> gating disabled, everyone in (unchanged behavior).
+   ACCESS_HASH null -> gating disabled, everyone in.
    Otherwise the bare URL shows the #locked screen. Getting in requires
-   either ?k=<token> in the URL (auto, from a master link) or typing the
-   token into the lock screen — that unlock is remembered on the device
-   afterward. #s/... share links (the app's existing "send this one book or
-   chapter to someone" links, from the tocShare/btnShare buttons) ALWAYS
-   bypass the key entirely, including ones already sent out before this lock
-   existed — the key only ever guards general "/" library browsing, never a
-   link you deliberately shared. */
+   either ?k=<key> in the URL (auto, from a master link) or typing the key
+   into the lock screen — that unlock is remembered on the device afterward.
+   Only the SHA-256 of the key is in this page, so the key can't be read out
+   of the source. #s/... share links ALWAYS bypass the key: the key only
+   guards general library browsing, never a link you deliberately shared.
+   (The content itself is still inside this file — this is a privacy curtain
+   for a personal library, not access control.) */
+async function sha256Hex(str){
+  const bytes=new TextEncoder().encode(str);
+  if(crypto.subtle){
+    const buf=await crypto.subtle.digest("SHA-256",bytes);
+    return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+  return sha256Fallback(bytes);
+}
+function sha256Fallback(msg){ // compact pure-JS SHA-256 for non-secure contexts (file://)
+  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const H=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const l=msg.length,padded=new Uint8Array(((l+9+63)>>6)<<6);padded.set(msg);padded[l]=0x80;
+  new DataView(padded.buffer).setUint32(padded.length-4,l*8,false);
+  const w=new Uint32Array(64),rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<padded.length;o+=64){
+    const dv=new DataView(padded.buffer,o,64);
+    for(let i=0;i<16;i++)w[i]=dv.getUint32(i*4,false);
+    for(let i=16;i<64;i++){const s0=rotr(w[i-15],7)^rotr(w[i-15],18)^(w[i-15]>>>3),s1=rotr(w[i-2],17)^rotr(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){const S1=rotr(e,6)^rotr(e,11)^rotr(e,25),ch=(e&f)^(~e&g),t1=(h+S1+ch+K[i]+w[i])>>>0,S0=rotr(a,2)^rotr(a,13)^rotr(a,22),mj=(a&b)^(a&c)^(b&c),t2=(S0+mj)>>>0;h=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;}
+    H[0]+=a;H[1]+=b;H[2]+=c;H[3]+=d;H[4]+=e;H[5]+=f;H[6]+=g;H[7]+=h;
+  }
+  return [...H].map(x=>x.toString(16).padStart(8,"0")).join("");
+}
 function unlockedOnThisDevice(){return localStorage.getItem("hkr.unlocked")==="1";}
+function siteKey(){return localStorage.getItem("hkr.key")||null;}
 function showLocked(msg){
   locked.classList.remove("hidden");
   home.classList.add("hidden");toc.classList.add("hidden");reader.classList.add("hidden");
   document.body.classList.remove("reader-open");
-  if(msg)$("lockErr").textContent=msg;
+  $("lockErr").textContent=msg||"";
+  const hint=$("lockHint");
+  if(hint)hint.textContent=new URLSearchParams(location.search).get("shared")==="1"
+    ?"A book is waiting to import. Unlock first, then it will be converted on this device."
+    :"This library is private. Open it with a link that includes the key, or enter it below.";
 }
-function tryEnter(){
-  if(!ACCESS_TOKEN)return true; // gating off
+async function tryEnter(){
+  if(!ACCESS_HASH)return true; // gating off
   if(share)return true; // #s/... link — always open, key not required
   if(unlockedOnThisDevice())return true;
-  const params=new URLSearchParams(location.search);
-  return params.get("k")===ACCESS_TOKEN;
+  const k=new URLSearchParams(location.search).get("k");
+  if(k&&await sha256Hex(k)===ACCESS_HASH){
+    // remember this device only for a plain (unscoped) unlock via the master link
+    localStorage.setItem("hkr.unlocked","1");localStorage.setItem("hkr.key",k);
+    return true;
+  }
+  return false;
 }
-function attemptUnlock(){
+async function attemptUnlock(){
   const val=$("lockInput").value.trim();
   if(!val){showLocked("Enter the key first.");return;}
-  if(val!==ACCESS_TOKEN){showLocked("That's not it.");$("lockInput").value="";return;}
-  localStorage.setItem("hkr.unlocked","1");
+  if(await sha256Hex(val)!==ACCESS_HASH){showLocked("That's not it.");$("lockInput").value="";return;}
+  localStorage.setItem("hkr.unlocked","1");localStorage.setItem("hkr.key",val);
   locked.classList.add("hidden");
   boot();
 }
-function boot(){
+let booted=false;
+async function boot(){
   parseShare(decodeURIComponent(location.hash)); // sets `share`, which tryEnter needs
-  if(!tryEnter()){showLocked();return;}
-  const params=new URLSearchParams(location.search);
-  // remember this device only for a plain (unscoped) unlock via the master
-  // link/key — a #s/... share link never persists access beyond itself.
-  if(ACCESS_TOKEN&&params.get("k")===ACCESS_TOKEN&&!share&&!unlockedOnThisDevice())
-    localStorage.setItem("hkr.unlocked","1");
+  if(!await tryEnter()){showLocked();return;}
   locked.classList.add("hidden");
   applySettings();
+  if(!booted){
+    booted=true;
+    try{await loadLocalBooks();}catch(e){console.warn("local books unavailable",e);}
+    rebuildQuickOpen();
+  }
   route();
   registerServiceWorker();
+  intakeSharedFiles();
 }
 function showView(v){
   home.classList.toggle("hidden",v!=="home");
@@ -825,52 +1131,79 @@ function coverStyle(title){
 }
 function coverHtml(b){
   const p=bookPct(b);
-  return `<div class="cover" style="${coverStyle(b.title)}">
+  const img=b.cover?`<img src="${esc(b.cover)}" alt="" loading="lazy" decoding="async">`:"";
+  return `<div class="cover${img?" img":""}" style="${coverStyle(b.title)}">${img}
     <span class="bt">${esc(b.title)}</span>
     <span class="ba">${esc(b.author||"")}</span>
+    ${b.local?`<span class="badge" title="Imported on this device">DEVICE</span>`:""}
     <span class="bar"><i style="width:${Math.round(p*100)}%"></i></span></div>`;
 }
+function bookCardHtml(b){
+  const p=bookPct(b);
+  const cap=p>=.95?"✓ Finished":(p>0?Math.round(p*100)+"% read":b.chapters.length+" chapter"+(b.chapters.length===1?"":"s"));
+  return `<button class="bookcard" data-book="${esc(b.id)}" title="${esc(b.title)}">${coverHtml(b)}
+    <span class="cap ${p>=.95?"done":""}">${cap}</span></button>`;
+}
+function inProgressBooks(){
+  // books started but not finished, most recently read first
+  return Object.values(BOOKS).filter(b=>{const p=bookPct(b);return p>0&&p<.95;})
+    .sort((a,b)=>((lastByBook[b.id]||{}).t||0)-((lastByBook[a.id]||{}).t||0));
+}
+const IS_IOS=(/iP(hone|ad|od)/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1))&&!window.MSStream;
+const IS_MOBILE=IS_IOS||/Android/i.test(navigator.userAgent);
+const STANDALONE=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 
 /* ================= home (shelves) ================= */
 function renderHome(){
   const nBooks=Object.keys(BOOKS).length;
   const streak=readingStreak(),todayW=stats.days[todayKey()]||0;
-  const statBits=(streak?` · 🔥 ${streak}-day streak`:"")+
-    (todayW?` · ${Math.max(1,Math.round(todayW/230))} min today`:"");
   let h=`<div class="lib-top"><div><h1>Library</h1>
-    <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters${statBits}</p></div>
+    <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
     <div style="display:flex;gap:8px;">
     <button class="icon-btn" id="homeQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>
-    ${ACCESS_TOKEN?'<button class="icon-btn" id="homeLink" title="Copy a link to the whole library">🔗</button>':''}
+    ${ACCESS_HASH?'<button class="icon-btn" id="homeLink" title="Copy a link to the whole library (includes the key)">🔗</button>':''}
     <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div></div>
+    <div class="statline">
+      ${streak?`<span>🔥 ${streak}-day streak</span>`:""}
+      ${todayW?`<span>${Math.max(1,Math.round(todayW/230))} min today</span>`:""}
+      <button id="homeStats">Reading stats →</button></div>
     <div class="searchwrap"><input type="search" class="searchbox" id="searchBox"
       placeholder="Search every book…  ( / )" autocomplete="off"></div>
     <div id="sresults" class="hidden"></div>
     <div id="shelves">
-    <div id="offlineBar"></div>`;
+    <div id="offlineBar"></div>
+    <div id="importBar"></div>`;
+  if(IS_IOS&&!STANDALONE&&!ui.hideInstall&&location.protocol!=="file:")
+    h+=`<div class="hint"><span>📲</span><span><b>Add to Home Screen</b> for a full-screen reader that opens offline:
+      tap Share <span style="font-size:15px">⎙</span> then “Add to Home Screen”. Imported books stay on this device — open the app regularly so Safari does not evict them.</span><button id="hideInstall" title="Dismiss">✕</button></div>`;
+  if(IS_MOBILE&&IMPORT_OK)
+    h+=`<div class="hint"><span>📥</span><span><b>Import from this phone.</b> Tap Import a book and pick an <b>.epub</b> from Files or iCloud Drive. Conversion happens here — nothing is uploaded. Apple Books / Kindle store files are DRM-locked and will not convert.</span></div>`;
   if(last){
-    const c=CHAPTERS.find(x=>x.id===last.id);
+    const c=chapterById(last.id);
     if(c){const b=BOOKS[c.book];
       h+=`<button class="continue" data-ch="${esc(c.id)}"><span class="lbl">Continue reading</span>
         <div class="t">${esc(c.title)}</div>
-        <div class="p">${esc(b.title)} · ${Math.round(chPct(c.id)*100)}% of chapter</div></button>`;}
+        <div class="p">${esc(b.title)} · ${Math.round(chPct(c.id)*100)}% of chapter · ${Math.round(bookPct(b)*100)}% of book</div></button>`;}
+  }
+  const ip=inProgressBooks();
+  if(ip.length>=2){
+    h+=`<div class="section-h">Currently reading <span class="cnt">${ip.length}</span></div><div class="shelf row">`;
+    ip.slice(0,12).forEach(b=>{h+=bookCardHtml(b);});
+    h+=`</div>`;
   }
   LIB.forEach(s=>{
-    h+=`<div class="section-h">${esc(s.title)}</div><div class="shelf">`;
-    s.books.forEach(b=>{
-      const p=bookPct(b);
-      const cap=p>=.95?"✓ Finished":(p>0?Math.round(p*100)+"% read":b.chapters.length+" chapters");
-      h+=`<button class="bookcard" data-book="${esc(b.id)}">${coverHtml(b)}
-        <span class="cap ${p>=.95?"done":""}">${cap}</span></button>`;
-    });
+    h+=`<div class="section-h">${esc(s.title)} <span class="cnt">${s.books.length}</span></div><div class="shelf">`;
+    s.books.forEach(b=>{h+=bookCardHtml(b);});
     h+=`</div>`;
   });
   h+=`<div class="tools-row">
+    <button id="btnImportBook" title="Add an .epub / .md / .txt from this device — it is converted here, in the browser, and stored on this device only">📥 Import a book</button>
     ${vocab.length?`<button id="btnVocab" title="Words you looked up while reading">🔤 Vocabulary (${vocab.length})</button>`:""}
-    <button id="btnExport" title="Download progress, highlights & bookmarks as JSON">⬇ Back up my data</button>
-    <button id="btnImport" title="Restore a previously downloaded backup">⬆ Restore backup</button>
-    <input type="file" id="importFile" accept="application/json" class="hidden">
-  </div></div>`;
+    <button id="btnExport" title="Download progress, highlights, bookmarks, vocabulary, Ask AI keys and imported books as JSON">⬇ Back up my data</button>
+    <button id="btnRestore" title="Restore a previously downloaded backup">⬆ Restore backup</button>
+    <button id="btnHelp" title="Keyboard shortcuts & tips">? Help</button>
+  </div>
+  <p class="sub" style="margin-top:14px;font-size:11.5px">Build ${BUILD_ID}${IMPORT_OK?"":" · in-browser import needs a newer browser (Safari 16.4+, Chrome 103+)"}</p></div>`;
   home.innerHTML=h;
   home.querySelectorAll("[data-book]").forEach(el=>el.addEventListener("click",
     ()=>nav(bookHash(BOOKS[el.dataset.book]))));
@@ -878,43 +1211,82 @@ function renderHome(){
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
   $("homeTheme").addEventListener("click",()=>{cycleTheme();});
   $("homeQk").addEventListener("click",qkOpen);
+  $("homeStats").addEventListener("click",()=>nav("#stats"));
   if($("homeLink"))$("homeLink").addEventListener("click",()=>copyShare("",$("homeLink")));
   if($("btnVocab"))$("btnVocab").addEventListener("click",()=>nav("#v"));
+  if($("hideInstall"))$("hideInstall").addEventListener("click",()=>{ui.hideInstall=true;store.set("ui",ui);renderHome();});
   $("btnExport").addEventListener("click",exportData);
-  $("btnImport").addEventListener("click",()=>$("importFile").click());
-  $("importFile").addEventListener("change",importData);
+  $("btnRestore").addEventListener("click",()=>$("restoreFile").click());
+  $("btnImportBook").addEventListener("click",()=>{
+    if(!IMPORT_OK){toast("This browser can't unzip files itself — update it (Safari 16.4+ / Chrome 103+) or import on another device.");return;}
+    $("importFile").click();});
+  $("btnHelp").addEventListener("click",toggleHelp);
   const sb=$("searchBox");
   let sT;
   sb.addEventListener("input",()=>{clearTimeout(sT);sT=setTimeout(()=>renderSearch(sb.value),120);});
-  paintOffline();
+  paintOffline();paintImportBar();
 }
+$("restoreFile").addEventListener("change",importData);
+$("importFile").addEventListener("change",e=>{importFiles([...e.target.files]);e.target.value="";});
+/* drag a book file onto the shelves (desktop) */
+["dragenter","dragover"].forEach(ev=>document.addEventListener(ev,e=>{
+  if(home.classList.contains("hidden")||!e.dataTransfer||![...e.dataTransfer.types].includes("Files"))return;
+  e.preventDefault();home.classList.add("dropzone");}));
+document.addEventListener("dragleave",e=>{if(e.relatedTarget===null)home.classList.remove("dropzone");});
+document.addEventListener("drop",e=>{
+  home.classList.remove("dropzone");
+  if(home.classList.contains("hidden")||!e.dataTransfer)return;
+  const files=[...e.dataTransfer.files].filter(f=>/\.(epub|md|markdown|txt)$/i.test(f.name));
+  if(!files.length)return;
+  e.preventDefault();importFiles(files);
+});
 
 /* ================= full-text search ================= */
 function stripMd(s){
-  return s.replace(/```[\s\S]*?```/g," ").replace(/[#>*_`|-]+/g," ")
-          .replace(/\[([^\]]*)\]\([^)]*\)/g,"$1").replace(/\s+/g," ").trim();
+  return s.replace(/```[\s\S]*?```/g," ").replace(/!\[[^\]]*\]\([^)]*\)/g," ")
+          .replace(/\[([^\]]*)\]\([^)]*\)/g,"$1").replace(/<!--[\s\S]*?-->/g," ")
+          .replace(/[#>*_`|~-]+/g," ").replace(/\s+/g," ").trim();
+}
+// plain-text copies are built lazily and cached on the chapter — searching
+// 500+ chapters per keystroke must not re-strip 6 MB of markdown each time
+function plainOf(c){
+  if(c._plain==null){c._plain=stripMd(c.md);c._plainLc=c._plain.toLowerCase();}
+  return c._plain;
 }
 function renderSearch(q){
   const box=$("sresults"),shelves=$("shelves");
   q=q.trim();
   if(q.length<2){box.classList.add("hidden");shelves.classList.remove("hidden");box.innerHTML="";return;}
-  const ql=q.toLowerCase(),results=[];
+  const toks=[...new Set(q.toLowerCase().split(/\s+/).filter(Boolean))];
+  const results=[];
   for(const c of CHAPTERS){
-    const inTitle=c.title.toLowerCase().includes(ql);
-    const body=stripMd(c.md),idx=body.toLowerCase().indexOf(ql);
-    if(!inTitle&&idx<0)continue;
-    let snip="";
-    if(idx>=0){
-      const s=Math.max(0,idx-60),e=Math.min(body.length,idx+q.length+90);
-      snip=(s>0?"…":"")+body.slice(s,e)+(e<body.length?"…":"");
+    plainOf(c);
+    const tl=c.title.toLowerCase();
+    let score=0,first=-1,ok=true;
+    for(const t of toks){
+      const inTitle=tl.includes(t);
+      const idx=c._plainLc.indexOf(t);
+      if(!inTitle&&idx<0){ok=false;break;}
+      if(inTitle)score+=10;
+      if(idx>=0){
+        if(first<0||idx<first)first=idx;
+        let k=0,p=idx;while(p>=0&&k<25){k++;p=c._plainLc.indexOf(t,p+1);}
+        score+=k;
+      }
     }
-    results.push({c,snip,rank:inTitle?0:1});
-    if(results.length>=60)break;
+    if(!ok)continue;
+    let snip="";
+    if(first>=0){
+      const s=Math.max(0,first-60),e=Math.min(c._plain.length,first+toks[0].length+110);
+      snip=(s>0?"…":"")+c._plain.slice(s,e)+(e<c._plain.length?"…":"");
+    }
+    results.push({c,snip,score});
   }
-  results.sort((a,b)=>a.rank-b.rank);
-  const hi=s=>esc(s).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),m=>`<mark>${m}</mark>`);
+  results.sort((a,b)=>b.score-a.score);
+  const rx=new RegExp(toks.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|"),"gi");
+  const hi=s=>esc(s).replace(rx,m=>`<mark>${m}</mark>`);
   let h=`<p class="snone">${results.length?results.length+" matching chapter"+(results.length>1?"s":""):"No matches for “"+esc(q)+"”"}</p>`;
-  results.slice(0,50).forEach(r=>{
+  results.slice(0,60).forEach(r=>{
     const b=BOOKS[r.c.book];
     h+=`<button class="sres" data-ch="${esc(r.c.id)}">
       <div class="b">${esc(b.title)}</div>
@@ -927,33 +1299,50 @@ function renderSearch(q){
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
 }
 
-/* ================= backup / restore (item 5) ================= */
-const DATA_KEYS=["settings","progress","last","lastBook","highlights","bookmarks","ttsDict","vocab","stats"];
-function exportData(){
-  const data={};DATA_KEYS.forEach(k=>data[k]=store.get(k,null));
-  const blob=new Blob([JSON.stringify({app:"hkr",exported:new Date().toISOString(),data},null,2)],
-    {type:"application/json"});
+/* ================= backup / restore ================= */
+const DATA_KEYS=["settings","progress","last","lastBook","highlights","hlColor","bookmarks","ttsDict","vocab","stats","ui","ai"];
+function downloadBlob(blob,name){
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download="library-backup.json";a.click();
+  a.href=URL.createObjectURL(blob);a.download=name;a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+async function exportData(){
+  const data={};DATA_KEYS.forEach(k=>data[k]=store.get(k,null));
+  let localBooks=[];
+  try{localBooks=await idbAll();}catch(e){}
+  const payload={app:"hkr",version:2,exported:new Date().toISOString(),data,localBooks};
+  downloadBlob(new Blob([JSON.stringify(payload)],{type:"application/json"}),
+    "library-backup-"+todayKey()+".json");
+  toast(`Backup saved${localBooks.length?` (incl. ${localBooks.length} imported book${localBooks.length>1?"s":""})`:""}`);
+}
+function reloadState(){
+  progress=store.get("progress",{});last=store.get("last",null);
+  lastByBook=store.get("lastBook",{});
+  Object.keys(lastByBook).forEach(k=>{if(typeof lastByBook[k]==="string")lastByBook[k]={id:lastByBook[k],t:0};});
+  highlights=store.get("highlights",{});
+  bookmarks=store.get("bookmarks",[]);ttsDict=store.get("ttsDict",{});
+  vocab=store.get("vocab",[]);ui=store.get("ui",{});
+  stats=store.get("stats",{});stats.days=stats.days||{};stats.finished=stats.finished||{};stats.secs=stats.secs||{};
 }
 function importData(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=()=>{
+  r.onload=async()=>{
     try{
       const obj=JSON.parse(r.result);
       if(!obj||obj.app!=="hkr"||!obj.data)throw new Error("bad format");
-      if(!confirm("Restore this backup? It replaces your current progress, highlights and bookmarks."))return;
+      const nLocal=(obj.localBooks||[]).length;
+      const ok=await sheet({title:"Restore this backup?",noInput:true,ok:"Restore",
+        hint:`From ${esc((obj.exported||"").slice(0,10))}. It replaces your current progress, highlights, bookmarks and vocabulary${nLocal?` and adds ${nLocal} imported book${nLocal>1?"s":""}`:""}.`});
+      if(!ok)return;
       DATA_KEYS.forEach(k=>{if(obj.data[k]!=null)store.set(k,obj.data[k]);});
       S=Object.assign(S,obj.data.settings||{});
-      progress=store.get("progress",{});last=store.get("last",null);
-      lastByBook=store.get("lastBook",{});highlights=store.get("highlights",{});
-      bookmarks=store.get("bookmarks",[]);ttsDict=store.get("ttsDict",{});
-      vocab=store.get("vocab",[]);
-      stats=store.get("stats",{});stats.days=stats.days||{};stats.finished=stats.finished||{};
+      reloadState();
+      if(nLocal){for(const b of obj.localBooks){try{await idbPut(b);}catch(err){}} await loadLocalBooks();rebuildQuickOpen();}
+      if(obj.data.ai)AI=Object.assign(AI,obj.data.ai);
       applySettings();renderHome();
-    }catch(err){alert("Could not read that backup file.");}
+      toast("Backup restored");
+    }catch(err){toast("Could not read that backup file.");}
   };
   r.readAsText(f);
   e.target.value="";
@@ -970,30 +1359,38 @@ function renderToc(b){
   // resume target: this book's own last-read chapter, else first unfinished chapter
   let resume=null;
   const lb=lastByBook[b.id];
-  if(lb){const c=CHAPTERS.find(x=>x.id===lb);if(c&&c.book===b.id)resume=c;}
-  if(!resume&&last){const c=CHAPTERS.find(x=>x.id===last.id);if(c&&c.book===b.id)resume=c;}
+  if(lb&&lb.id){const c=chapterById(lb.id);if(c&&c.book===b.id)resume=c;}
+  if(!resume&&last){const c=chapterById(last.id);if(c&&c.book===b.id)resume=c;}
   if(!resume)resume=b.chapters.map(i=>CHAPTERS[i]).find(c=>chPct(c.id)<.95)||CHAPTERS[b.chapters[0]];
+  const wordsLeft=b.chapters.reduce((a,i)=>a+CHAPTERS[i].words*(1-chPct(CHAPTERS[i].id)),0);
+  const leftMin=Math.ceil(wordsLeft/230);
+  const left=p>0&&p<.95?` · ${leftMin>=60?Math.round(leftMin/60*10)/10+" h":leftMin+" min"} left`:"";
   let h=`<div class="lib-top">${share
       ?`<span class="sub" style="color:var(--muted);font-size:12px">Shared from a library</span>`
       :`<button class="icon-btn" id="tocBack" title="Library">‹</button>`}
     <div style="display:flex;gap:8px">
       ${share?"":'<button class="icon-btn" id="tocQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>'}
-      <button class="icon-btn" id="tocShare" title="Copy a link that shares just this book">⤴</button>
+      ${share||b.local?"":'<button class="icon-btn" id="tocShare" title="Copy a link that shares just this book">⤴</button>'}
+      ${share?"":'<button class="icon-btn" id="tocMore" title="More — reset progress, mark finished…">⋯</button>'}
       <button class="icon-btn" id="tocTheme" title="Cycle theme">◑</button></div></div>
   <div class="hero">${coverHtml(b)}<div>
     <h1>${esc(b.title)}</h1>
     ${b.author?`<p class="author">${esc(b.author)}</p>`:""}
-    <p class="meta">${esc(b.section)} · ${b.chapters.length} chapters · ~${time}
-      ${stats.finished[b.id]?` · ✓ finished ${stats.finished[b.id]}`:(p>0?` · ${Math.round(p*100)}% read`:"")}</p></div></div>`;
+    <p class="meta">${esc(b.section)} · ${b.chapters.length} chapter${b.chapters.length===1?"":"s"} · ~${time}
+      ${stats.finished[b.id]?` · ✓ finished ${stats.finished[b.id]}`:(p>0?` · ${Math.round(p*100)}% read${left}`:"")}</p></div></div>`;
   if(b.description)h+=`<p class="desc">${esc(b.description)}</p>`;
   h+=`<button class="primary" data-ch="${esc(resume.id)}">${p>0?"Continue reading":"Start reading"} — ${esc(resume.title)}</button>`;
   const nHl=share?0:bookHighlightCount(b); // highlights page is not part of the shared view
   if(nHl)h+=`<button class="linkrow" id="tocHl">✎ ${nHl} highlight${nHl>1?"s":""} & notes in this book →</button>`;
-  const marks=bookmarks.filter(m=>{const c=CHAPTERS.find(x=>x.id===m.ch);return c&&c.book===b.id;});
+  if(b.local&&!share)
+    h+=`<div class="tools-row" style="margin:0 0 18px">
+      <button id="locExport" title="Download this book as one markdown file with chapter markers — drop it into tools/import-book.py to add it to the repo">⬇ Export as Markdown</button>
+      <button id="locDelete" title="Remove this imported book from this device">🗑 Remove from device</button></div>`;
+  const marks=bookmarks.filter(m=>{const c=chapterById(m.ch);return c&&c.book===b.id;});
   if(marks.length){
     h+=`<div class="section-h">Bookmarks</div>`;
     marks.forEach((m,i)=>{
-      const c=CHAPTERS.find(x=>x.id===m.ch);
+      const c=chapterById(m.ch);
       h+=`<button class="chap" data-bkm="${i}"><span class="n">⚑</span>
         <span class="t">${esc(c.title)} — ${Math.round(m.pct*100)}%</span>
         <span class="pct" data-delbkm="${i}">✕</span></button>`;
@@ -1041,28 +1438,130 @@ function renderToc(b){
   const back=$("tocBack");
   if(back)back.addEventListener("click",()=>nav(""));
   if($("tocQk"))$("tocQk").addEventListener("click",qkOpen);
-  $("tocShare").addEventListener("click",()=>copyShare("#s/b/"+encodeURIComponent(b.id),$("tocShare")));
+  if($("tocShare"))$("tocShare").addEventListener("click",()=>copyShare("#s/b/"+encodeURIComponent(b.id),$("tocShare")));
+  if($("tocMore"))$("tocMore").addEventListener("click",async()=>{
+    const r=await sheet({title:b.title,noInput:true,ok:p>=.95?"Mark as unread":"Mark as finished",danger:"Reset progress",
+      hint:"<b>Mark as finished</b> ticks every chapter. <b>Reset progress</b> clears this book's reading positions (highlights and bookmarks stay)."});
+    if(!r)return;
+    if(r.danger){b.chapters.forEach(i=>{delete progress[CHAPTERS[i].id];});delete stats.finished[b.id];delete lastByBook[b.id];
+      if(last&&chapterById(last.id)&&chapterById(last.id).book===b.id){last=null;store.set("last",last);}}
+    else if(p>=.95){b.chapters.forEach(i=>{delete progress[CHAPTERS[i].id];});delete stats.finished[b.id];}
+    else{b.chapters.forEach(i=>{progress[CHAPTERS[i].id]={pct:1};});stats.finished[b.id]=todayKey();}
+    store.set("progress",progress);store.set("stats",stats);store.set("lastBook",lastByBook);
+    renderToc(b);
+  });
+  if($("locExport"))$("locExport").addEventListener("click",()=>exportLocalBook(b));
+  if($("locDelete"))$("locDelete").addEventListener("click",async()=>{
+    const ok=await sheet({title:`Remove “${b.title}” from this device?`,noInput:true,ok:"Remove",
+      hint:"The imported book and its text are deleted from this browser. Your highlights and progress for it are kept in case you import it again."});
+    if(!ok)return;
+    await deleteLocalBook(b.id);
+    toast("Removed");nav("");
+  });
   $("tocTheme").addEventListener("click",()=>{cycleTheme();});
 }
 
+/* ================= reading stats page ================= */
+function dayKeyOf(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function renderStatsPage(){
+  const days=stats.days,keys=Object.keys(days).sort();
+  const totalW=keys.reduce((a,k)=>a+days[k],0);
+  const activeDays=keys.filter(k=>days[k]>0).length;
+  const finished=Object.keys(stats.finished).length;
+  const streak=readingStreak();
+  let best=0,run=0,prevD=null;
+  keys.forEach(k=>{const d=new Date(k+"T00:00:00");
+    run=(prevD&&(d-prevD)/864e5===1&&days[k]>0)?run+1:(days[k]>0?1:0);best=Math.max(best,run);prevD=d;});
+  // last 26 weeks, GitHub-style, columns = weeks, rows = Mon..Sun
+  const today=new Date();today.setHours(0,0,0,0);
+  const start=new Date(today);start.setDate(start.getDate()-(26*7-1)-((start.getDay()+6)%7));
+  const max=Math.max(1,...keys.map(k=>days[k]));
+  let heat="";
+  for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1)){
+    const k=dayKeyOf(d),w=days[k]||0;
+    const lvl=!w?0:w>max*.75?4:w>max*.5?3:w>max*.25?2:1;
+    heat+=`<i class="l${lvl}" title="${k}: ${w?Math.round(w/230)+" min":"—"}"></i>`;
+  }
+  const recent=keys.slice(-14).reverse().filter(k=>days[k]>0);
+  let h=`<div class="lib-top"><button class="icon-btn" id="stBack" title="Back">‹</button>
+    <button class="icon-btn" id="stTheme" title="Cycle theme">◑</button></div>
+    <h1 style="font-size:22px;margin:18px 4px 4px">Reading stats</h1>
+    <p class="sub" style="color:var(--muted);font-size:13px;margin:0 4px 14px">Words you turn past are counted as reading; minutes assume ~230 words a minute. Time on the page is the clock while a chapter is open (idle gaps over 2 minutes are ignored).</p>
+    <div class="statgrid">
+      <div class="st"><b>${streak}</b><span>day streak</span></div>
+      <div class="st"><b>${best}</b><span>best streak</span></div>
+      <div class="st"><b>${Math.round(totalW/230/60*10)/10}h</b><span>estimated from words</span></div>
+      <div class="st"><b>${Math.round((Object.values(stats.secs||{}).reduce((a,n)=>a+n,0))/3600*10)/10}h</b><span>time on the page</span></div>
+      <div class="st"><b>${activeDays}</b><span>days read</span></div>
+      <div class="st"><b>${finished}</b><span>books finished</span></div>
+      <div class="st"><b>${activeDays?Math.round(totalW/activeDays/230):0}</b><span>min / active day</span></div>
+    </div>
+    <div class="section-h">Last 26 weeks</div>
+    <div class="heat">${heat}</div>`;
+  if(recent.length){
+    h+=`<div class="section-h">Recent days</div>`;
+    recent.forEach(k=>{h+=`<div class="chap" style="cursor:default"><span class="n">${k.slice(5)}</span><span class="t">${Math.round(days[k]/230)} min · ${days[k].toLocaleString()} words</span></div>`;});
+  }
+  const fin=Object.entries(stats.finished).sort((a,b)=>b[1].localeCompare(a[1]));
+  if(fin.length){
+    h+=`<div class="section-h">Finished</div>`;
+    fin.forEach(([id,d])=>{const b=BOOKS[id];if(b)h+=`<button class="chap" data-book="${esc(id)}"><span class="n">✓</span><span class="t">${esc(b.title)}</span><span class="pct">${d}</span></button>`;});
+  }
+  toc.innerHTML=h;
+  toc.querySelectorAll("[data-book]").forEach(el=>el.addEventListener("click",()=>nav(bookHash(BOOKS[el.dataset.book]))));
+  $("stBack").addEventListener("click",()=>nav(""));
+  $("stTheme").addEventListener("click",()=>{cycleTheme();});
+}
+
 /* ================= vocabulary book ================= */
+let vocabReview=null; // {order:[idx…], i, shown}
 function renderVocabPage(){
   let h=`<div class="lib-top"><button class="icon-btn" id="vBack" title="Back">‹</button>
-    <button class="icon-btn" id="vTheme" title="Cycle theme">◑</button></div>
+    <div style="display:flex;gap:8px">
+      ${vocab.length?`<button class="icon-btn" id="vExport" title="Download as CSV (word, meaning) — imports into Anki">⬇</button>`:""}
+      <button class="icon-btn" id="vTheme" title="Cycle theme">◑</button></div></div>
     <h1 style="font-size:22px;margin:18px 4px 4px">🔤 Vocabulary</h1>
     <p class="sub" style="color:var(--muted);font-size:13px;margin:0 4px 20px">
       Every word or phrase you looked up with “Meaning” (D) lands here automatically.</p>`;
   if(!vocab.length)h+=`<p class="snone">Nothing yet — select a word while reading and press D.</p>`;
-  vocab.forEach((v,i)=>{
-    const c=CHAPTERS.find(x=>x.id===v.ch);
-    h+=`<div class="hlcard"><div class="q">${esc(v.w)}</div>
-      <div class="note">${esc(v.def)}</div>
-      <div class="meta"><span>${c?esc(c.title):""}</span><span class="del" data-vdel="${i}">Delete</span></div></div>`;
-  });
+  else if(vocabReview){
+    const v=vocab[vocabReview.order[vocabReview.i]];
+    const c=v?chapterById(v.ch):null;
+    h+=`<div class="hlcard" style="text-align:center;padding:26px 18px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">${vocabReview.i+1} / ${vocabReview.order.length}</div>
+      <div style="font-size:22px;font-weight:600">${esc(v.w)}</div>
+      ${c?`<div class="note" style="margin-top:4px">${esc(c.title)}</div>`:""}
+      ${vocabReview.shown?`<div style="margin-top:16px;font-size:14px;line-height:1.55;text-align:left">${mdToHtml(v.def)}</div>`:""}
+      <div class="tools-row" style="justify-content:center;margin-top:18px">
+        ${vocabReview.shown
+          ?`<button id="vrAgain">↺ Again</button><button id="vrGot" style="color:var(--accent)">✓ Got it</button>`
+          :`<button id="vrShow" style="color:var(--accent)">Show meaning</button>`}
+        <button id="vrStop">Stop review</button></div></div>`;
+  }else{
+    h+=`<div class="tools-row" style="margin:0 4px 16px"><button id="vReview" style="color:var(--accent)">▶ Review as flashcards</button></div>`;
+    vocab.forEach((v,i)=>{
+      const c=chapterById(v.ch);
+      h+=`<div class="hlcard"><div class="q">${esc(v.w)}${v.via?` <span style="font-size:11px;color:var(--muted)">· ${esc(v.via)}</span>`:""}</div>
+        <div class="note">${esc(v.def.length>400?v.def.slice(0,400)+"…":v.def)}</div>
+        <div class="meta"><span>${c?esc(c.title):""}</span><span class="del" data-vdel="${i}">Delete</span></div></div>`;
+    });
+  }
   toc.innerHTML=h;
   toc.querySelectorAll("[data-vdel]").forEach(el=>el.addEventListener("click",()=>{
     vocab.splice(+el.dataset.vdel,1);store.set("vocab",vocab);renderVocabPage();
   }));
+  const on=(id,fn)=>{const el=$(id);if(el)el.addEventListener("click",fn);};
+  on("vReview",()=>{const order=vocab.map((_,i)=>i);for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+    vocabReview={order,i:0,shown:false};renderVocabPage();});
+  on("vrShow",()=>{vocabReview.shown=true;renderVocabPage();});
+  const step=again=>{const r=vocabReview;if(again)r.order.push(r.order[r.i]);r.i++;r.shown=false;
+    if(r.i>=r.order.length){vocabReview=null;toast("Review done");}renderVocabPage();};
+  on("vrGot",()=>step(false));on("vrAgain",()=>step(true));
+  on("vrStop",()=>{vocabReview=null;renderVocabPage();});
+  on("vExport",()=>{
+    const csv=vocab.map(v=>`"${v.w.replace(/"/g,'""')}","${v.def.replace(/"/g,'""').replace(/\n+/g," ")}"`).join("\n");
+    downloadBlob(new Blob([csv],{type:"text/csv"}),"vocabulary.csv");
+  });
   $("vBack").addEventListener("click",()=>nav(""));
   $("vTheme").addEventListener("click",()=>{cycleTheme();});
 }
@@ -1080,13 +1579,9 @@ function exportHighlightsMd(b){
       md+="\n";
     });
   });
-  const blob=new Blob([md],{type:"text/markdown"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=(b.title.replace(/[^\w\- ]+/g,"").trim()||"book")+" - highlights.md";
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  downloadBlob(new Blob([md],{type:"text/markdown"}),(b.title.replace(/[^\w\- ]+/g,"").trim()||"book")+" - highlights.md");
 }
+let pendingHl=null; // {ch, text} — highlight to scroll to after the chapter renders
 function renderHighlightsPage(b){
   let h=`<div class="lib-top"><button class="icon-btn" id="hlBack" title="Back">‹</button>
     <div style="display:flex;gap:8px">
@@ -1102,23 +1597,24 @@ function renderHighlightsPage(b){
     h+=`<div class="section-h">${esc(c.title)}</div>`;
     hls.forEach((hl,j)=>{
       h+=`<button class="hlcard" data-ch="${esc(c.id)}" data-j="${j}">
-        <div class="q">${esc(hl.text)}</div>
+        <div class="q${hl.c?" c-"+hl.c:""}">${esc(hl.text)}</div>
         ${hl.note?`<div class="note">✎ ${esc(hl.note)}</div>`:""}
-        <div class="meta"><span>Chapter ${c.num}</span><span class="del" data-del="1">Delete</span></div>
+        <div class="meta"><span>Chapter ${c.num}${hl.t?" · "+new Date(hl.t).toLocaleDateString():""}</span><span class="del" data-del="1">Delete</span></div>
       </button>`;
     });
   });
   if(!any)h+=`<p class="snone">No highlights in this book yet. Select text while reading to add one.</p>`;
   toc.innerHTML=h;
-  toc.querySelectorAll(".hlcard").forEach(el=>el.addEventListener("click",e=>{
+  toc.querySelectorAll(".hlcard").forEach(el=>el.addEventListener("click",async e=>{
     const ch=el.dataset.ch,j=+el.dataset.j;
     if(e.target.closest("[data-del]")){
-      if(!confirm("Delete this highlight?"))return;
+      if(!await confirmSheet("Delete this highlight?","Delete"))return;
       highlights[ch].splice(j,1);
       if(!highlights[ch].length)delete highlights[ch];
       store.set("highlights",highlights);
       renderHighlightsPage(b);return;
     }
+    pendingHl={ch,text:(highlights[ch][j]||{}).text};
     nav("#c/"+encodeURIComponent(ch));
   }));
   $("hlBack").addEventListener("click",()=>nav(bookHash(b)));
@@ -1152,21 +1648,36 @@ function renderChapter(i,fromEnd){
   content.querySelectorAll("a[data-int]").forEach(a=>a.addEventListener("click",e=>{
     e.preventDefault();
     if(share&&share.type==="chapter")return; // shared chapter: stay on this chapter
-    const f=a.getAttribute("href").split("/").pop();
+    const href=a.getAttribute("href")||"";
+    if(href.startsWith("#")){ // in-chapter anchor
+      const t=href.slice(1).toLowerCase();
+      const el=[...content.querySelectorAll("h1,h2,h3,h4,[id]")].find(x=>(x.id||"").toLowerCase()===t||x.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-")===t);
+      if(el)jumpToElement(el);
+      return;
+    }
+    const f=href.split("#")[0].split("/").pop();
     // resolve within the same book first, then anywhere in the library
     let j=b.chapters.find(k=>CHAPTERS[k].file===f);
     if(j===undefined&&!share)j=CHAPTERS.findIndex(x=>x.file===f); // share mode never leaves the book
     if(j>=0)nav(chapterHash(CHAPTERS[j]));
   }));
+  content.querySelectorAll("img").forEach(img=>{
+    img.addEventListener("load",()=>{if(cur===i&&S.mode==="page")reflowKeepingPct(()=>{});},{once:true});
+    img.addEventListener("error",()=>{ // show the alt text instead of a broken icon
+      const s=document.createElement("span");s.className="imgcap";s.textContent=img.alt?`[image: ${img.alt}]`:"[image unavailable offline]";
+      img.replaceWith(s);},{once:true});
+  });
   applyHighlights(c.id);
   $("stTitle").textContent=`${b.title} — ${c.title}`;
   $("barTitle").textContent=c.title;
   const soloCh=!!(share&&share.type==="chapter");
   $("btnQk").classList.toggle("hidden",!!share);
+  $("btnShare").classList.toggle("hidden",!!b.local);
   $("btnToc").style.visibility=soloCh?"hidden":"";
   $("btnPrevCh").style.visibility=$("btnNextCh").style.visibility=soloCh?"hidden":"";
   last={id:c.id};store.set("last",last);
-  lastByBook[c.book]=c.id;store.set("lastBook",lastByBook);
+  lastByBook[c.book]={id:c.id,t:Date.now()};store.set("lastBook",lastByBook);
+  sessionStart();
   requestAnimationFrame(()=>{
     const saved=progress[c.id];
     let pct=fromEnd?1:(saved?saved.pct:0);
@@ -1174,19 +1685,39 @@ function renderChapter(i,fromEnd){
     paginate();
     goToPct(pct,false);
     restoreAnim();
+    if(pendingHl&&pendingHl.ch===c.id){
+      const m=[...content.querySelectorAll("mark.hl")].find(x=>x.textContent&&pendingHl.text&&pendingHl.text.startsWith(x.textContent.slice(0,40)));
+      pendingHl=null;
+      if(m){jumpToElement(m);m.classList.add("flash");}
+    }
     if(ttsActive&&!ttsResumeAfterRender){ // same-chapter re-render while listening
       ttsBuildWords();
       if(ttsWords.length)ttsSetWord(Math.min(ttsIdx,ttsWords.length-1));
     }
-    if(ttsResumeAfterRender){ttsResumeAfterRender=false;ttsOpen(true);}
+    if(ttsResumeAfterRender){
+      ttsIdx=0;
+      ttsOpen(false,true); // open the bar; ttsFlushContinue / hold.onend starts speech
+      if(ttsWordsFor!==cur)ttsBuildWords();
+      ttsFlushContinue();
+    }
   });
+}
+function jumpToElement(el){
+  if(S.mode==="scroll")pages.scrollTo({top:Math.max(0,el.offsetTop-16)});
+  else goTo(Math.floor(el.offsetLeft/step()),false);
+  saveProgress();updateStatus();
 }
 
 /* ================= text-to-speech (Listen) =================
-   Reads the current chapter aloud, word by word, using the Web Speech API.
-   Chapter text is chunked (TTS_CHUNK words/utterance) because some browsers'
-   speech engines stall or drop boundary events on very long utterances. */
+   Default voice is Kokoro "Heart" (af_heart) — the same neural voice the
+   screen tutor speaks with — running in the browser. The model downloads
+   once (~90 MB, q8) and the browser keeps it. iPhone system voices stay
+   available underneath. Web Speech is the fallback (and the default for
+   books whose language is not English).
+   Utterances are cut at sentence ends so a phone can make the next sentence
+   while the current one is still playing. */
 const TTS_OK="speechSynthesis" in window;
+const KOKORO_OK=("Worker" in window)&&("Audio" in window);
 let ttsActive=false, ttsSpeaking=false, ttsWords=[], ttsWordsFor=-1, ttsBreaks=[],
     ttsIdx=0, ttsChunkBase=0, ttsUtter=null, ttsAutoNav=false, ttsResumeAfterRender=false,
     ttsTimer=null, ttsBoundarySeen=false, ttsSeekDragging=false, ttsVoiceList=[];
@@ -1195,10 +1726,16 @@ let ttsDict=store.get("ttsDict",{}); // {word(lowercase): spoken form} — user 
 /* spoken-form preprocessing: the highlight shows the word as written, but the
    engine is fed this transformed text (browsers ignore SSML, so rewriting the
    text is the only pronunciation control there is) */
-const TTS_EXPAND={"e.g":"for example","i.e":"that is","etc":"et cetera","vs":"versus","approx":"approximately"};
-const TTS_SAY_AS_WORD=new Set(["NASA","JSON","YAML","REST","RAM","ROM","LASER","RADAR","SIM","CRUD","AJAX","DAO","NATO"]);
+const TTS_EXPAND={"e.g":"for example","i.e":"that is","etc":"et cetera","vs":"versus","approx":"approximately",
+  "w/":"with","w/o":"without","no.":"number","fig":"figure","ch":"chapter","cf":"compare","et al":"and others"};
+const TTS_SAY_AS_WORD=new Set(["NASA","JSON","YAML","REST","RAM","ROM","LASER","RADAR","SIM","CRUD","AJAX","DAO","NATO",
+  "SQL","AWS","GPU","CPU","API","URL","HTML","CSS","PDF","GIF","JPEG","LLM","RAG","MEV","AMM","DEFI","NFT","ZK","OK","UX","UI","IO"]);
+const TTS_SPELL=new Set(["SQL","AWS","GPU","CPU","API","URL","HTML","CSS","PDF","LLM","MEV","AMM","NFT","ZK","UX","UI","IO"]); // say-as-letters even though common
 function ttsSpokenWord(w){
   if(w==="&")return "and";
+  if(/^(https?:\/\/|www\.)\S+$/i.test(w))return "link";                        // don't spell out URLs
+  if(/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(w))return "email address";
+  if(/^[#*_`~>|\\\-=+]+$/.test(w))return "";                                  // markdown debris
   const m=w.match(/^([^A-Za-z0-9]*)(.*?)([^A-Za-z0-9]*)$/);
   const pre=m[1],core=m[2],suf=m[3];
   if(!core)return w;
@@ -1206,44 +1743,311 @@ function ttsSpokenWord(w){
   if(ttsDict[lc])return pre+ttsDict[lc]+suf;
   if(TTS_EXPAND[lc])return pre+TTS_EXPAND[lc]+suf;
   let am=core.match(/^([A-Z]{2,6})(s)?$/);              // UHI -> "U H I"
-  if(am&&!TTS_SAY_AS_WORD.has(am[1]))
+  if(am&&(TTS_SPELL.has(am[1])||!TTS_SAY_AS_WORD.has(am[1])))
     return pre+am[1].split("").join(" ")+(am[2]?" s":"")+suf;
-  am=core.match(/^v(\d+)$/i);                            // v4 -> "V 4"
+  am=core.match(/^v(\d+(?:\.\d+)*)$/i);                  // v4 -> "V 4"
   if(am)return pre+"V "+am[1]+suf;
+  am=core.match(/^(\d+)x$/i);                            // 3x -> "3 times"
+  if(am)return pre+am[1]+" times"+suf;
   return w;
 }
 
-/* voice list: English voices ranked quality-first (Premium/Enhanced/Natural on
-   top, novelty voices last); local voices also fire word-boundary events */
+/* voice list: ranked quality-first (Premium/Enhanced/Natural on top, novelty
+   voices last), grouped by language with the book's language (default English)
+   first; local voices also fire word-boundary events */
 function ttsScoreVoice(v){
   let s=0;
   if(/premium/i.test(v.name))s+=5;
   if(/enhanced/i.test(v.name))s+=4;
-  if(/natural|neural/i.test(v.name))s+=4;
-  if(/google/i.test(v.name))s+=2;
+  if(/natural|neural|siri/i.test(v.name))s+=4;
+  if(/google|microsoft/i.test(v.name))s+=2;
   if(v.localService)s+=1;
   if(/eloquence|grandma|grandpa|shelley|flo|sandy|reed|rocko|eddy|albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|junior|ralph|fred|kathy/i.test(v.name))s-=8;
   return s;
 }
+function bookLang(){
+  const c=CHAPTERS[cur],b=c?bookOf(c):null;
+  return ((b&&b.lang)||document.documentElement.lang||"en").slice(0,2).toLowerCase();
+}
+const LANG_NAMES={en:"English",hi:"Hindi",es:"Spanish",fr:"French",de:"German",it:"Italian",pt:"Portuguese",
+  ja:"Japanese",zh:"Chinese",ko:"Korean",ru:"Russian",ar:"Arabic",nl:"Dutch",sv:"Swedish",tr:"Turkish",pl:"Polish"};
+const KOKORO_VOICES=[
+  ["af_heart","Heart"],
+  ["af_bella","Bella"],
+  ["af_nicole","Nicole"],
+  ["am_michael","Michael"],
+  ["bf_emma","Emma · British"],
+  ["bm_george","George · British"],
+];
+let kokoroFailed=false;
+function ttsVoiceId(){
+  if(S.ttsVoice)return S.ttsVoice;
+  return bookLang()==="en"?"kokoro:af_heart":"";
+}
+function ttsUsesKokoro(){return KOKORO_OK&&!kokoroFailed&&ttsVoiceId().startsWith("kokoro:");}
+function kokoroVoiceName(){return (ttsVoiceId().split(":")[1]||"af_heart");}
 function ttsLoadVoices(){
-  if(!TTS_OK)return;
-  const all=speechSynthesis.getVoices();
-  if(!all.length)return;
-  let list=all.filter(v=>/^en/i.test(v.lang));
-  if(!list.length)list=all.slice();
-  list.sort((a,b)=>ttsScoreVoice(b)-ttsScoreVoice(a)||a.name.localeCompare(b.name));
-  ttsVoiceList=list;
-  const sel=$("ttsVoice");
-  sel.innerHTML=list.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}${v.localService?"":" ☁"}</option>`).join("");
-  const cv=ttsCurrentVoice();
-  if(cv)sel.value=cv.name;
+  const sel=$("ttsVoice");if(!sel)return;
+  const want=bookLang();
+  let h=`<optgroup label="Kokoro — saved on this phone">`;
+  KOKORO_VOICES.forEach(([id,name])=>{h+=`<option value="kokoro:${id}">${esc(name)}</option>`;});
+  h+=`</optgroup>`;
+  ttsVoiceList=[];
+  if(TTS_OK){
+    const all=speechSynthesis.getVoices();
+    if(all.length){
+      const list=all.slice().sort((a,b)=>{
+        const la=a.lang.slice(0,2).toLowerCase()===want,lb=b.lang.slice(0,2).toLowerCase()===want;
+        if(la!==lb)return la?-1:1;
+        return ttsScoreVoice(b)-ttsScoreVoice(a)||a.lang.localeCompare(b.lang)||a.name.localeCompare(b.name);
+      });
+      ttsVoiceList=list;
+      const groups=new Map();
+      list.forEach(v=>{const k=v.lang.slice(0,2).toLowerCase();if(!groups.has(k))groups.set(k,[]);groups.get(k).push(v);});
+      groups.forEach((vs,k)=>{
+        const label="This "+(LANG_NAMES[k]||k.toUpperCase())+" device";
+        const opts=vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name.replace(/^Microsoft |^Google /,""))}${/^en/i.test(v.lang)?"":" ("+esc(v.lang)+")"}${v.localService?"":" ☁"}</option>`).join("");
+        h+=`<optgroup label="${esc(label)}">${opts}</optgroup>`;
+      });
+    }
+  }
+  sel.innerHTML=h;
+  const id=ttsVoiceId();
+  if(id&&[...sel.options].some(o=>o.value===id))sel.value=id;
+  else if(ttsVoiceList[0])sel.value=ttsVoiceList[0].name;
 }
 function ttsCurrentVoice(){
   if(!ttsVoiceList.length)ttsLoadVoices();
-  if(S.ttsVoice){const v=ttsVoiceList.find(x=>x.name===S.ttsVoice);if(v)return v;}
+  if(S.ttsVoice&&!S.ttsVoice.startsWith("kokoro:")){const v=ttsVoiceList.find(x=>x.name===S.ttsVoice);if(v)return v;}
   return ttsVoiceList[0]||null;
 }
 if(TTS_OK)speechSynthesis.onvoiceschanged=ttsLoadVoices;
+
+/* Kokoro (Heart) runs in a module worker so the page stays usable while a
+   sentence is synthesised. device is always "wasm": Safari's WebGPU path
+   reloads the tab on iPhone once the model finishes loading. q8 is ~90 MB;
+   the q4 file is several times larger and is the wrong choice for a phone. */
+const KOKORO_URL="https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js";
+const KOKORO_MODEL="onnx-community/Kokoro-82M-v1.0-ONNX";
+const KOKORO_WORKER_SRC=`
+import { KokoroTTS } from ${JSON.stringify(KOKORO_URL)};
+const MODEL=${JSON.stringify(KOKORO_MODEL)};
+let tts=null, chain=Promise.resolve();
+function enqueue(fn){ chain=chain.then(fn).catch(()=>{}); }
+function pcm16Wav(samples, rate){
+  const n=samples.length, buf=new ArrayBuffer(44+n*2), v=new DataView(buf);
+  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  w(0,"RIFF"); v.setUint32(4,36+n*2,true); w(8,"WAVE"); w(12,"fmt ");
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,rate,true); v.setUint32(28,rate*2,true);
+  v.setUint16(32,2,true); v.setUint16(34,16,true);
+  w(36,"data"); v.setUint32(40,n*2,true);
+  let o=44;
+  for(let i=0;i<n;i++){
+    const x=Math.max(-1,Math.min(1,samples[i]||0));
+    v.setInt16(o, x<0?x*0x8000:x*0x7fff, true); o+=2;
+  }
+  return buf;
+}
+self.onmessage=(e)=>{
+  const m=e.data||{};
+  if(m.cmd==="load"){
+    enqueue(async()=>{
+      try{
+        if(!tts){
+          tts=await KokoroTTS.from_pretrained(MODEL,{
+            dtype:"q8", device:"wasm",
+            progress_callback:p=>self.postMessage({cmd:"progress", p})
+          });
+        }
+        self.postMessage({cmd:"ready"});
+      }catch(err){ self.postMessage({cmd:"error", message:String(err&&err.message||err)}); }
+    });
+  }else if(m.cmd==="speak"){
+    enqueue(async()=>{
+      try{
+        if(!tts) throw new Error("Heart is not loaded yet");
+        const audio=await tts.generate(m.text,{voice:m.voice||"af_heart", speed:m.speed||1});
+        let pcm=audio.audio;
+        if(pcm&&pcm.data) pcm=pcm.data;
+        if(!(pcm instanceof Float32Array)) pcm=Float32Array.from(pcm);
+        const wav=pcm16Wav(pcm, audio.sampling_rate||24000);
+        self.postMessage({cmd:"audio", id:m.id, wav}, [wav]);
+      }catch(err){ self.postMessage({cmd:"error", id:m.id, message:String(err&&err.message||err)}); }
+    });
+  }
+};
+`;
+let kWorker=null, kLoaded=null, kSeq=0, kEpoch=0, kNext=null, kReady=false, kokoroPausedMid=false;
+const kWait=new Map();
+function kokoroNote(msg){
+  const el=$("ttsKokoroNote"); if(!el)return;
+  if(!msg){el.classList.add("hidden");el.textContent="";return;}
+  el.classList.remove("hidden"); el.textContent=msg;
+}
+function kokoroProgress(p){
+  if(!p)return;
+  if(p.status==="ready"||p.status==="done"){ if(kReady)kokoroNote(""); return; }
+  const pct=typeof p.progress==="number"?Math.round(p.progress):null;
+  const mb=p.total?Math.round(p.total/1048576):90;
+  kokoroNote(pct!=null?`Downloading Heart… ${pct}% of ~${mb} MB`:"Downloading Heart voice…");
+}
+function kokoroEnsure(){
+  if(kLoaded)return kLoaded;
+  const blob=new Blob([KOKORO_WORKER_SRC],{type:"text/javascript"});
+  kWorker=new Worker(URL.createObjectURL(blob),{type:"module"});
+  kLoaded=new Promise((res,rej)=>{
+    kWorker.onmessage=e=>{
+      const m=e.data||{};
+      if(m.cmd==="progress")kokoroProgress(m.p);
+      else if(m.cmd==="ready"){kReady=true;kokoroNote("");res();}
+      else if(m.cmd==="audio"){const w=kWait.get(m.id);if(w){kWait.delete(m.id);w.res(m.wav);}}
+      else if(m.cmd==="error"){
+        const w=m.id!=null&&kWait.get(m.id);
+        if(w){kWait.delete(m.id);w.rej(new Error(m.message||"Kokoro failed"));}
+        else rej(new Error(m.message||"Kokoro failed to start"));
+      }
+    };
+    kWorker.onerror=ev=>{rej(new Error(ev.message||"Kokoro failed to start"));};
+    kWorker.postMessage({cmd:"load"});
+  });
+  kLoaded.catch(()=>{kLoaded=null;kWorker=null;kReady=false;});
+  return kLoaded;
+}
+function kokoroGenerate(text, voice, speed){
+  const id=++kSeq;
+  return kokoroEnsure().then(()=>new Promise((res,rej)=>{
+    kWait.set(id,{res,rej});
+    kWorker.postMessage({cmd:"speak", id, text, voice, speed});
+  }));
+}
+function kokoroHold(){
+  const a=$("ttsAudio"); if(!a)return;
+  a.ontimeupdate=null; a.onended=null;
+  a.loop=true; a.volume=0.01; a.dataset.kind="hold";
+  if(a.src!==SILENT_WAV)a.src=SILENT_WAV;
+  const p=a.play(); if(p&&p.catch)p.catch(()=>{});
+}
+function kokoroStopAudio(){
+  const a=$("ttsAudio"); if(!a)return;
+  a.onended=null; a.ontimeupdate=null;
+  try{a.pause();}catch(e){}
+  a.dataset.kind="";
+}
+function ttsChunk(i, limit){
+  if(!ttsWords.length||i>=ttsWords.length)return null;
+  let end=i, chars=0;
+  while(end<ttsWords.length){
+    chars+=ttsWords[end].textContent.length+1; end++;
+    if(end>=ttsWords.length)break;
+    if(ttsBreaks[end-1]&&chars>=limit)break;
+    if(chars>=limit*2)break;
+  }
+  const weights=[];
+  const spoken=[];
+  for(let k=i;k<end;k++){
+    let s=ttsSpokenWord(ttsWords[k].textContent);
+    if(ttsBreaks[k]===2&&s&&!/[.!?…,;:]$/.test(s))s+=".";
+    spoken.push(s);
+    weights.push(Math.max(1,(s||"").replace(/\s/g,"").length));
+  }
+  return {start:i,end,text:spoken.join(" ").replace(/\s+/g," ").trim(),weights};
+}
+function kokoroPlay(wav, chunk, epoch){
+  const a=$("ttsAudio");
+  if(a._url)URL.revokeObjectURL(a._url);
+  const url=URL.createObjectURL(new Blob([wav],{type:"audio/wav"}));
+  a._url=url; a.loop=false; a.volume=1; a.dataset.kind="speech";
+  const weights=chunk.weights, total=weights.reduce((s,w)=>s+w,0)||1;
+  a.ontimeupdate=()=>{
+    if(epoch!==kEpoch||!a.duration)return;
+    const t=Math.min(1,a.currentTime/a.duration);
+    let acc=0,k=0;
+    for(;k<weights.length;k++){acc+=weights[k]; if(acc/total>=t)break;}
+    ttsSetWord(chunk.start+Math.min(k,weights.length-1));
+  };
+  a.onended=()=>{
+    if(epoch!==kEpoch||!ttsSpeaking)return;
+    if(chunk.end>=ttsWords.length)ttsChapterEnded();
+    else ttsSpeakKokoro(chunk.end);
+  };
+  a.src=url;
+  const p=a.play();
+  // iOS may refuse play() once the download took us outside the tap.
+  // Keep the audio queued so the next play tap starts it without rebuilding.
+  if(p&&p.catch)p.catch(()=>{
+    if(epoch!==kEpoch)return;
+    kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();
+    toast("Tap play to start Heart");
+  });
+}
+function kokoroFail(from, err){
+  console.error("kokoro", err);
+  kokoroFailed=true; kNext=null; kokoroStopAudio(); kokoroNote("");
+  const sys=ttsVoiceList[0];
+  S.ttsVoice=sys?sys.name:"";
+  store.set("settings",S); ttsLoadVoices();
+  toast("Heart needs a connection the first time (~90 MB). Using this phone's voice until then.");
+  if(TTS_OK)ttsSpeakFrom(from);
+  else{ttsSpeaking=false;paintTtsPlay();}
+}
+function ttsSpeakKokoro(i){
+  const pending=kNext&&kNext.start===i?kNext.promise:null;
+  kNext=null;
+  const epoch=++kEpoch;
+  kokoroPausedMid=false;
+  const chunk=ttsChunk(i, 140);
+  if(!chunk){ttsChapterEnded();return;}
+  if(!chunk.text){ttsSpeakKokoro(chunk.end);return;}
+  ttsSetWord(chunk.start);
+  kokoroHold();
+  if(!kReady)kokoroNote("Downloading Heart… first time only, about 90 MB");
+  const voice=kokoroVoiceName();
+  const speed=Math.min(1.6,Math.max(0.7,S.ttsRate||1));
+  const job=pending||kokoroGenerate(chunk.text, voice, speed);
+  job.then(wav=>{
+    if(epoch!==kEpoch||!ttsSpeaking)return;
+    const nxt=ttsChunk(chunk.end, 140);
+    if(nxt&&nxt.text)kNext={start:nxt.start, promise:kokoroGenerate(nxt.text, voice, speed)};
+    kokoroNote("");
+    kokoroPlay(wav, chunk, epoch);
+  }).catch(err=>{ if(epoch===kEpoch)kokoroFail(chunk.start, err); });
+}
+
+/* keep-alive: a looping silent <audio> started on the same user gesture as
+   the voice. It (a) makes the Media Session lock-screen / headset controls
+   appear and work on phones, since speechSynthesis alone isn't "media", and
+   (b) keeps the audio session alive in the background on Android. iOS still
+   suspends speechSynthesis when the screen locks — see ttsWatchVisibility. */
+const SILENT_WAV=(()=>{ // 1 s of 8 kHz 8-bit silence
+  const n=8000,b=new Uint8Array(44+n),dv=new DataView(b.buffer);
+  const str=(o,s)=>{for(let i=0;i<s.length;i++)b[o+i]=s.charCodeAt(i);};
+  str(0,"RIFF");dv.setUint32(4,36+n,true);str(8,"WAVE");str(12,"fmt ");dv.setUint32(16,16,true);
+  dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,8000,true);dv.setUint32(28,8000,true);
+  dv.setUint16(32,1,true);dv.setUint16(34,8,true);str(36,"data");dv.setUint32(40,n,true);
+  b.fill(128,44);
+  return URL.createObjectURL(new Blob([b],{type:"audio/wav"}));
+})();
+function keepAliveStart(){
+  const a=$("keepAlive");
+  try{if(!a.src)a.src=SILENT_WAV;a.volume=0.01;const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}
+}
+function keepAliveStop(){const a=$("keepAlive");try{a.pause();}catch(e){}}
+function ttsWatchVisibility(){
+  // Coming back from the background: Chrome/Safari often leave the engine
+  // "speaking" but silent, or wedged in a paused state. Re-speak from the
+  // current word so the user hears it continue instead of having to fiddle.
+  if(document.visibilityState!=="visible"||!ttsActive||!ttsSpeaking)return;
+  if(ttsUsesKokoro()){
+    const a=$("ttsAudio");
+    if(a&&a.dataset.kind==="speech"&&a.paused)a.play().catch(()=>{});
+    return;
+  }
+  if(!TTS_OK)return;
+  const wedged=!speechSynthesis.speaking||speechSynthesis.paused;
+  if(IS_MOBILE||wedged)setTimeout(()=>{if(ttsSpeaking&&ttsActive)ttsSpeakFrom(ttsIdx);},150);
+}
+document.addEventListener("visibilitychange",ttsWatchVisibility);
 
 /* estimated tracker for voices that never fire word-boundary events
    (Google/network voices): advance on a timer until a real event shows up */
@@ -1270,7 +2074,9 @@ function ttsBuildWords(){
   const nodes=[];let n;
   while(n=walker.nextNode()){
     if(!n.nodeValue.trim())continue;
-    if(n.parentElement&&n.parentElement.closest("pre"))continue; // don't read code aloud
+    const pe=n.parentElement;
+    if(pe&&pe.closest("pre,figcaption,.imgcap,sup.fn"))continue; // don't read code / captions / footnote marks
+    if(S.ttsSkipHead&&pe&&pe.closest("h1,h2,h3,h4,h5,h6,table"))continue;
     nodes.push(n);
   }
   nodes.forEach(node=>{
@@ -1300,6 +2106,36 @@ function ttsClearCur(){
   const p=content.querySelector(".tts-w.tts-cur");
   if(p)p.classList.remove("tts-cur");
 }
+/* [start, end) word range of the sentence containing word i */
+function ttsSentenceRange(i){
+  let s=i;while(s>0&&!ttsBreaks[s-1])s--;
+  let e=i;while(e<ttsWords.length-1&&!ttsBreaks[e])e++;
+  return [s,e+1];
+}
+let ttsSentCur=[-1,-1];
+function ttsPaintSentence(i){
+  const [s,e]=ttsSentenceRange(i);
+  if(s===ttsSentCur[0]&&e===ttsSentCur[1])return;
+  for(let k=ttsSentCur[0];k<ttsSentCur[1];k++)if(ttsWords[k])ttsWords[k].classList.remove("tts-sent");
+  for(let k=s;k<e;k++)ttsWords[k].classList.add("tts-sent");
+  ttsSentCur=[s,e];
+}
+function ttsSentenceText(i){
+  const [s,e]=ttsSentenceRange(i);
+  return ttsWords.slice(s,e).map(w=>w.textContent).join(" ").replace(/\s+/g," ").trim();
+}
+/* index of the first word currently visible (page mode: on this page;
+   scroll mode: at/below the top of the viewport) — where Listen should start */
+function ttsFirstVisibleWord(){
+  if(!ttsWords.length)return 0;
+  if(S.mode==="scroll"){
+    const top=pages.getBoundingClientRect().top+4;
+    const k=ttsWords.findIndex(w=>w.getBoundingClientRect().bottom>=top);
+    return k<0?0:k;
+  }
+  const st=step(),k=ttsWords.findIndex(w=>Math.floor(w.offsetLeft/st)>=page);
+  return k<0?0:k;
+}
 let ttsLastScroll=0;
 function ttsAutoScroll(el){
   /* keep the spoken word inside a comfortable reading band of the visible
@@ -1323,6 +2159,7 @@ function ttsSetWord(i){
   ttsIdx=i;
   const el=ttsWords[i];
   el.classList.add("tts-cur");
+  ttsPaintSentence(i);
   if(!ttsSeekDragging)$("ttsSeek").value=i;
   if(S.mode==="scroll"){
     ttsAutoScroll(el);
@@ -1332,6 +2169,12 @@ function ttsSetWord(i){
   }
 }
 function ttsSpeakFrom(i){
+  if(ttsUsesKokoro()){
+    if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
+    ttsStopTimer();
+    ttsSpeakKokoro(i);return;
+  }
+  if(kEpoch){kEpoch++;kNext=null;kokoroStopAudio();}
   if(!TTS_OK)return;
   ttsStopTimer();
   speechSynthesis.cancel();
@@ -1351,14 +2194,16 @@ function ttsSpeakFrom(i){
   const chunk=ttsWords.slice(i,end);
   const spoken=chunk.map((w,k)=>{
     let s=ttsSpokenWord(w.textContent);
-    if(ttsBreaks[i+k]===2&&!/[.!?…,;:]$/.test(s))s+=".";  // pause after headings/paragraphs
+    if(ttsBreaks[i+k]===2&&s&&!/[.!?…,;:]$/.test(s))s+=".";  // pause after headings/paragraphs
     return s;
   });
   const starts=[];let pos=0;
   spoken.forEach(s=>{starts.push(pos);pos+=s.length+1;});
-  const u=new SpeechSynthesisUtterance(spoken.join(" "));
+  const text=spoken.join(" ");   // keep single-space joins so `starts` maps onto charIndex
+  if(!text.trim()){ttsSpeakFrom(end);return;}                  // nothing speakable here (e.g. a row of symbols)
+  const u=new SpeechSynthesisUtterance(text);
   u.rate=S.ttsRate;
-  const v=ttsCurrentVoice();if(v)u.voice=v;
+  const v=ttsCurrentVoice();if(v){u.voice=v;u.lang=v.lang;}
   ttsBoundarySeen=false;
   u.onboundary=e=>{
     if(ttsUtter!==u)return;
@@ -1370,7 +2215,13 @@ function ttsSpeakFrom(i){
   u.onend=()=>{ttsStopTimer();if(ttsSpeaking&&ttsUtter===u)ttsSpeakFrom(end);};
   u.onerror=e=>{
     if(e.error==="interrupted"||e.error==="canceled")return; // our own cancel()
-    if(ttsUtter===u){ttsStopTimer();ttsSpeaking=false;paintTtsPlay();}
+    if(ttsUtter!==u)return;
+    ttsStopTimer();
+    // skip a chunk the engine cannot speak (unsupported glyph, offline voice)
+    // instead of wedging the bar in "playing" — same class as Readest #4613
+    if(ttsSpeaking&&end<ttsWords.length)ttsSpeakFrom(end);
+    else if(ttsSpeaking)ttsChapterEnded();
+    else paintTtsPlay();
   };
   ttsUtter=u;
   ttsSetWord(i);
@@ -1378,17 +2229,65 @@ function ttsSpeakFrom(i){
   ttsStartFallback(end);
 }
 function ttsChapterEnded(){
+  markChapterFinished();
   const j=siblingChapter(1);
   if(j!==null){
     ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
+    if(ttsUsesKokoro())kokoroHold();
+    else ttsHoldUntilReady();
     nav(chapterHash(CHAPTERS[j]));
   }else{
     ttsSpeaking=false;paintTtsPlay();
+    toast("End of book");
   }
 }
-function paintTtsPlay(){$("ttsPlay").textContent=ttsSpeaking?"⏸":"▶";}
-function ttsOpen(autoplay){
-  if(!TTS_OK){alert("Reading aloud isn't supported in this browser.");return;}
+function ttsHoldUntilReady(){
+  // iOS only starts speech inside a user gesture, but once started, onend →
+  // speak() is allowed. Keep a silent utterance in that chain until the next
+  // chapter's word list exists, then hand off.
+  if(!TTS_OK||!ttsActive)return;
+  if(ttsResumeAfterRender&&ttsWordsFor===cur&&ttsWords.length){ttsFlushContinue();return;}
+  if(!ttsResumeAfterRender)return;
+  const hold=new SpeechSynthesisUtterance(" ");
+  hold.volume=0;hold.rate=2;
+  hold.onend=ttsHoldUntilReady;
+  hold.onerror=ttsHoldUntilReady;
+  try{speechSynthesis.speak(hold);}catch(e){}
+}
+function ttsFlushContinue(){
+  if(!ttsResumeAfterRender||!ttsActive||ttsWordsFor!==cur||!ttsWords.length)return;
+  ttsResumeAfterRender=false;
+  ttsSpeaking=true;
+  if(!ttsUsesKokoro())keepAliveStart();
+  ttsSpeakFrom(0);
+  paintTtsPlay();
+}
+function paintTtsPlay(){
+  $("ttsPlay").textContent=ttsSpeaking?"⏸":"▶";
+  if("mediaSession" in navigator){try{navigator.mediaSession.playbackState=ttsSpeaking?"playing":"paused";}catch(e){}}
+}
+function ttsPaintOptions(){
+  $("ttsSkipHead").classList.toggle("on",!!S.ttsSkipHead);
+}
+/* ttsOpen(autoplay, fromStart): opens the Listen bar. Unless `fromStart` (auto
+   advance into the next chapter) the voice starts at the first word visible
+   on the current page / scroll position — not at the top of the chapter. */
+let ttsUnlocked=false;
+function ttsUnlock(){
+  if(ttsUnlocked||!TTS_OK)return;
+  try{
+    const u=new SpeechSynthesisUtterance(" ");
+    u.volume=0;u.rate=4;
+    speechSynthesis.speak(u);
+    speechSynthesis.cancel();
+    ttsUnlocked=true;
+  }catch(e){}
+}
+function ttsOpen(autoplay,fromStart){
+  if(!TTS_OK&&!KOKORO_OK){toast("Reading aloud isn't supported in this browser.");return;}
+  if(ttsUsesKokoro())kokoroHold();
+  else ttsUnlock();
+  const fresh=ttsWordsFor!==cur;
   ttsActive=true;
   $("btnListen").classList.add("on");
   $("ttsBar").classList.remove("hidden");
@@ -1401,30 +2300,46 @@ function ttsOpen(autoplay){
     reader.classList.add("listening");
     reflowKeepingPct(()=>{});
   }
-  if(ttsWordsFor!==cur)ttsBuildWords();
-  ttsLoadVoices();
+  if(fresh)ttsBuildWords();
+  ttsLoadVoices();ttsPaintOptions();
   $("ttsRateSlider").value=S.ttsRate;$("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
-  // best-effort lock-screen / media-key controls where the browser supports
-  // Media Session for speech synthesis
   if("mediaSession" in navigator){
     try{
       const c=CHAPTERS[cur],b=c?bookOf(c):null;
       if(c)navigator.mediaSession.metadata=new MediaMetadata({title:c.title,artist:b?b.title:"",album:"Library"});
       navigator.mediaSession.setActionHandler("play",()=>{if(!ttsSpeaking)ttsPlay();});
       navigator.mediaSession.setActionHandler("pause",()=>{if(ttsSpeaking)ttsPause();});
+      navigator.mediaSession.setActionHandler("stop",ttsClose);
       navigator.mediaSession.setActionHandler("nexttrack",()=>ttsSentence(1));
       navigator.mediaSession.setActionHandler("previoustrack",()=>ttsSentence(-1));
+      try{navigator.mediaSession.setActionHandler("seekforward",()=>ttsSentence(1));
+          navigator.mediaSession.setActionHandler("seekbackward",()=>ttsSentence(-1));}catch(e){}
     }catch(e){}
   }
-  if(autoplay)ttsPlay();
+  if(fresh){
+    const start=()=>{
+      if(!ttsActive)return;
+      if(!fromStart)ttsIdx=ttsFirstVisibleWord();
+      if(ttsWords.length)ttsSetWord(Math.min(ttsIdx,ttsWords.length-1));
+      if(autoplay)ttsPlay();
+    };
+    // chapter auto-advance must speak in the same turn as onend when possible
+    if(fromStart)start();
+    else requestAnimationFrame(start);
+  }else if(autoplay)ttsPlay();
 }
 function ttsClose(){
   ttsActive=false;ttsSpeaking=false;
+  kEpoch++;kNext=null;kokoroPausedMid=false;
   ttsStopTimer();
   ttsSleepClear();
+  keepAliveStop();
+  kokoroStopAudio();kokoroNote("");
   $("voiceHelp").classList.add("hidden");
   if(TTS_OK)speechSynthesis.cancel();
   ttsClearCur();
+  for(let k=ttsSentCur[0];k<ttsSentCur[1];k++)if(ttsWords[k])ttsWords[k].classList.remove("tts-sent");
+  ttsSentCur=[-1,-1];
   $("btnListen").classList.remove("on");
   $("ttsBar").classList.add("hidden");
   $("botbar").classList.remove("hidden");
@@ -1433,23 +2348,58 @@ function ttsClose(){
     reader.classList.remove("listening");
     if(cur>=0)reflowKeepingPct(()=>{});
   }
+  if("mediaSession" in navigator){try{navigator.mediaSession.playbackState="none";}catch(e){}}
   paintTtsPlay();
 }
 /* pause = cancel + remember the word; resume = speak again from that word.
    The engine's own pause()/resume() is broken on Android and can wedge Chrome. */
 function ttsPlay(){
-  if(!ttsActive)ttsOpen(false);
+  if(!ttsActive){
+    if(ttsUsesKokoro())kokoroHold();
+    else ttsUnlock();
+    ttsOpen(true);return;
+  }
+  // Resume the sentence already in the audio element. Calling kokoroHold
+  // first would replace that audio with silence.
+  if(ttsUsesKokoro()&&kokoroPausedMid){
+    kokoroPausedMid=false;ttsSpeaking=true;
+    const p=$("ttsAudio").play(); if(p&&p.catch)p.catch(()=>{});
+    paintTtsPlay();return;
+  }
+  if(ttsUsesKokoro())kokoroHold();
+  else ttsUnlock();
   if(ttsWordsFor!==cur)ttsBuildWords();
-  if(!ttsWords.length)return;
+  if(!ttsWords.length){toast("Nothing to read in this chapter.");return;}
   ttsSpeaking=true;
+  if(!ttsUsesKokoro())keepAliveStart();
   ttsSpeakFrom(Math.min(ttsIdx,ttsWords.length-1));
   paintTtsPlay();
 }
 function ttsPause(){
+  if(ttsUsesKokoro()){
+    const a=$("ttsAudio");
+    if(a.dataset.kind==="speech"&&!a.ended){
+      a.pause();kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
+    }
+    kEpoch++;kNext=null;kokoroStopAudio();kokoroNote("");
+    ttsSpeaking=false;paintTtsPlay();return;
+  }
   ttsSpeaking=false;
   ttsStopTimer();
+  keepAliveStop();
   if(TTS_OK)speechSynthesis.cancel();
   paintTtsPlay();
+}
+/* keep the sentence being read as a highlight (Readest has this; very handy
+   when listening with the phone in a pocket) */
+function ttsKeepSentence(){
+  if(!ttsActive||!ttsWords.length)return;
+  const text=ttsSentenceText(ttsIdx);
+  if(text.length<2)return;
+  const c=CHAPTERS[cur];
+  if((highlights[c.id]||[]).some(h=>h.text===text)){toast("Already highlighted");return;}
+  saveHighlight(text,undefined,"y");
+  toast("Sentence saved to highlights");
 }
 function ttsSeekTo(i){
   if(!ttsWords.length)return;
@@ -1521,7 +2471,7 @@ function markText(root,text,attrs){
     const range=document.createRange();
     range.setStart(sl.node,sl.s);range.setEnd(sl.node,sl.e);
     const mark=document.createElement("mark");
-    mark.className="hl"+(attrs.note?" noted":"");
+    mark.className="hl c-"+(attrs.color||"y")+(attrs.note?" noted":"");
     mark.dataset.hl=attrs.i;
     if(attrs.note)mark.title=attrs.note;
     try{range.surroundContents(mark);}catch(e){}
@@ -1529,7 +2479,7 @@ function markText(root,text,attrs){
   return true;
 }
 function applyHighlights(chId){
-  (highlights[chId]||[]).forEach((hl,i)=>markText(content,hl.text,{i,note:hl.note}));
+  (highlights[chId]||[]).forEach((hl,i)=>markText(content,hl.text,{i,note:hl.note,color:hl.c}));
 }
 const hlPop=$("hlPop");
 function hideHlPop(){hlPop.classList.add("hidden");hlPop.innerHTML="";}
@@ -1548,12 +2498,37 @@ function showHlPop(x,y,buttons){
   hlPop.style.left=Math.max(8,Math.min(innerWidth-r.width-8,x-r.width/2))+"px";
   hlPop.style.top=Math.max(8,(y-r.height-12<8?y+18:y-r.height-12))+"px";
 }
-function saveHighlight(text,note){
+let lastHlColor=store.get("hlColor","y");
+function saveHighlight(text,note,color){
   const c=CHAPTERS[cur];if(!c)return;
-  (highlights[c.id]=highlights[c.id]||[]).push(note?{text,note}:{text});
+  color=color||lastHlColor||"y";
+  const hl={text,t:Date.now()};
+  if(note)hl.note=note;
+  if(color!=="y")hl.c=color;
+  (highlights[c.id]=highlights[c.id]||[]).push(hl);
   store.set("highlights",highlights);
-  markText(content,text,{i:highlights[c.id].length-1,note});
+  lastHlColor=color;store.set("hlColor",color);
+  markText(content,text,{i:highlights[c.id].length-1,note,color});
   const sel=window.getSelection();if(sel)sel.removeAllRanges();
+}
+/* note editor (bottom sheet) shared by new highlights and existing marks */
+async function editNoteSheet(hl,text){
+  return sheet({title:hl?"Edit highlight":"Add a note",quote:text.length>160?text.slice(0,160)+"…":text,
+    value:hl&&hl.note||"",placeholder:"Your thought about this passage (optional)",
+    colors:true,color:hl?(hl.c||"y"):lastHlColor,ok:"Save",danger:hl?"Remove":null});
+}
+function removeHighlight(chId,i){
+  if(!highlights[chId])return;
+  highlights[chId].splice(i,1);
+  if(!highlights[chId].length)delete highlights[chId];
+  store.set("highlights",highlights);
+}
+/* H = highlight the selection with the last colour; Shift+H = with a note */
+function highlightSelection(withNote){
+  const s=selectionInContent();
+  if(!s){toast("Select some text first");return;}
+  if(!withNote){saveHighlight(s.text);return;}
+  editNoteSheet(null,s.text).then(r=>{if(r)saveHighlight(s.text,r.value||undefined,r.color);});
 }
 function selectionInContent(){
   const sel=window.getSelection();
@@ -1570,36 +2545,50 @@ function maybeShowSelectionPop(){
   if(!s){return;}
   aiLastCtx=selectionContext(); // remember for the A / D shortcuts
   const rect=s.sel.getRangeAt(0).getBoundingClientRect();
-  showHlPop(rect.left+rect.width/2,rect.top,[
+  const ctx=selectionContext()||aiLastCtx;
+  const btns=[
     ["✎ Highlight",()=>saveHighlight(s.text)],
-    ["＋ Note",()=>{
-      const note=prompt("Note for this highlight:");
-      if(note!=null)saveHighlight(s.text,note.trim()||undefined);
-    }],
-    ["✦ Ask",()=>aiOpen(selectionContext()||aiLastCtx)],
-    ["Aa Meaning",()=>aiDefine(selectionContext()||aiLastCtx)],
-  ]);
+    ["＋ Note",()=>editNoteSheet(null,s.text).then(r=>{if(r)saveHighlight(s.text,r.value||undefined,r.color);})],
+    ["✦ Ask",()=>aiOpen(ctx)],
+    ["Aa Meaning",()=>aiDefine(ctx)],
+  ];
+  if(ttsActive)btns.push(["▶ Read from here",()=>{
+    const node=s.sel.anchorNode,el=node&&(node.nodeType===3?node.parentElement:node);
+    const w=el&&el.closest(".tts-w");
+    const k=w?ttsWords.indexOf(w):-1;
+    if(k>=0){ttsSeekTo(k);if(!ttsSpeaking)ttsPlay();}
+  }]);
+  if(navigator.share||navigator.clipboard)btns.push(["Copy",()=>{
+    const c=CHAPTERS[cur],b=c&&bookOf(c);
+    const quote=`“${s.text}”`+(b?`\n— ${b.title}, ${c.title}`:"");
+    if(navigator.clipboard)navigator.clipboard.writeText(quote).then(()=>toast("Quote copied"),()=>{});
+  }]);
+  showHlPop(rect.left+rect.width/2,rect.top,btns);
 }
 function openMarkPop(markEl,x,y){
   const c=CHAPTERS[cur];if(!c)return;
   const i=+markEl.dataset.hl,hl=(highlights[c.id]||[])[i];
   if(!hl)return;
   const btns=[];
-  if(hl.note)btns.push(["View note",()=>alert(hl.note)]);
-  btns.push([hl.note?"Edit note":"＋ Note",()=>{
-    const note=prompt("Note for this highlight:",hl.note||"");
-    if(note==null)return;
-    if(note.trim())hl.note=note.trim();else delete hl.note;
+  btns.push([hl.note?"✎ Note":"＋ Note",async()=>{
+    const r=await editNoteSheet(hl,hl.text);
+    if(!r)return;
+    if(r.danger){removeHighlight(c.id,i);renderChapter(cur);toast("Highlight removed");return;}
+    if(r.value)hl.note=r.value;else delete hl.note;
+    if(r.color&&r.color!=="y")hl.c=r.color;else delete hl.c;
+    lastHlColor=r.color||"y";store.set("hlColor",lastHlColor);
     store.set("highlights",highlights);
     renderChapter(cur);
   }]);
-  btns.push(["Remove",()=>{
-    highlights[c.id].splice(i,1);
-    if(!highlights[c.id].length)delete highlights[c.id];
-    store.set("highlights",highlights);
-    renderChapter(cur);
-  }]);
+  ["y","g","b","p"].forEach(col=>{if((hl.c||"y")!==col)btns.push([{y:"🟡",g:"🟢",b:"🔵",p:"🟣"}[col],()=>{
+    if(col==="y")delete hl.c;else hl.c=col;
+    lastHlColor=col;store.set("hlColor",col);
+    store.set("highlights",highlights);renderChapter(cur);
+  }]);});
+  btns.push(["✦ Ask",()=>aiOpen({text:hl.text,para:""})]);
+  btns.push(["Remove",()=>{removeHighlight(c.id,i);renderChapter(cur);}]);
   showHlPop(x,y,btns);
+  if(hl.note)toast("Note: "+hl.note,null,null,6000);
 }
 /* ================= Ask AI =================
    Select text → ✦ Ask (or press A / D) → a small chat panel answers questions
@@ -1623,22 +2612,19 @@ const AI_PROVIDERS={
   gemini:{name:"Google Gemini", base:"https://generativelanguage.googleapis.com/v1beta/openai",
     keyUrl:"https://aistudio.google.com/apikey", keyLbl:"aistudio.google.com/apikey",
     keyHint:"AIza… API key",
-    note:"Generous free tier and the most capable free option here. Paste an AI Studio key.",
-    models:["gemini-2.5-flash","gemini-2.5-flash-lite","gemini-2.5-pro","gemini-2.0-flash"]},
+    note:"Generous free tier and the most capable free option here. Paste an AI Studio key. (2.5-series ids are restricted for new projects — use ↻ to see what your key can reach.)",
+    models:["gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-2.5-flash"]},
   groq:{name:"Groq", base:"https://api.groq.com/openai/v1",
     keyUrl:"https://console.groq.com/keys", keyLbl:"console.groq.com/keys",
     keyHint:"gsk_… key",
-    note:"Very fast, free tier with per-minute limits. Hosts Kimi K2 and the open gpt-oss models.",
-    models:["llama-3.3-70b-versatile","llama-3.1-8b-instant","openai/gpt-oss-120b",
-      "openai/gpt-oss-20b","moonshotai/kimi-k2-instruct","qwen/qwen3-32b",
-      "deepseek-r1-distill-llama-70b"]},
+    note:"Very fast, free tier with per-minute limits. The open gpt-oss models are the current free workhorses (llama-3.x / kimi-k2 ids were retired).",
+    models:["openai/gpt-oss-120b","openai/gpt-oss-20b","qwen/qwen3.8-27b"]},
   openrouter:{name:"OpenRouter (free models)", base:"https://openrouter.ai/api/v1",
     keyUrl:"https://openrouter.ai/keys", keyLbl:"openrouter.ai/keys",
     keyHint:"sk-or-… key",
-    note:"One key, hundreds of models. Ids ending in “:free” cost nothing — this is the widest safety net when other tiers are exhausted.",
-    models:["x-ai/grok-4-fast:free","deepseek/deepseek-chat-v3.1:free","deepseek/deepseek-r1:free",
-      "moonshotai/kimi-k2:free","qwen/qwen3-235b-a22b:free","meta-llama/llama-3.3-70b-instruct:free",
-      "google/gemma-3-27b-it:free","mistralai/mistral-small-3.2-24b-instruct:free"]},
+    note:"One key, hundreds of models. <code>openrouter/free</code> auto-routes to whichever free model is up right now; ids ending in “:free” cost nothing — the widest safety net when other tiers are exhausted.",
+    models:["openrouter/free","thinkingmachines/inkling:free","thinkingmachines/inkling-small:free",
+      "google/gemma-4-31b-it:free","google/gemma-4-26b-a4b-it:free","nvidia/nemotron-3-super-120b-a12b:free"]},
   cerebras:{name:"Cerebras", base:"https://api.cerebras.ai/v1",
     keyUrl:"https://cloud.cerebras.ai/", keyLbl:"cloud.cerebras.ai",
     keyHint:"csk-… key",
@@ -1901,11 +2887,83 @@ function aiClose(){
   if($("aaPanel").classList.contains("hidden"))$("scrim").classList.add("hidden");
   const sel=window.getSelection();if(sel)sel.removeAllRanges();
 }
+/* Meaning: a single English word is looked up in a keyless dictionary first
+   (instant, no setup, works without any AI provider); phrases, failures and
+   "explain in context" go to the AI. Wikipedia covers proper nouns. */
+const dictCache=new Map();
+async function dictLookup(word){
+  const w=word.toLowerCase().replace(/[^a-z'-]/g,"");
+  if(!w||w.length>40)return null;
+  if(dictCache.has(w))return dictCache.get(w);
+  let out=null;
+  const tryJson=async(url,ms)=>{
+    const ac=new AbortController();const t=setTimeout(()=>ac.abort(),ms||4000);
+    try{const r=await fetch(url,{signal:ac.signal});if(!r.ok)return null;return await r.json();}
+    catch(e){return null;}finally{clearTimeout(t);}
+  };
+  // 1) englishdictionaryapi.com — CORS-enabled, keyless, ~1000 req/h
+  let j=await tryJson("https://englishdictionaryapi.com/api/v1/words/"+encodeURIComponent(w));
+  const pick=(entry)=>{
+    const lines=[];
+    const meanings=entry.meanings||entry.senses||[];
+    for(const m of meanings){
+      const pos=m.partOfSpeech||m.pos||"";
+      const defs=(m.definitions||[]).slice(0,2);
+      for(const d of defs){
+        const dt=typeof d==="string"?d:(d.definition||d.text||"");
+        if(!dt)continue;
+        lines.push(`**${pos}** — ${dt}`+(d.example?`\n  _“${d.example}”_`:""));
+      }
+      if(lines.length>=4)break;
+    }
+    const ph=entry.phonetic||(entry.phonetics||[]).map(p=>p.text).find(Boolean)||"";
+    return lines.length?{word:entry.word||w,phonetic:ph,body:lines.join("\n")}:null;
+  };
+  if(j){const e=Array.isArray(j)?j[0]:(j.data||j);if(e)out=pick(e);}
+  // 2) dictionaryapi.dev (same shape; rate-limited and flaky, hence second)
+  if(!out){j=await tryJson("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(w));
+    if(Array.isArray(j)&&j[0])out=pick(j[0]);}
+  // 3) Wikipedia summary — names, places, concepts
+  if(!out){j=await tryJson("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(word.trim()),5000);
+    if(j&&j.extract&&j.type!=="disambiguation")out={word:j.title,phonetic:"",body:j.extract.split(/(?<=\.)\s/).slice(0,3).join(" "),src:"Wikipedia"};}
+  dictCache.set(w,out);
+  return out;
+}
 function aiDefine(ctx){
   if(!ctx||!ctx.text){aiOpen(ctx);return;}
-  const short=ctx.text.length>80?ctx.text.slice(0,80)+"…":ctx.text;
-  if(ctx.text.length<=60)aiVocabPending=ctx.text; // word/short phrase → vocabulary book
-  aiOpen(ctx,`What does “${short}” mean here? Give a short, dictionary-style answer.`);
+  const text=ctx.text.trim();
+  const short=text.length>80?text.slice(0,80)+"…":text;
+  const q=`What does “${short}” mean here? Give a short, dictionary-style answer.`;
+  const isWord=/^[A-Za-z][A-Za-z'-]{1,39}$/.test(text)||/^[A-Z][a-z]+(\s[A-Z][a-z]+){0,2}$/.test(text);
+  if(!isWord){if(text.length<=60)aiVocabPending=text;aiOpen(ctx,q);return;}
+  // word: dictionary first, AI as fallback / for "in context"
+  if(reader.classList.contains("hidden"))return;
+  hideHlPop();hidePanel();
+  if(!aiCtx||aiCtx.text!==ctx.text)aiMsgs=[];
+  aiCtx=ctx;
+  const chId=CHAPTERS[cur]?CHAPTERS[cur].id:"";
+  $("aiPanel").classList.remove("hidden");$("scrim").classList.remove("hidden");
+  paintAiHead();aiShowSetup(false);
+  aiMsgs.push({role:"user",content:q});
+  const reply={role:"assistant",content:"",via:"looking up…"};
+  aiMsgs.push(reply);aiBusy=true;aiRender();
+  dictLookup(text).then(d=>{
+    aiBusy=false;
+    if(d){
+      reply.content=`**${d.word}**${d.phonetic?" "+d.phonetic:""}\n\n${d.body}`;
+      reply.via=d.src||"Dictionary";
+      vocab.unshift({w:text,def:d.body.slice(0,600),ch:chId,d:Date.now()});
+      vocab=vocab.slice(0,500);store.set("vocab",vocab);
+      aiRender();
+      // offer the contextual explanation as a one-tap follow-up
+      $("aiChips").innerHTML=`<button data-q="Explain what “${esc(short)}” means in this specific passage.">In this context</button>`+AI_CHIPS_SEL;
+      return;
+    }
+    // no dictionary hit → ask the AI, same conversation
+    aiMsgs.splice(aiMsgs.length-2,2);
+    if(aiChain().length){aiVocabPending=text;aiSend(q);}
+    else{aiMsgs.push({role:"user",content:q},{role:"assistant",content:"⚠ No dictionary entry found, and no AI provider is set up yet (⚙)."});aiRender();aiShowSetup(true);}
+  });
 }
 /* one attempt against one provider; streams into `reply` and throws on failure.
    Throws with .started set when tokens already arrived, so the caller knows not
@@ -1918,7 +2976,7 @@ async function aiAttempt(id,messages,reply){
     res=await fetch(aiBaseOf(id)+"/chat/completions",{
       method:"POST",
       headers:Object.assign({"Content-Type":"application/json"},key?{"Authorization":"Bearer "+key}:{}),
-      body:JSON.stringify({model,stream:true,max_tokens:700,messages})
+      body:JSON.stringify({model,stream:true,max_tokens:1000,messages})
     });
   }catch(e){
     throw new Error(p.local
@@ -2064,9 +3122,10 @@ $("aiMsgs").addEventListener("click",e=>{
   // anchor to the discussed passage when there is one (so it shows highlighted
   // in the text); otherwise it's a chapter-level note on the highlights page
   const anchor=(aiCtx&&aiCtx.text)?aiCtx.text:"✦ "+c.title;
-  (highlights[c.id]=highlights[c.id]||[]).push({text:anchor,note:m.content.slice(0,2000)});
+  (highlights[c.id]=highlights[c.id]||[]).push({text:anchor,note:m.content.slice(0,2000),t:Date.now()});
   store.set("highlights",highlights);
   if(aiCtx&&aiCtx.text)markText(content,anchor,{i:highlights[c.id].length-1,note:m.content});
+  toast("Saved to highlights & notes");
   m.saved=true;aiRender();
 });
 
@@ -2077,17 +3136,22 @@ $("helpOverlay").addEventListener("click",toggleHelp);
 function restoreAnim(){requestAnimationFrame(()=>{content.style.transition="";});}
 function paginate(){
   if(S.mode==="scroll"){pageCount=1;updateStatus();return;}
-  const w=pages.clientWidth;
-  content.style.setProperty("--pw",w+"px");
-  const gap=Math.max(40,Math.round(w*0.12));
+  const w=pages.clientWidth,gap=gapOf(w);
+  // two-up: each column is (w-gap)/2 wide with the same gap between, so a pair
+  // of columns spans exactly one page step and paging maths is unchanged
+  content.style.setProperty("--pw",(twoCols()?(w-gap)/2:w)+"px");
   content.style.setProperty("--gap",gap+"px");
-  // force reflow then measure
-  const step=w+gap;
-  pageCount=Math.max(1,Math.ceil(pages.scrollWidth/step));
+  // measure with no translateX — a leftover transform can inflate scrollWidth
+  const saved=content.style.transform;
+  content.style.transform="none";
+  const stepW=w+gap;
+  pageCount=Math.max(1,Math.round(pages.scrollWidth/stepW));
+  content.style.transform=saved;
   $("slider").max=pageCount;
   updateStatus();
 }
-function step(){const w=pages.clientWidth;const gap=Math.max(40,Math.round(w*0.12));return w+gap;}
+function gapOf(w){return twoCols()?Math.max(36,Math.round(w*0.07)):Math.max(40,Math.round(w*0.12));}
+function step(){const w=pages.clientWidth;return w+gapOf(w);}
 function goTo(p,animate=true){
   if(S.mode==="scroll")return;
   p=Math.max(0,Math.min(pageCount-1,p));
@@ -2108,12 +3172,30 @@ function goToPct(pct,animate){
   }
   goTo(Math.round(pct*(pageCount-1)),animate);
 }
+function isShortChapter(){
+  if(S.mode==="scroll")return pages.scrollHeight<=pages.clientHeight+4;
+  return pageCount<=1;
+}
 function curPct(){
+  // A chapter that fits on one screen is opened, not finished. Marking it
+  // 100% here used to auto-finish every short note the moment you tapped it.
   if(S.mode==="scroll"){
     const m=pages.scrollHeight-pages.clientHeight;
-    return m>0?pages.scrollTop/m:1;
+    return m>0?Math.min(1,pages.scrollTop/m):0;
   }
-  return pageCount>1?page/(pageCount-1):1;
+  return pageCount>1?page/(pageCount-1):0;
+}
+function markChapterFinished(){
+  if(cur<0)return;
+  const c=CHAPTERS[cur],prev=progress[c.id]?progress[c.id].pct:0;
+  if(prev>=.95)return;
+  progress[c.id]={pct:1};
+  store.set("progress",progress);
+  const k=todayKey();
+  stats.days[k]=(stats.days[k]||0)+Math.round((1-prev)*c.words);
+  const b=bookOf(c);
+  if(b&&!stats.finished[b.id]&&bookPct(b)>=.95)stats.finished[b.id]=k;
+  store.set("stats",stats);
 }
 function todayKey(){
   const d=new Date();
@@ -2163,15 +3245,21 @@ function openSibling(offset,fromEnd){
   else if(fromEnd===undefined)backToToc();  // past the last chapter -> book TOC
 }
 function next(){
-  if(S.mode==="scroll"){pages.scrollBy({top:pages.clientHeight*.9,behavior:"smooth"});return;}
-  if(page<pageCount-1)goTo(page+1);
-  else{const j=siblingChapter(1);if(j!==null)nav(chapterHash(CHAPTERS[j]));}
+  if(S.mode==="scroll"){
+    const atEnd=pages.scrollTop+pages.clientHeight>=pages.scrollHeight-2;
+    if(!atEnd){pages.scrollBy({top:pages.clientHeight*.9,behavior:"smooth"});return;}
+  }else if(page<pageCount-1){goTo(page+1);return;}
+  if(isShortChapter()||curPct()>=.95)markChapterFinished();
+  const j=siblingChapter(1);
+  if(j!==null)nav(chapterHash(CHAPTERS[j]));
+  else if(cur>=0&&!(share&&share.type==="chapter"))toast("End of book","Contents",backToToc);
 }
 function prev(){
-  if(S.mode==="scroll"){pages.scrollBy({top:-pages.clientHeight*.9,behavior:"smooth"});return;}
-  if(page>0)goTo(page-1);
-  else{const j=siblingChapter(-1);
-    if(j!==null){pendingFromEnd=true;nav(chapterHash(CHAPTERS[j]));}}
+  if(S.mode==="scroll"){
+    if(pages.scrollTop>2){pages.scrollBy({top:-pages.clientHeight*.9,behavior:"smooth"});return;}
+  }else if(page>0){goTo(page-1);return;}
+  const j=siblingChapter(-1);
+  if(j!==null){pendingFromEnd=true;nav(chapterHash(CHAPTERS[j]));}
 }
 let pendingFromEnd=false;
 function backToToc(){
@@ -2188,7 +3276,8 @@ function toggleBars(){barsOn?hideBars():showBars();}
 function showPanel(){$("aaPanel").classList.remove("hidden");$("scrim").classList.remove("hidden");}
 function hidePanel(){$("aaPanel").classList.add("hidden");$("scrim").classList.add("hidden");}
 function cycleTheme(){
-  S.theme=S.theme==="light"?"sepia":S.theme==="sepia"?"dark":"light";
+  const order=["light","sepia","gray","dark","black"];
+  S.theme=order[(order.indexOf(S.theme)+1)%order.length];
   applySettings();
 }
 function reflowKeepingPct(fn){
@@ -2211,9 +3300,30 @@ $("btnNextCh").addEventListener("click",()=>openSibling(1,false));
 $("slider").addEventListener("input",e=>goTo(e.target.value-1,false));
 
 /* Listen (text-to-speech) controls */
-$("btnListen").addEventListener("click",()=>{ttsActive?ttsClose():ttsOpen(true);});
+$("btnListen").addEventListener("click",()=>{ttsUnlock();ttsActive?ttsClose():ttsOpen(true);});
 $("ttsClose").addEventListener("click",ttsClose);
 $("ttsPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
+$("ttsSaveSent").addEventListener("click",ttsKeepSentence);
+$("ttsSkipHead").addEventListener("click",()=>{
+  S.ttsSkipHead=!S.ttsSkipHead;store.set("settings",S);ttsPaintOptions();
+  toast(S.ttsSkipHead?"Skipping headings & tables":"Reading headings & tables");
+  // rebuild the word list, keeping the place
+  const was=ttsWords[ttsIdx],wasSpeaking=ttsSpeaking;
+  const anchorText=was?was.textContent:"";
+  if(wasSpeaking){
+    ttsSpeaking=false;
+    if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
+    kEpoch++;kNext=null;kokoroPausedMid=false;kokoroStopAudio();
+  }
+  renderChapter(cur);                       // rebuilds the word spans in its own frame
+  requestAnimationFrame(()=>{
+    if(ttsWordsFor!==cur)ttsBuildWords();
+    const k=ttsWords.findIndex(w=>w.textContent===anchorText);
+    ttsIdx=k<0?Math.min(ttsIdx,Math.max(0,ttsWords.length-1)):k;
+    if(ttsWords.length)ttsSetWord(ttsIdx);
+    if(wasSpeaking)ttsPlay();
+  });
+});
 $("ttsSeek").addEventListener("input",e=>{
   ttsSeekDragging=true; // stop boundary events yanking the thumb mid-drag
   ttsClearCur();
@@ -2231,15 +3341,19 @@ $("ttsRateSlider").addEventListener("change",e=>{
 });
 $("ttsVoice").addEventListener("change",e=>{
   S.ttsVoice=e.target.value;store.set("settings",S);
+  if(e.target.value.startsWith("kokoro:"))kokoroFailed=false;
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
-  else if(TTS_OK){ // quick preview of the newly chosen voice
+  else if(e.target.value.startsWith("kokoro:"))
+    kokoroNote(kReady?"Heart is ready.":"Heart downloads once (~90 MB) the first time you press play, then stays on this phone.");
+  else if(TTS_OK){ // quick preview of the newly chosen device voice
+    kokoroNote("");
     const u=new SpeechSynthesisUtterance("This voice will read your books.");
     const v=ttsCurrentVoice();if(v)u.voice=v;
     u.rate=S.ttsRate;
     speechSynthesis.cancel();speechSynthesis.speak(u);
   }
 });
-/* sleep timer: ⏾ cycles Off → 15 → 30 → 60 min, then pauses the voice */
+/* sleep timer: ⏾ cycles Off → 5 → 15 → 30 → 60 min, then pauses the voice */
 let ttsSleepMin=0,ttsSleepT=null;
 function paintSleep(){
   const b=$("ttsSleep");
@@ -2248,7 +3362,7 @@ function paintSleep(){
 }
 function ttsSleepClear(){if(ttsSleepT){clearTimeout(ttsSleepT);ttsSleepT=null;}ttsSleepMin=0;paintSleep();}
 $("ttsSleep").addEventListener("click",()=>{
-  ttsSleepMin=ttsSleepMin===0?15:ttsSleepMin===15?30:ttsSleepMin===30?60:0;
+  ttsSleepMin=ttsSleepMin===0?5:ttsSleepMin===5?15:ttsSleepMin===15?30:ttsSleepMin===30?60:0;
   if(ttsSleepT){clearTimeout(ttsSleepT);ttsSleepT=null;}
   if(ttsSleepMin)ttsSleepT=setTimeout(()=>{ttsPause();ttsSleepMin=0;ttsSleepT=null;paintSleep();},ttsSleepMin*60000);
   paintSleep();
@@ -2276,14 +3390,20 @@ function voiceHelpHtml(){
     more voices. Microsoft Edge additionally ships very good “Natural” online voices out of the box.</p>`};
   let order=[ios,and,mac,win];
   if(/Android/i.test(ua))order=[and,ios,mac,win];
+  else if(/Macintosh/i.test(ua)&&navigator.maxTouchPoints>1)order=[ios,mac,and,win];
   else if(/Macintosh/i.test(ua))order=[mac,win,ios,and];
   else if(/Windows/i.test(ua))order=[win,mac,ios,and];
-  return `<h2>Get better reading voices</h2>
-    <p class="dim">Voices come from your device, not this app — installing one good system voice
-    upgrades the narration everywhere, permanently. Your device first:</p>`
+  return `<h2>Voices</h2>
+    <p>The default is <b>Heart</b> — the same Kokoro voice the screen tutor uses.
+    The first time you press play it downloads about 90&nbsp;MB, then it stays on
+    this phone and works with no connection. It is much closer to a person than
+    the voices iOS ships with.</p>
+    <p class="dim">Heart runs in a safe mode on iPhone on purpose. Safari's faster
+    graphics path reloads the page once this model finishes loading, so it is not used.</p>
+    <p class="dim">Bella, Nicole, Michael, Emma and George are the same download — pick
+    them in the Voice menu. “This device” underneath is the phone's own voice, if you prefer it:</p>`
     +order.map(s=>`<h3>${s.t}</h3>${s.h}`).join("")
-    +`<p class="dim">Tip: in the Voice menu, names containing <b>Premium</b>, <b>Enhanced</b>,
-    <b>Natural</b> or <b>Siri</b> sound best. Tap anywhere outside this card to close.</p>`;
+    +`<p class="dim">Tap anywhere outside this card to close.</p>`;
 }
 $("ttsVoiceHelp").addEventListener("click",()=>{
   const v=$("voiceHelp");
@@ -2294,23 +3414,28 @@ $("voiceHelp").addEventListener("click",e=>{
   if(!e.target.closest("a")&&!e.target.closest(".card"))$("voiceHelp").classList.add("hidden");
 });
 
-$("ttsDictBtn").addEventListener("click",()=>{
+$("ttsDictBtn").addEventListener("click",async()=>{
+  const wasSpeaking=ttsSpeaking;
+  if(wasSpeaking)ttsPause();
   const curW=ttsWords[ttsIdx]
     ?ttsWords[ttsIdx].textContent.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g,""):"";
-  const w=prompt("Fix pronunciation — which word?",curW);
-  if(!w||!w.trim())return;
-  const lc=w.trim().toLowerCase();
-  const p=prompt(`How should “${w.trim()}” be spoken?\nSpell it phonetically (e.g. “Uniswap” → “you-nee-swap”). Leave empty to remove the fix.`,ttsDict[lc]||"");
-  if(p==null)return;
-  if(p.trim())ttsDict[lc]=p.trim();else delete ttsDict[lc];
+  const w=await sheet({title:"Fix a pronunciation",value:curW,multiline:false,placeholder:"Which word?",ok:"Next"});
+  if(!w||!w.value){if(wasSpeaking)ttsPlay();return;}
+  const lc=w.value.toLowerCase();
+  const p=await sheet({title:`How should “${w.value}” be spoken?`,value:ttsDict[lc]||"",multiline:false,
+    placeholder:"spell it as it sounds, e.g. you-nee-swap",ok:"Save",danger:ttsDict[lc]?"Remove fix":null,
+    hint:"Browsers ignore SSML, so the voice is simply fed this spelling instead. Fixes apply everywhere in the library."});
+  if(!p){if(wasSpeaking)ttsPlay();return;}
+  if(p.danger||!p.value)delete ttsDict[lc];else ttsDict[lc]=p.value;
   store.set("ttsDict",ttsDict);
-  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  toast(p.danger||!p.value?"Pronunciation fix removed":`“${w.value}” → “${p.value}”`);
+  if(wasSpeaking)ttsPlay();
 });
-if(!TTS_OK)$("btnListen").style.display="none";
+if(!TTS_OK&&!KOKORO_OK)$("btnListen").style.display="none";
 
 $("fsUp").addEventListener("click",()=>{if(S.fs<26){S.fs++;reflowKeepingPct(applySettings);}});
 $("fsDown").addEventListener("click",()=>{if(S.fs>13){S.fs--;reflowKeepingPct(applySettings);}});
-[["segFont","font"],["segLh","lh"],["segMargin","margin"],["segAnim","anim"],["themeChips","theme"]]
+[["segFont","font"],["segLh","lh"],["segMargin","margin"],["segAlign","align"],["segCols","cols"],["segAnim","anim"],["themeChips","theme"]]
 .forEach(([id,key])=>{
   $(id).addEventListener("click",e=>{
     const b=e.target.closest("button");if(!b)return;
@@ -2390,6 +3515,8 @@ let tx=0,ty=0,tt=0;
 $("pageArea").addEventListener("touchstart",e=>{
   tx=e.touches[0].clientX;ty=e.touches[0].clientY;tt=Date.now();},{passive:true});
 $("pageArea").addEventListener("touchend",e=>{
+  const sel=window.getSelection();
+  if(sel&&sel.toString())return; // don't turn the page while selecting text
   const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
   if(Date.now()-tt<600&&Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.4){
     if(S.mode!=="scroll"){dx<0?next():prev();}
@@ -2397,8 +3524,13 @@ $("pageArea").addEventListener("touchend",e=>{
 
 /* keyboard */
 document.addEventListener("keydown",e=>{
-  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+  const tag=e.target.tagName;
+  if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT"||e.target.isContentEditable)return;
   if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(!$("sheet").classList.contains("hidden")){
+    if(e.key==="Escape")closeSheet(null);
+    return;
+  }
   if(!$("voiceHelp").classList.contains("hidden")){
     if(e.key==="Escape")$("voiceHelp").classList.add("hidden");
     return;
@@ -2408,15 +3540,24 @@ document.addEventListener("keydown",e=>{
     return;
   }
   if(reader.classList.contains("hidden")){
-    if(e.key==="Escape"&&!toc.classList.contains("hidden")&&!share)nav("");
+    if(e.key==="Escape"&&!toc.classList.contains("hidden")&&!share){
+      const h=decodeURIComponent(location.hash);
+      if(h.startsWith("#h/"))nav("#b/"+h.slice(3));else nav("");
+    }
     if(e.key==="/"&&!home.classList.contains("hidden")){
       const sb=$("searchBox");if(sb){e.preventDefault();sb.focus();}
     }
+    if(e.key==="?")toggleHelp();
     return;
   }
   const aiOn=!$("aiPanel").classList.contains("hidden");
   switch(e.key){
     case "b":case "B":toggleBookmark();break;
+    case "h":highlightSelection(false);break;
+    case "H":highlightSelection(true);break;
+    case "n":case "N":openSibling(1,false);break;
+    case "p":case "P":openSibling(-1,false);break;
+    case "s":case "S":if(ttsActive)ttsKeepSentence();break;
     case "ArrowRight":case "PageDown":
       if(ttsActive&&e.key==="ArrowRight")ttsSentence(1);else next();break;
     case "ArrowLeft":case "PageUp":
@@ -2455,7 +3596,7 @@ document.addEventListener("keydown",e=>{
 let wheelLock=0;
 document.addEventListener("wheel",e=>{
   if(reader.classList.contains("hidden")||S.mode==="scroll")return;
-  if(e.target.closest("#aaPanel")||e.target.closest(".tblwrap"))return;
+  if(e.target.closest("#aaPanel,#aiPanel,#qkOverlay,#helpOverlay,#voiceHelp,#sheet,#ttsBar,.tblwrap,pre"))return;
   e.preventDefault();
   const now=Date.now();if(now-wheelLock<380)return;
   const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
@@ -2482,14 +3623,20 @@ window.addEventListener("resize",()=>{
    A command palette that jumps to any book or chapter from any view. It only
    exists for the real library — share links (#s/...) are scoped views, so the
    palette (and its shortcut) is disabled there and on the lock screen. */
-const QK_ITEMS=[];
-LIB.forEach(s=>s.books.forEach(b=>{
-  QK_ITEMS.push({type:"book",id:b.id,title:b.title,sub:s.title,
-    key:(b.title+" "+(b.author||"")+" "+s.title).toLowerCase()});
-  b.chapters.forEach(i=>{const c=CHAPTERS[i];
-    QK_ITEMS.push({type:"ch",id:c.id,title:c.title,sub:b.title,
-      key:(c.title+" "+b.title).toLowerCase()});});
-}));
+let QK_ITEMS=[];
+function rebuildQuickOpen(){
+  QK_ITEMS=[];
+  LIB.forEach(s=>s.books.forEach(b=>{
+    QK_ITEMS.push({type:"book",id:b.id,title:b.title,sub:s.title,
+      key:(b.title+" "+(b.author||"")+" "+s.title).toLowerCase()});
+    b.chapters.forEach(i=>{const c=CHAPTERS[i];
+      QK_ITEMS.push({type:"ch",id:c.id,title:c.title,sub:b.title,
+        key:(c.title+" "+b.title).toLowerCase()});});
+  }));
+  [["#v","Vocabulary book"],["#stats","Reading stats"]].forEach(([h,t])=>
+    QK_ITEMS.push({type:"page",id:h,title:t,sub:"Page",key:t.toLowerCase()}));
+}
+rebuildQuickOpen();
 let qkRes=[],qkSel=0,qkHeads=[];
 function qkScore(it,toks){
   let s=0;
@@ -2524,7 +3671,7 @@ function qkRender(){
   const box=$("qkList");
   if(!qkRes.length){box.innerHTML=`<div class="qk-none">No books or chapters match.</div>`;return;}
   box.innerHTML=qkRes.map((it,i)=>`<button class="qk-item ${i===qkSel?"sel":""}" data-i="${i}">
-    <span class="ic">${it.type==="book"?"▤":it.type==="head"?"¶":"§"}</span>
+    <span class="ic">${it.type==="book"?"▤":it.type==="head"?"¶":it.type==="page"?"◧":"§"}</span>
     <span class="t">${esc(it.title)}</span>
     <span class="b">${esc(it.sub||"")}</span></button>`).join("");
   const sel=box.querySelector(".qk-item.sel");
@@ -2539,6 +3686,7 @@ function qkGo(it){
     saveProgress();updateStatus();
     return;
   }
+  if(it.type==="page"){nav(it.id);return;}
   nav(it.type==="book"?"#b/"+encodeURIComponent(it.id):"#c/"+encodeURIComponent(it.id));
 }
 function qkOpen(){
@@ -2580,7 +3728,6 @@ $("btnQk").addEventListener("click",qkOpen);
    The whole library is embedded in this one document, so caching it makes every
    book readable with no connection. Only meaningful when served over http(s);
    on file:// there's no service worker / Cache API, so the UI stays hidden. */
-const OFFLINE_CACHE="library-offline-v3";
 const OFFLINE_OK=("serviceWorker" in navigator)&&("caches" in window)&&
   (location.protocol==="https:"||location.protocol==="http:");
 let offlineReady=false, offlineBusy=false;
@@ -2601,14 +3748,19 @@ async function offlineSave(){
     // {cache:"reload"} bypasses the HTTP cache so we store a fresh copy.
     await Promise.allSettled(["./","./index.html","./manifest.webmanifest"]
       .map(u=>c.add(new Request(u,{cache:"reload"}))));
+    const imgs=[...document.querySelectorAll("img[src]")]
+      .map(i=>i.getAttribute("src"))
+      .filter(s=>s&&!/^(data:|blob:|https?:)/i.test(s));
+    await Promise.allSettled([...new Set(imgs)].map(u=>c.add(new Request(u,{cache:"reload"}))));
     offlineReady=true;
   }catch(e){offlineReady=false;}
   offlineBusy=false; paintOffline();
+  if(offlineReady)toast("Library saved for offline reading");
 }
 function offlineBarHtml(){
   if(!OFFLINE_OK)return "";
   if(offlineBusy)return `<div class="offbar busy"><span class="spin"></span>Saving library for offline…</div>`;
-  if(offlineReady)return `<button class="offbar ready" id="offBtn" title="Refresh the offline copy"><span class="dot">✓</span>Available offline · tap to update</button>`;
+  if(offlineReady)return `<button class="offbar ready" id="offBtn" title="Refresh the offline copy now"><span class="dot">✓</span>Available offline · updates itself</button>`;
   return `<button class="offbar" id="offBtn"><span class="dot">⬇</span>Save whole library for offline</button>`;
 }
 function paintOffline(){
@@ -2618,23 +3770,735 @@ function paintOffline(){
   const b=document.getElementById("offBtn");
   if(b)b.addEventListener("click",offlineSave);
 }
+let swRegistered=false;
 function registerServiceWorker(){
-  if(!OFFLINE_OK)return;
-  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  if(!OFFLINE_OK||swRegistered)return;
+  swRegistered=true;
+  // a new build was fetched in the background (stale-while-revalidate) —
+  // offer a one-tap reload rather than silently showing stale chapters.
+  // The worker may post this before this script even ran (the page is big),
+  // so listen first and drain the queued messages explicitly.
+  navigator.serviceWorker.addEventListener("message",e=>{
+    if(e.data&&e.data.type==="updated")toast("New library version available","Reload",()=>location.reload(),0);
+  });
+  if(navigator.serviceWorker.startMessages)navigator.serviceWorker.startMessages();
+  navigator.serviceWorker.register("sw.js").then(reg=>{
+    reg.addEventListener("updatefound",()=>{
+      const nw=reg.installing;if(!nw)return;
+      nw.addEventListener("statechange",()=>{
+        if(nw.state==="installed"&&navigator.serviceWorker.controller)nw.postMessage({type:"skipWaiting"});
+      });
+    });
+  }).catch(()=>{});
   offlineCheck().then(paintOffline);
 }
 
+/* ================= reading time =================
+   Seconds actually spent with a chapter on screen (tab visible), bucketed
+   per day for the stats page. A 2-minute idle cap means a tab left open
+   overnight doesn't count as a 9-hour session. */
+let sessT=0,sessLastTick=0,sessTimer=null;
+function sessionStart(){
+  if(sessTimer)return;
+  sessLastTick=Date.now();
+  sessTimer=setInterval(sessionTick,15000);
+}
+function sessionTick(){
+  const now=Date.now(),dt=(now-sessLastTick)/1000;
+  sessLastTick=now;
+  if(document.visibilityState!=="visible"||reader.classList.contains("hidden")||cur<0)return;
+  if(dt>120)return; // tab was throttled / asleep — don't credit the gap
+  stats.secs=stats.secs||{};
+  const k=todayKey();
+  stats.secs[k]=(stats.secs[k]||0)+Math.round(dt);
+  store.set("stats",stats);
+}
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible")sessLastTick=Date.now();else sessionTick();
+});
+window.addEventListener("pagehide",()=>{sessionTick();if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();});
+function pinOverlays(){
+  const vv=window.visualViewport;
+  const kb=vv?Math.max(0,innerHeight-(vv.height+vv.offsetTop)):0;
+  document.documentElement.style.setProperty("--kb",kb+"px");
+}
+if(window.visualViewport){
+  visualViewport.addEventListener("resize",pinOverlays);
+  visualViewport.addEventListener("scroll",pinOverlays);
+}
+pinOverlays();
+
+/* ================= import books on this device =================
+   "Put an EPUB in from my phone and have it converted" — without a server.
+
+   • ZIP is read natively: central directory parsed by hand, deflate members
+     inflated with DecompressionStream("deflate-raw") (Safari/iOS 16.4+,
+     Chrome 103+, Firefox 113+). No JS zip library, no build step.
+   • EPUB: container.xml → OPF (metadata, manifest, spine) → nav.xhtml / NCX
+     for titles + part grouping → each spine document is converted from XHTML
+     to the same Markdown dialect the repo uses (DOMParser, tree walk).
+   • .md / .txt: split exactly like tools/import-book.py — <!-- chapter: -->
+     markers, else multiple H1s, else one chapter.
+   • Result lives in IndexedDB on this device ("On this device" shelf) and
+     reads, listens, highlights and searches like any built-in book. "Export
+     as Markdown" produces the file to drop into tools/import-book.py when a
+     book should join the repo for every device.
+   Intake routes: 📥 button / drag-drop / Web Share Target (Android & desktop
+   PWA) / file_handlers (desktop PWA). iOS has no share-target support, so
+   there it's the button (Files app, iCloud Drive, "Save to Files" from Mail). */
+const IMPORT_OK=("DecompressionStream" in window)&&("indexedDB" in window)&&("DOMParser" in window);
+const LOCAL_SECTION={id:"local",title:"On this device",books:[]};
+
+/* ---------- IndexedDB (one store, whole book per record) ---------- */
+const IDB_NAME="hkr-books",IDB_STORE="books";
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(IDB_NAME,1);
+    r.onupgradeneeded=()=>{r.result.createObjectStore(IDB_STORE,{keyPath:"id"});};
+    r.onsuccess=()=>res(r.result);
+    r.onerror=()=>rej(r.error||new Error("IndexedDB unavailable"));
+  });
+}
+function idbReq(mode,fn){
+  return idbOpen().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(IDB_STORE,mode),req=fn(tx.objectStore(IDB_STORE));
+    tx.oncomplete=()=>{db.close();res(req?req.result:undefined);};
+    tx.onerror=()=>{db.close();rej(tx.error);};
+    tx.onabort=()=>{db.close();rej(tx.error||new Error("aborted"));};
+  }));
+}
+const idbAll=()=>idbReq("readonly",s=>s.getAll());
+const idbPut=b=>idbReq("readwrite",s=>s.put(b));
+const idbDelete=id=>idbReq("readwrite",s=>s.delete(id));
+
+/* ---------- mount local books into LIB / CHAPTERS ---------- */
+let localBooks=[]; // records as stored: {id,title,author,lang,cover,added,source,chapters:[{title,md,part}]}
+async function loadLocalBooks(){
+  if(!("indexedDB" in window))return;
+  localBooks=(await idbAll()).sort((a,b)=>(b.added||0)-(a.added||0));
+  // strip whatever was mounted before
+  for(let i=CHAPTERS.length-1;i>=0;i--)if(CHAPTERS[i].local)CHAPTERS.splice(i,1);
+  const li=LIB.indexOf(LOCAL_SECTION);if(li>=0)LIB.splice(li,1);
+  LOCAL_SECTION.books=[];
+  localBooks.forEach(rec=>{
+    const idxs=[];
+    rec.chapters.forEach((ch,n)=>{
+      idxs.push(CHAPTERS.length);
+      CHAPTERS.push({id:`local:${rec.id}/${n+1}`,file:"",book:rec.id,part:ch.part||"",num:n+1,
+        title:ch.title,md:ch.md,words:(ch.md.match(/\S+/g)||[]).length,local:true});
+    });
+    LOCAL_SECTION.books.push({id:rec.id,title:rec.title,author:rec.author||"",description:"",
+      cover:rec.cover||"",lang:rec.lang||"",local:true,chapters:idxs});
+  });
+  if(LOCAL_SECTION.books.length)LIB.unshift(LOCAL_SECTION);
+  indexLibrary();
+}
+async function deleteLocalBook(id){
+  await idbDelete(id);
+  await loadLocalBooks();rebuildQuickOpen();
+}
+function exportLocalBook(b){
+  const rec=localBooks.find(r=>r.id===b.id);if(!rec)return;
+  let out=`<!-- title: ${rec.title} -->\n`+(rec.author?`<!-- author: ${rec.author} -->\n`:"")+"\n";
+  let part="";
+  rec.chapters.forEach(ch=>{
+    if((ch.part||"")!==part){part=ch.part||"";if(part)out+=`<!-- part: ${part} -->\n\n`;}
+    out+=`<!-- chapter: ${ch.title} -->\n${ch.md.trim()}\n\n`;
+  });
+  downloadBlob(new Blob([out],{type:"text/markdown"}),slugify(rec.title)+".md");
+  toast("Markdown downloaded — run tools/import-book.py on it to add the book to the repo");
+}
+function slugify(s){return String(s).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
+  .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"book";}
+
+/* ---------- ZIP reader (central directory + deflate-raw) ---------- */
+async function zipEntries(buf){
+  const dv=new DataView(buf),u8=new Uint8Array(buf);
+  // end of central directory: scan back for 0x06054b50
+  let eocd=-1;
+  for(let i=buf.byteLength-22;i>=Math.max(0,buf.byteLength-66000);i--){
+    if(dv.getUint32(i,true)===0x06054b50){eocd=i;break;}
+  }
+  if(eocd<0)throw new Error("Not a ZIP/EPUB file");
+  let count=dv.getUint16(eocd+10,true),cdOff=dv.getUint32(eocd+16,true);
+  if(count===0xffff||cdOff===0xffffffff){ // zip64
+    let loc=-1;
+    for(let i=eocd-20;i>=Math.max(0,eocd-200);i--)if(dv.getUint32(i,true)===0x07064b50){loc=i;break;}
+    if(loc<0)throw new Error("Unsupported ZIP64 layout");
+    const z64=Number(dv.getBigUint64(loc+8,true));
+    count=Number(dv.getBigUint64(z64+32,true));cdOff=Number(dv.getBigUint64(z64+48,true));
+  }
+  const dec=new TextDecoder("utf-8"),entries=new Map();
+  let p=cdOff;
+  for(let k=0;k<count;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),usize=dv.getUint32(p+24,true);
+    const nlen=dv.getUint16(p+28,true),elen=dv.getUint16(p+30,true),clen=dv.getUint16(p+32,true);
+    const off=dv.getUint32(p+42,true);
+    const name=dec.decode(u8.subarray(p+46,p+46+nlen));
+    entries.set(name,{name,method,csize,usize,off});
+    p+=46+nlen+elen+clen;
+  }
+  const readEntry=async e=>{
+    const h=e.off;
+    if(dv.getUint32(h,true)!==0x04034b50)throw new Error("Corrupt ZIP entry "+e.name);
+    const nlen=dv.getUint16(h+26,true),elen=dv.getUint16(h+28,true);
+    const start=h+30+nlen+elen,data=u8.subarray(start,start+e.csize);
+    if(e.method===0)return data;
+    if(e.method!==8)throw new Error("Unsupported compression in "+e.name);
+    const ds=new DecompressionStream("deflate-raw");
+    const w=ds.writable.getWriter();w.write(data);w.close();
+    return new Uint8Array(await new Response(ds.readable).arrayBuffer());
+  };
+  return {
+    has:n=>entries.has(n),
+    names:()=>[...entries.keys()],
+    bytes:async n=>{const e=entries.get(n);if(!e)throw new Error("Missing "+n);return readEntry(e);},
+    text:async n=>dec.decode(await readEntry(entries.get(n)||(()=>{throw new Error("Missing "+n);})())),
+  };
+}
+
+/* ---------- path helpers ---------- */
+function pathJoin(base,rel){
+  rel=rel.split("#")[0];
+  try{rel=decodeURIComponent(rel);}catch(e){}
+  if(rel.startsWith("/"))return rel.slice(1);
+  const parts=(base?base.split("/").slice(0,-1):[]);
+  for(const seg of rel.split("/")){
+    if(seg===".."){parts.pop();}else if(seg&&seg!==".")parts.push(seg);
+  }
+  return parts.join("/");
+}
+function dirOf(p){return p.includes("/")?p.slice(0,p.lastIndexOf("/")+1):"";}
+
+/* ---------- XHTML → Markdown ----------
+   A tree walk (not regex) so nested lists, blockquotes, tables and inline
+   markup inside headings come out right. Output matches tools/FORMAT-PROMPT.md:
+   ATX headings, blank-line paragraphs, `-` lists, `>` quotes, GFM tables,
+   fenced code, ![](data:) images kept small. */
+const BLOCK_TAGS=new Set(["p","div","section","article","aside","header","footer","nav","main","h1","h2","h3","h4","h5","h6",
+  "ul","ol","li","blockquote","pre","table","thead","tbody","tfoot","tr","figure","figcaption","hr","br","dl","dt","dd","address","center"]);
+function htmlToMd(doc,ctx){
+  // ctx: {images: Map(src -> dataURL|null), base}
+  const out=[];
+  // escape only what the reader's renderer would otherwise interpret
+  const inlineEsc=s=>s.replace(/[\\*`\[\]]/g,m=>"\\"+m).replace(/~~/g,"\\~~")
+    .replace(/(^|\s)_(?=\S)|(\S)_(?=\s|$)/g,(m,a,b)=>(a||b||"")+"\\_");
+  const text=(s)=>s.replace(/\s+/g," ");
+  // a paragraph line that happens to start like a list / heading / quote / table
+  const guard=s=>s.split("\n").map(l=>l.replace(/^(\s*)([#>|+-]|\d+[.)])(\s|$)/,"$1\\$2$3").replace(/^(\s*)(-{3,}|\*{3,}|_{3,})\s*$/,"$1\\$2")).join("\n");
+  function inline(node){
+    let s="";
+    node.childNodes.forEach(n=>{
+      if(n.nodeType===3){s+=inlineEsc(text(n.nodeValue));return;}
+      if(n.nodeType!==1)return;
+      const t=n.localName,cls=(n.getAttribute("class")||"").toLowerCase();
+      if(t==="br"){s+="  \n";return;}
+      if(t==="img"||t==="image"){s+=imageMd(n);return;}
+      if(t==="sup"&&(n.querySelector("a")||/note|fn/.test(cls))){
+        const num=(n.textContent.match(/\d+/)||[""])[0];s+=num?`[^${num}]`:"";return;}
+      if(t==="a"){
+        const href=n.getAttribute("href")||"",inner=inline(n).trim();
+        if(!inner)return;
+        if(/^(https?:|mailto:)/i.test(href))s+=`[${inner}](${href})`;
+        else if(/note|fn/.test(cls)&&/^\d+$/.test(inner))s+=`[^${inner}]`;
+        else s+=inner;   // internal EPUB link: keep the words, drop the pointer
+        return;}
+      if(t==="code"||t==="kbd"||t==="samp"||t==="tt"){const c=n.textContent.replace(/\s+/g," ").trim();if(c)s+="`"+c.replace(/`/g,"ˋ")+"`";return;}
+      const inner=inline(n);
+      if(!inner.trim()){s+=inner;return;}
+      const style=(n.getAttribute("style")||"").toLowerCase();
+      const strong=t==="b"||t==="strong"||/font-weight\s*:\s*(bold|[6-9]00)/.test(style)||/\bbold\b/.test(cls);
+      const em=t==="i"||t==="em"||t==="cite"||t==="dfn"||t==="var"||/font-style\s*:\s*italic/.test(style)||/\bitalic\b/.test(cls);
+      const del=t==="s"||t==="del"||t==="strike";
+      const lead=inner.match(/^\s*/)[0],trail=inner.match(/\s*$/)[0],core=inner.trim();
+      let w=core;
+      if(strong&&!/^\*\*.*\*\*$/.test(w))w="**"+w+"**";
+      if(em&&!/^(\*|_).*(\*|_)$/.test(w))w="*"+w+"*";
+      if(del)w="~~"+w+"~~";
+      s+=lead+w+trail;
+    });
+    return s;
+  }
+  function imageMd(n){
+    const src=n.getAttribute("src")||n.getAttribute("xlink:href")||n.getAttributeNS("http://www.w3.org/1999/xlink","href")||"";
+    const alt=(n.getAttribute("alt")||"").replace(/[\[\]]/g,"").trim();
+    const key=pathJoin(ctx.base,src);
+    const data=ctx.images.get(key);
+    if(!data)return alt?`*[image: ${alt}]*`:"";
+    return `![${alt}](${data})`;
+  }
+  function headingLevel(el){
+    const m=el.localName.match(/^h([1-6])$/);
+    return m?+m[1]:0;
+  }
+  function block(node,prefix){
+    // emits paragraphs into `out`, each already prefixed (for quotes/lists)
+    const push=s=>{if(s==null)return;out.push(prefix+s.replace(/\n/g,"\n"+prefix));};
+    let buf="";
+    const flush=()=>{const t=buf.replace(/[ \t]+\n/g,"\n").replace(/\n{2,}/g,"\n").trim();if(t)push(guard(t));buf="";};
+    node.childNodes.forEach(n=>{
+      if(n.nodeType===3){buf+=inlineEsc(text(n.nodeValue));return;}
+      if(n.nodeType!==1)return;
+      const t=n.localName;
+      if(!BLOCK_TAGS.has(t)){
+        if(t==="img"||t==="image"||t==="svg"){flush();
+          const im=t==="svg"?n.querySelector("image"):n;
+          const md=im?imageMd(im):"";if(md)push(md);return;}
+        if(t==="script"||t==="style"||t==="head"||t==="title")return;
+        buf+=inline(n);return;
+      }
+      flush();
+      const lvl=headingLevel(n);
+      if(lvl){const h=inline(n).replace(/\s+/g," ").trim();if(h)push("#".repeat(lvl)+" "+h.replace(/\s*#+\s*$/,""));return;}
+      if(t==="br"){buf+="\n";return;}
+      if(t==="hr"){push("---");return;}
+      if(t==="pre"){
+        const code=n.textContent.replace(/\n$/,"");
+        const lang=((n.querySelector("code")||n).getAttribute("class")||"").match(/language-(\w+)/);
+        push("```"+(lang?lang[1]:"")+"\n"+code+"\n```");return;}
+      if(t==="blockquote"){
+        const sub=[];const saved=out.length;block(n,"");
+        const got=out.splice(saved);push(got.map(x=>"> "+x.replace(/\n/g,"\n> ")).join("\n>\n"));return;}
+      if(t==="ul"||t==="ol"){push(listMd(n,0));return;}
+      if(t==="table"){const tm=tableMd(n);if(tm)push(tm);return;}
+      if(t==="figure"){
+        const saved=out.length;block(n,"");
+        const got=out.splice(saved);
+        if(got.length)push(got.join("\n\n"));return;}
+      if(t==="figcaption"){const c=inline(n).trim();if(c)push("*"+c+"*");return;}
+      if(t==="dt"){const c=inline(n).trim();if(c)push("**"+c+"**");return;}
+      if(t==="dd"){const saved=out.length;block(n,"");const got=out.splice(saved);if(got.length)push(got.join("\n\n"));return;}
+      if(t==="li"){buf+=inline(n);return;}  // stray li outside a list
+      if(t==="p"){
+        const cls=(n.getAttribute("class")||"").toLowerCase();
+        const c=inline(n).replace(/[ \t]*\n[ \t]*/g,"\n").trim();
+        if(!c)return;
+        // common EPUB conventions: a centred/“title” paragraph at the top acts as a heading
+        if(/\b(chapter-?title|title|heading|h[1-3]|ct|cn)\b/.test(cls)&&c.length<120&&!/[.!?]$/.test(c)&&n.parentElement&&!n.previousElementSibling)push("## "+c.replace(/\n/g," "));
+        // calibre-style "heading as a bold paragraph": one short, wholly bold
+        // line (not ending a sentence) is a sub-heading
+        else if(/^\*\*[^*\n]{2,90}\*\*$/.test(c)&&!/[.!?:;,]\*\*$/.test(c)&&(c.match(/\S+/g)||[]).length<=10&&n.children.length===1&&/^(b|strong)$/.test(n.children[0].localName))push("### "+c.slice(2,-2).trim());
+        else if(/\b(epigraph|quote|blockquote|extract)\b/.test(cls))push("> "+guard(c).replace(/\n/g,"\n> "));
+        else push(guard(c));
+        return;}
+      // generic container (div/section/article/…): recurse in place
+      block(n,"");
+    });
+    flush();
+  }
+  function listMd(list,depth){
+    const ordered=list.localName==="ol";
+    let start=parseInt(list.getAttribute("start")||"1",10)||1,i=0;
+    const items=[];
+    [...list.children].forEach(li=>{
+      if(li.localName!=="li")return;
+      const marker=ordered?`${start+i}. `:"- ";i++;
+      const pad=" ".repeat(marker.length);
+      let head="",tail=[];
+      li.childNodes.forEach(n=>{
+        if(n.nodeType===1&&(n.localName==="ul"||n.localName==="ol")){tail.push(listMd(n,depth+1));}
+        else if(n.nodeType===1&&BLOCK_TAGS.has(n.localName)&&n.localName!=="br"){
+          const saved=out.length;block(n,"");const got=out.splice(saved);
+          if(got.length){if(!head.trim())head=got.shift();tail.push(...got);}
+        }else if(n.nodeType===3)head+=inlineEsc(text(n.nodeValue));
+        else if(n.nodeType===1)head+=inline(n);
+      });
+      head=head.replace(/\s+/g," ").trim();
+      const cb=li.querySelector('input[type="checkbox"]');
+      if(cb&&!ordered)head=(cb.checked?"[x] ":"[ ] ")+head;
+      let s=marker+head;
+      tail.forEach(t=>{s+="\n"+t.split("\n").map(l=>pad+l).join("\n");});
+      items.push(s);
+    });
+    return items.join("\n");
+  }
+  function tableMd(tbl){
+    const rows=[...tbl.querySelectorAll("tr")].map(tr=>[...tr.children].filter(c=>/^t[hd]$/.test(c.localName))
+      .map(c=>inline(c).replace(/\s+/g," ").replace(/\|/g,"\\|").trim()));
+    if(!rows.length)return "";
+    const n=Math.max(...rows.map(r=>r.length));
+    if(n<2||rows.length<2){ // single-column / layout table → paragraphs
+      return rows.map(r=>r.join(" ")).filter(Boolean).join("\n\n");
+    }
+    const norm=r=>{const x=r.slice();while(x.length<n)x.push("");return "| "+x.join(" | ")+" |";};
+    const cap=tbl.querySelector("caption");
+    return (cap?"**"+inline(cap).trim()+"**\n\n":"")+norm(rows[0])+"\n|"+" --- |".repeat(n)+"\n"+rows.slice(1).map(norm).join("\n");
+  }
+  block(doc.body||doc.documentElement,"");
+  return out.join("\n\n").replace(/\n{3,}/g,"\n\n").trim();
+}
+
+/* ---------- images: keep covers + small inline figures as data URLs ---------- */
+async function shrinkImage(bytes,mime,maxSide,quality){
+  try{
+    const blob=new Blob([bytes],{type:mime||"image/jpeg"});
+    const bmp=await createImageBitmap(blob);
+    const sc=Math.min(1,maxSide/Math.max(bmp.width,bmp.height));
+    const w=Math.max(1,Math.round(bmp.width*sc)),h=Math.max(1,Math.round(bmp.height*sc));
+    const cv=document.createElement("canvas");cv.width=w;cv.height=h;
+    cv.getContext("2d").drawImage(bmp,0,0,w,h);bmp.close&&bmp.close();
+    return cv.toDataURL("image/jpeg",quality||0.8);
+  }catch(e){return null;}
+}
+const IMG_MIME={jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",gif:"image/gif",webp:"image/webp",svg:"image/svg+xml"};
+
+/* ---------- EPUB ---------- */
+async function parseEpub(buf,fileName,progressCb){
+  const zip=await zipEntries(buf);
+  if(zip.has("META-INF/encryption.xml"))
+    throw new Error("This book is DRM-locked (Apple Books, Kindle, or Adobe). Export a DRM-free EPUB you own, then try again.");
+  const xml=s=>new DOMParser().parseFromString(s,"application/xml");
+  const q=(root,sel)=>root.querySelector(sel);
+  // 1. container → OPF
+  let opfPath="";
+  if(zip.has("META-INF/container.xml")){
+    const c=xml(await zip.text("META-INF/container.xml"));
+    const rf=[...c.getElementsByTagName("*")].find(e=>e.localName==="rootfile"&&/oebps-package/.test(e.getAttribute("media-type")||""))
+      ||[...c.getElementsByTagName("*")].find(e=>e.localName==="rootfile");
+    opfPath=rf?rf.getAttribute("full-path"):"";
+  }
+  if(!opfPath)opfPath=zip.names().find(n=>n.endsWith(".opf"))||"";
+  if(!opfPath)throw new Error("No OPF package found — not an EPUB?");
+  const opfDir=dirOf(opfPath);
+  const opf=xml(await zip.text(opfPath));
+  const byLocal=(root,name)=>[...root.getElementsByTagName("*")].filter(e=>e.localName===name);
+  const meta=name=>{const e=byLocal(opf,name)[0];return e?e.textContent.trim():"";};
+  let title=meta("title")||fileName.replace(/\.epub$/i,"").replace(/[_-]+/g," ");
+  const author=byLocal(opf,"creator").map(e=>e.textContent.trim()).filter(Boolean).join(", ");
+  const lang=(meta("language")||"").slice(0,5);
+  // 2. manifest + spine
+  const manifest=new Map();
+  byLocal(opf,"item").forEach(it=>manifest.set(it.getAttribute("id"),{
+    href:pathJoin(opfPath,it.getAttribute("href")||""),type:it.getAttribute("media-type")||"",
+    props:it.getAttribute("properties")||"",id:it.getAttribute("id")}));
+  const spineEl=byLocal(opf,"spine")[0];
+  const spine=byLocal(opf,"itemref")
+    .filter(r=>(r.getAttribute("linear")||"yes")!=="no")
+    .map(r=>manifest.get(r.getAttribute("idref"))).filter(Boolean)
+    .filter(it=>/html|xml/.test(it.type)&&!/\bnav\b/.test(it.props));
+  if(!spine.length)throw new Error("EPUB has an empty spine");
+  // 3. TOC: nav.xhtml (EPUB3) or NCX (EPUB2) → ordered [{href, title, depth}]
+  let toc=[];
+  const navItem=[...manifest.values()].find(it=>/\bnav\b/.test(it.props));
+  if(navItem&&zip.has(navItem.href)){
+    const nd=new DOMParser().parseFromString(await zip.text(navItem.href),"application/xhtml+xml");
+    let navEl=[...nd.getElementsByTagName("*")].find(e=>e.localName==="nav"&&/\btoc\b/.test(e.getAttributeNS("http://www.idpf.org/2007/ops","type")||e.getAttribute("epub:type")||""))
+      ||[...nd.getElementsByTagName("*")].find(e=>e.localName==="nav");
+    const walk=(ol,depth)=>{[...ol.children].forEach(li=>{
+      if(li.localName!=="li")return;
+      const a=[...li.children].find(x=>x.localName==="a"||x.localName==="span");
+      if(a)toc.push({href:a.getAttribute("href")?pathJoin(navItem.href,a.getAttribute("href")):"",
+        frag:(a.getAttribute("href")||"").split("#")[1]||"",title:a.textContent.replace(/\s+/g," ").trim(),depth});
+      [...li.children].filter(x=>x.localName==="ol").forEach(o=>walk(o,depth+1));
+    });};
+    const ol=navEl&&[...navEl.children].find(x=>x.localName==="ol");
+    if(ol)walk(ol,0);
+  }
+  if(!toc.length){
+    const ncxId=spineEl&&spineEl.getAttribute("toc");
+    const ncx=(ncxId&&manifest.get(ncxId))||[...manifest.values()].find(it=>/ncx/.test(it.type));
+    if(ncx&&zip.has(ncx.href)){
+      const nd=xml(await zip.text(ncx.href));
+      const walk=(parent,depth)=>{[...parent.children].forEach(np=>{
+        if(np.localName!=="navPoint")return;
+        const lbl=[...np.getElementsByTagName("*")].find(e=>e.localName==="text");
+        const src=[...np.children].find(e=>e.localName==="content");
+        const s=src?src.getAttribute("src")||"":"";
+        toc.push({href:s?pathJoin(ncx.href,s):"",frag:s.split("#")[1]||"",title:lbl?lbl.textContent.replace(/\s+/g," ").trim():"",depth});
+        walk(np,depth+1);
+      });};
+      const nm=[...nd.getElementsByTagName("*")].find(e=>e.localName==="navMap");
+      if(nm)walk(nm,0);
+    }
+  }
+  // 4. cover
+  let cover=null;
+  {
+    let cItem=[...manifest.values()].find(it=>/\bcover-image\b/.test(it.props));
+    if(!cItem){const m=byLocal(opf,"meta").find(e=>e.getAttribute("name")==="cover");if(m)cItem=manifest.get(m.getAttribute("content"));}
+    if(!cItem)cItem=[...manifest.values()].find(it=>/^image\//.test(it.type)&&/cover/i.test(it.href));
+    if(cItem&&zip.has(cItem.href)){cover=await shrinkImage(await zip.bytes(cItem.href),cItem.type,480,0.82);}
+  }
+  // 5. convert spine documents
+  const images=new Map();let imgBudget=1.5*1024*1024; // total inline-image budget per book
+  const chapters=[];
+  const tocByHref=new Map();
+  toc.forEach(t=>{if(!tocByHref.has(t.href))tocByHref.set(t.href,[]);tocByHref.get(t.href).push(t);});
+  // part labels: a depth-0 TOC entry with children that itself holds little text
+  const partOf=new Map();let curPart="";
+  for(let i=0;i<toc.length;i++){
+    const t=toc[i];
+    if(t.depth===0){const hasKids=toc[i+1]&&toc[i+1].depth>0;curPart=hasKids?t.title:"";}
+    if(t.depth>0&&curPart)partOf.set(t,curPart);
+  }
+  for(let si=0;si<spine.length;si++){
+    const it=spine[si];
+    if(progressCb)progressCb(si/spine.length,`Converting ${si+1}/${spine.length}`);
+    if(!zip.has(it.href))continue;
+    let src=await zip.text(it.href);
+    let doc=new DOMParser().parseFromString(src,"application/xhtml+xml");
+    if(doc.getElementsByTagName("parsererror").length)doc=new DOMParser().parseFromString(src,"text/html");
+    // inline images referenced by this doc (lazy, budgeted)
+    for(const im of doc.querySelectorAll("img,image")){
+      const s=im.getAttribute("src")||im.getAttribute("xlink:href")||im.getAttributeNS("http://www.w3.org/1999/xlink","href")||"";
+      if(!s||/^(data:|https?:)/i.test(s))continue;
+      const key=pathJoin(it.href,s);
+      if(images.has(key))continue;
+      let data=null;
+      if(imgBudget>0&&zip.has(key)){
+        const ext=(key.split(".").pop()||"").toLowerCase();
+        if(ext!=="svg"){data=await shrinkImage(await zip.bytes(key),IMG_MIME[ext],900,0.78);
+          if(data){imgBudget-=data.length;if(imgBudget<0)data=null;}}
+      }
+      images.set(key,data);
+    }
+    const entries=tocByHref.get(it.href)||[];
+    const first=entries.find(e=>!e.frag)||entries[0]||null;
+    // One XHTML file holding several TOC chapters (common in calibre/EPUB2
+    // output): drop a marker paragraph in front of each anchored block before
+    // converting, then split the Markdown on the markers. Document order wins
+    // over TOC order, so a "Copyright" entry pointing at the end stays at the end.
+    const fragEntries=entries.filter(x=>x.frag);
+    fragEntries.forEach((e,k)=>{
+      let el=doc.getElementById(e.frag)||doc.querySelector(`[name="${CSS.escape(e.frag)}"]`);
+      if(!el)return;
+      if(!BLOCK_TAGS.has(el.localName)){const blk=el.closest("p,h1,h2,h3,h4,h5,h6,div,section,li,blockquote,table,figure");if(blk&&blk!==doc.body)el=blk;}
+      if(el===doc.body||!el.parentNode)return;
+      const m=doc.createElement("p");m.textContent="\u0002"+k+"\u0002";
+      el.parentNode.insertBefore(m,el);
+    });
+    const md=htmlToMd(doc,{images,base:it.href});
+    if(!md||(md.match(/\S+/g)||[]).length<3)continue; // blank / cover pages
+    const pieces=[];
+    const bits=md.split(/\n*\u0002(\d+)\u0002\n*/);
+    if(bits[0].trim())pieces.push({title:first&&!first.frag?first.title:"",md:bits[0].trim(),part:partOf.get(first)||""});
+    for(let k=1;k<bits.length;k+=2){
+      const e=fragEntries[+bits[k]],body=(bits[k+1]||"").trim();
+      if(!body)continue;
+      const prev=pieces[pieces.length-1];
+      if(prev&&!prev.title&&!prev.md)continue;
+      pieces.push({title:e?e.title:"",md:body,part:(e&&partOf.get(e))||""});
+    }
+    pieces.forEach(p=>{p.md=p.md.replace(/\u0002\d+\u0002/g,"").trim();});
+    for(const p of pieces){
+      if(!p.md.trim()||(!p.title&&(p.md.match(/\S+/g)||[]).length<3))continue;
+      const h1=p.md.match(/^#{1,3}\s+(.+)$/m);
+      let t=p.title||(h1?h1[1].trim():"");
+      if(!t){
+        // untitled piece: a file that merely continues the previous chapter
+        // (calibre splits big chapters across files) is appended to it
+        const prev=chapters[chapters.length-1];
+        if(prev&&!/^#/.test(p.md)){prev.md+="\n\n"+p.md;continue;}
+        const firstLine=p.md.split("\n")[0].replace(/^#+\s*/,"").trim();
+        t=(firstLine.length<=80&&!/[.!?,;:]$/.test(firstLine))?firstLine:(chapters.length?`Section ${chapters.length+1}`:"Front Matter");
+      }
+      t=t.replace(/\s*#+\s*$/,"");
+      // leading heading / bold lines that merely spell the TOC title again
+      // ("THE SLOW-CARB DIET I" + "How to Lose 20 Pounds…") are dropped, then
+      // the chapter is given one clean H1 (the reader's TOC uses it)
+      const norm=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"");
+      const tn=norm(t);
+      let body=p.md;
+      for(let guard=0;guard<4;guard++){
+        const m=body.match(/^(?:#{1,6}\s+(.+)|\*\*([^*\n]+)\*\*)\s*(?:\n|$)/);
+        if(!m)break;
+        const line=norm(m[1]||m[2]);
+        if(line&&tn.includes(line)&&line.length>=3)body=body.slice(m[0].length).replace(/^\n+/,"");
+        else break;
+      }
+      if(!/^#\s/.test(body))body="# "+t+"\n\n"+body;
+      chapters.push({title:t,md:body,part:p.part||""});
+    }
+  }
+  if(!chapters.length)throw new Error("No readable text found in this EPUB");
+  const wc=s=>(s.match(/\S+/g)||[]).length;
+  const titleCase=s=>s===s.toUpperCase()&&/[A-Z]{3}/.test(s)
+    ?s.toLowerCase().replace(/(^|[\s—–\-(])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(And|Or|The|Of|To|A|In|For|On|At|By)\b/g,m=>m.toLowerCase()).replace(/^./,c=>c.toUpperCase())
+    :s;
+  // flat TOCs (most EPUB2 files): a near-empty, shouty "PART ONE" style entry
+  // followed by ordinary chapters is a part divider — it becomes the part
+  // label of what follows instead of a 5-word chapter of its own
+  let flatPart="";
+  const staged=[];
+  chapters.forEach((ch,i)=>{
+    const shouty=ch.title===ch.title.toUpperCase()&&/[A-Z]{3}/.test(ch.title);
+    const partish=/^(part|book|section|volume)\b/i.test(ch.title)||shouty;
+    if(partish&&wc(ch.md)<80&&i<chapters.length-1){flatPart=titleCase(ch.title);return;}
+    if(ch.part)flatPart="";  // nested TOC already gave a part — trust it
+    else if(flatPart)ch.part=flatPart;
+    staged.push(ch);
+  });
+  // tidy: the book's own contents page is redundant (the reader has a TOC);
+  // tiny pieces (title page, dedication, an image-only page) fold into the
+  // neighbouring chapter instead of being chapters of their own
+  const isTocPage=ch=>/^(contents|table of contents|document outline|toc|navigation)$/i.test(ch.title.trim());
+  const merged=[];
+  for(const ch of staged){
+    if(isTocPage(ch)&&wc(ch.md)<1500)continue;
+    const prev=merged[merged.length-1];
+    if(prev&&wc(prev.md)<80&&(!prev.part||prev.part===ch.part)){
+      // previous one was tiny: put it at the top of this chapter as a sub-heading
+      const h1=ch.md.match(/^#\s+.+$/m);
+      const rest=ch.md.replace(h1?h1[0]:"","").trim();
+      ch.md=(h1?h1[0]+"\n\n":"")+prev.md.replace(/^#\s+/,"## ")+"\n\n"+rest;
+      merged.pop();
+    }
+    merged.push(ch);
+  }
+  // a tiny trailing piece (blank "section", credits stub) joins the previous chapter
+  if(merged.length>1&&wc(merged[merged.length-1].md)<40){
+    const t=merged.pop();merged[merged.length-1].md+="\n\n"+t.md.replace(/^#\s+/,"## ");
+  }
+  return {title,author,lang,cover,chapters:merged.length?merged:chapters,source:"epub"};
+}
+
+/* ---------- Markdown / plain text ---------- */
+function splitMarkdownBook(text,fallbackTitle){
+  text=text.replace(/^\ufeff/,"").replace(/\r\n?/g,"\n");
+  const lines=text.split("\n");
+  const events=[];let fence=null;
+  const MARK=[/^\s*<!--\s*(chapter|part)\s*:\s*(.+?)\s*-->\s*$/i,/^\s*={3,}\s*(chapter|part)\s*:\s*(.+?)\s*=*\s*$/i];
+  const H1=/^#(?!#)\s+(.*\S)\s*$/;
+  let metaTitle="",metaAuthor="";
+  lines.forEach((ln,i)=>{
+    if(fence){if(ln.trim().startsWith(fence))fence=null;return;}
+    const f=ln.match(/^\s*(`{3,}|~{3,})/);if(f){fence=f[1];return;}
+    const mt=ln.match(/^\s*<!--\s*(title|author)\s*:\s*(.+?)\s*-->\s*$/i);
+    if(mt){if(mt[1].toLowerCase()==="title")metaTitle=mt[2];else metaAuthor=mt[2];events.push([i,"drop",""]);return;}
+    for(const rx of MARK){const m=ln.match(rx);if(m){events.push([i,m[1].toLowerCase(),m[2].trim()]);return;}}
+    const h=ln.match(H1);if(h)events.push([i,"h1",h[1].trim()]);
+  });
+  const evmap=new Map(events.map(e=>[e[0],e]));
+  const boundary=events.some(e=>e[1]==="chapter")?"chapter":(events.filter(e=>e[1]==="h1").length>=2?"h1":null);
+  const ensureH1=(body,t)=>/^\s*#(?!#)\s/.test(body)?body:`# ${t}\n\n${body}`;
+  const chapters=[];
+  if(!boundary){
+    const t=(events.find(e=>e[1]==="h1")||[])[2]||metaTitle||fallbackTitle;
+    const body=lines.filter((_,i)=>!evmap.has(i)||!/part|drop/.test(evmap.get(i)[1])).join("\n").trim();
+    chapters.push({title:t,md:ensureH1(body,t),part:""});
+  }else{
+    let pre=[],cur=null,part="";const raw=[];
+    lines.forEach((ln,i)=>{
+      const ev=evmap.get(i);
+      if(ev){
+        if(ev[1]==="drop")return;
+        if(ev[1]==="part"){part=ev[2];return;}
+        if(ev[1]===boundary){if(cur)raw.push(cur);cur={title:ev[2],part,lines:boundary==="h1"?[ln]:[]};return;}
+      }
+      (cur?cur.lines:pre).push(ln);
+    });
+    if(cur)raw.push(cur);
+    const preText=pre.join("\n").trim();
+    if(preText&&(preText.match(/\S+/g)||[]).length>20)chapters.push({title:"Front Matter",md:ensureH1(preText,"Front Matter"),part:""});
+    raw.forEach(c=>{const body=c.lines.join("\n").trim();if(body)chapters.push({title:c.title,md:ensureH1(body,c.title),part:c.part});});
+  }
+  const title=metaTitle||(chapters.length===1?chapters[0].title:fallbackTitle);
+  return {title,author:metaAuthor,lang:"",cover:null,chapters,source:"md"};
+}
+function textToMarkdown(text){
+  // plain .txt: blank-line paragraphs; single newlines inside a paragraph are joined
+  text=text.replace(/^\ufeff/,"").replace(/\r\n?/g,"\n");
+  const paras=text.split(/\n\s*\n/).map(p=>p.replace(/[ \t]*\n[ \t]*/g," ").trim()).filter(Boolean);
+  return paras.map(p=>{
+    // ALL CAPS short lines or "Chapter N" lines become headings
+    if(p.length<80&&(/^(chapter|part|book|section)\b/i.test(p)||(p===p.toUpperCase()&&/[A-Z]{3}/.test(p))))return "# "+p.replace(/\s+/g," ");
+    return p;
+  }).join("\n\n");
+}
+
+/* ---------- import driver ---------- */
+let importBusy=false,importMsg="";
+function paintImportBar(){
+  const el=document.getElementById("importBar");if(!el)return;
+  el.innerHTML=importBusy?`<div class="impbar"><span class="spin"></span><span>${esc(importMsg||"Importing…")}</span></div>`:"";
+}
+function setImportStatus(msg){importMsg=msg;paintImportBar();}
+async function importFiles(files){
+  files=[...files].filter(f=>/\.(epub|md|markdown|txt)$/i.test(f.name)||/epub|markdown|text\/plain/.test(f.type||""));
+  if(!files.length){toast("Pick an .epub, .md or .txt file (DRM-free)");return;}
+  if(!IMPORT_OK){toast("This browser can't convert books itself — update it (Safari 16.4+ / Chrome 103+).");return;}
+  if(importBusy){toast("Still importing the previous file…");return;}
+  importBusy=true;
+  if(home.classList.contains("hidden"))nav("");
+  let added=0,lastId=null;
+  for(const f of files){
+    try{
+      setImportStatus(`Reading ${f.name}…`);
+      let rec;
+      if(/\.epub$/i.test(f.name)||/epub/.test(f.type||"")){
+        const buf=await f.arrayBuffer();
+        rec=await parseEpub(buf,f.name,(p,msg)=>setImportStatus(`${f.name}: ${msg}`));
+      }else{
+        let text=await f.text();
+        if(/\.txt$/i.test(f.name))text=textToMarkdown(text);
+        rec=splitMarkdownBook(text,f.name.replace(/\.(md|markdown|txt)$/i,"").replace(/[_-]+/g," "));
+      }
+      rec.id="local/"+slugify(rec.title)+"-"+Math.random().toString(36).slice(2,7);
+      // same title already imported? replace it instead of piling up copies
+      const dup=localBooks.find(b=>b.title.toLowerCase()===rec.title.toLowerCase()&&(b.author||"").toLowerCase()===(rec.author||"").toLowerCase());
+      if(dup){rec.id=dup.id;}
+      rec.added=Date.now();
+      setImportStatus(`Saving ${rec.title}…`);
+      await idbPut(rec);
+      added++;lastId=rec.id;
+    }catch(err){
+      console.error("import failed",err);
+      const why=String(err.message||err);
+      toast(/DRM|locked/i.test(why)?why:`Couldn't import ${f.name}: ${why}`,null,null,9000);
+    }
+  }
+  importBusy=false;setImportStatus("");
+  if(added){
+    await loadLocalBooks();rebuildQuickOpen();
+    if(!home.classList.contains("hidden"))renderHome();
+    const b=BOOKS[lastId];
+    toast(added===1&&b?`“${b.title}” added — ${b.chapters.length} chapters`:`${added} books added`,
+      b?"Open":null,()=>nav(bookHash(b)),8000);
+  }else paintImportBar();
+}
+/* files handed over by the OS: Web Share Target (service worker parked them
+   in a cache, then redirected to ?shared=1) and the File Handling API */
+async function intakeSharedFiles(){
+  if(!IMPORT_OK)return;
+  try{
+    if(new URLSearchParams(location.search).get("shared")==="1"&&"caches" in window){
+      history.replaceState(null,"",location.pathname+location.hash);
+      const c=await caches.open(SHARE_INBOX);
+      const keys=await c.keys();
+      const files=[];
+      for(const k of keys){
+        const r=await c.match(k);if(!r)continue;
+        let name=r.headers.get("X-File-Name")||"shared.epub";
+        try{name=decodeURIComponent(name);}catch(e){}
+        files.push(new File([await r.blob()],name,{type:r.headers.get("Content-Type")||""}));
+        await c.delete(k);
+      }
+      if(files.length)importFiles(files);
+    }
+  }catch(e){console.warn("share intake failed",e);}
+  if("launchQueue" in window&&window.launchQueue.setConsumer){
+    window.launchQueue.setConsumer(async params=>{
+      if(!params.files||!params.files.length)return;
+      const files=[];
+      for(const h of params.files){try{files.push(await h.getFile());}catch(e){}}
+      if(files.length)importFiles(files);
+    });
+  }
+}
+
 /* ================= boot ================= */
-window.addEventListener("hashchange",()=>{
+window.addEventListener("hashchange",async()=>{
   const h=decodeURIComponent(location.hash);
   parseShare(h); // must run before tryEnter() — it reads `share`
-  if(!tryEnter()){showLocked();return;}
+  if(!await tryEnter()){showLocked();return;}
+  locked.classList.add("hidden");
   const fe=pendingFromEnd;pendingFromEnd=false;
   const id=fe?chapterIdFromHash(h):null;
   if(id!=null){
     const i=CHAPTERS.findIndex(c=>c.id===id);
     if(i>=0){if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
-      if(ttsActive){if(ttsAutoNav)ttsAutoNav=false;else ttsClose();}
+      if(ttsActive){if(ttsAutoNav||ttsResumeAfterRender)ttsAutoNav=false;else ttsClose();}
       hideBars();hidePanel();hideHlPop();showView("reader");renderChapter(i,true);return;}
   }
   route();

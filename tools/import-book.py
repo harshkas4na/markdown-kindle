@@ -7,6 +7,7 @@ Two ways to use it:
         Local web UI (default http://127.0.0.1:8081): paste text or drop
         .md/.txt files, preview the detected chapters, click "Add to library".
         The reader is served at /index.html on the same port.
+        Add --lan to bind 0.0.0.0 so a phone on the same Wi-Fi can open it.
 
     python3 tools/import-book.py <section> "<Book Title>" [files...] [options]
         CLI. <section> matches like new-book.py (fuzzy, created if missing).
@@ -91,12 +92,17 @@ def next_prefix(dirpath):
 def find_section(query):
     if not os.path.isdir(LIBRARY):
         return None
-    q = query.lower()
-    for name in sorted(os.listdir(LIBRARY)):
-        full = os.path.join(LIBRARY, name)
-        if not os.path.isdir(full) or name.startswith("."):
-            continue
-        if name.lower() == q or q in name.lower():
+    q = query.lower().strip()
+    names = [n for n in sorted(os.listdir(LIBRARY))
+             if os.path.isdir(os.path.join(LIBRARY, n)) and not n.startswith(".")]
+    for name in names:
+        if name.lower() == q:
+            return name
+    for name in names:
+        if name.lower().endswith("-" + q) or name.lower().startswith(q + "-"):
+            return name
+    for name in names:
+        if q in name.lower():
             return name
     return None
 
@@ -149,7 +155,7 @@ def scan(lines):
             continue
         m = FENCE_RE.match(ln)
         if m:
-            fence = m.group(1)[:3]
+            fence = m.group(1)
             continue
         mk = marker_of(ln)
         if mk:
@@ -263,7 +269,7 @@ def plan_files(entries):
 
 # ---------------------------------------------------------------- writing + building
 
-def write_book(section, title, plan, author="", description=""):
+def write_book(section, title, plan, author="", description="", lang=""):
     sec_dir = os.path.join(LIBRARY, section)
     book_folder = f"{next_prefix(sec_dir)}-{slugify(title)}"
     book_dir = os.path.join(sec_dir, book_folder)
@@ -276,6 +282,8 @@ def write_book(section, title, plan, author="", description=""):
         meta["author"] = author
     if description:
         meta["description"] = description
+    if lang:
+        meta["lang"] = lang[:5]
     with open(os.path.join(book_dir, "book.json"), "w", encoding="utf-8") as fh:
         json.dump(meta, fh, ensure_ascii=False, indent=2)
 
@@ -347,7 +355,7 @@ def api_import(body):
             "build": run_build()}
 
 
-def serve(port):
+def serve(port, host="127.0.0.1"):
     import http.server
 
     class Handler(http.server.SimpleHTTPRequestHandler):
@@ -403,9 +411,11 @@ def serve(port):
             except Exception as e:  # keep the server alive; surface the cause
                 return self._json({"error": f"{type(e).__name__}: {e}"}, 500)
 
-    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"Import UI:  http://127.0.0.1:{port}")
-    print(f"Reader:     http://127.0.0.1:{port}/index.html   (Ctrl-C to stop)")
+    httpd = http.server.ThreadingHTTPServer((host, port), Handler)
+    print(f"Import UI:  http://{host}:{port}")
+    print(f"Reader:     http://{host}:{port}/index.html   (Ctrl-C to stop)")
+    if host == "0.0.0.0":
+        print("Bound on all interfaces — open this machine's LAN IP from your phone.")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
@@ -454,7 +464,8 @@ def main():
         sys.exit(__doc__)
     if argv[0] == "--serve":
         port = int(argv[1]) if len(argv) > 1 and argv[1].isdigit() else 8081
-        serve(port)
+        host = "0.0.0.0" if "--lan" in argv else "127.0.0.1"
+        serve(port, host)
         return
 
     args, opts = parse_args(argv)

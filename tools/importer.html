@@ -308,6 +308,7 @@ $("#importBtn").addEventListener("click", async () => {
     out.hidden = false;
     out.textContent = r.build + (r.warnings.length ? "\n" + r.warnings.map(w => "! " + w).join("\n") : "");
     loadSections();   // a new section may have been created
+    $("#importBtn").disabled = false;
   } catch (e) {
     $("#result").className = "err";
     $("#result").textContent = "✗ " + e.message;
