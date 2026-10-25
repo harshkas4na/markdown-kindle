@@ -15,7 +15,10 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE && k !== INBOX).map(k => caches.delete(k)));
+    // only our own old versions: other caches (transformers-cache holds the
+    // ~90 MB Kokoro voice model) belong to libraries the page uses
+    await Promise.all(keys.filter(k => k.startsWith("library-") && k !== CACHE && k !== INBOX)
+      .map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });
@@ -32,6 +35,14 @@ function sameDoc(a, b) {
     if (x && y) return x === y;
   }
   return true; // nothing to compare — don't nag
+}
+
+function isolated(res) {
+  if (!res || res.status === 0 || res.type === "opaqueredirect") return res;
+  const h = new Headers(res.headers);
+  h.set("Cross-Origin-Opener-Policy", "same-origin");
+  h.set("Cross-Origin-Embedder-Policy", "require-corp");
+  return new Response(res.body, {status: res.status, statusText: res.statusText, headers: h});
 }
 
 async function notifyClients(msg) {
@@ -77,9 +88,9 @@ self.addEventListener("fetch", e => {
         }
         return fresh;
       }).catch(() => null);
-      if (cached) { e.waitUntil(refresh); return cached; }
+      if (cached) { e.waitUntil(refresh); return isolated(cached); }
       const fresh = await refresh;
-      return fresh || Response.error();
+      return fresh ? isolated(fresh) : Response.error();
     }
     try {
       const fresh = await fetch(req);

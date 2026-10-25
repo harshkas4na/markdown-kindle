@@ -265,14 +265,26 @@ Top-to-bottom map:
   listed on the book's TOC and jump back to the exact spot.
 - **Listen (read aloud)**: the 🔊 button starts **Kokoro Heart**, the same neural
   voice the screen tutor uses — not the robotic iPhone voice. The model downloads
-  once (~90 MB) into this browser and then works offline. Bella, Nicole, Michael,
+  once (~170 MB, `uint8`) into this browser and then works offline. The page is
+  served cross-origin isolated by `sw.js` so the voice runs on several threads —
+  on the first visit it runs on one, from the second visit on it's ~3× faster. Bella, Nicole, Michael,
   Emma and George are in the same download. The phone's own voices stay in the
   picker under "This device" (☁ marks online system voices). Books tagged with a
   non-English language start on the device voice, because Kokoro here is English.
   A bottom bar gives play/pause, a tracker, speed (0.5×–2.5×) and the voice
   picker. The word being spoken is highlighted and the page follows it; tap a
-  word to jump there. Sentences are spoken whole, and the next sentence is made
-  while the current one plays. Code blocks are skipped. A pronunciation layer
+  word to jump there. Sentences are spoken whole; several chunks are made ahead
+  of the one playing, and with the bar open the rest of the chapter and the start
+  of the next one are made in the background. Made audio is kept in Cache Storage
+  (`kokoro-audio-v1`, oldest chapters dropped past 600 MB), so seeking back,
+  listening again and the next chapter are instant. Kokoro extras in the bar:
+  **⬇ Save chapter** (make it all now — gapless and offline; when saved it becomes
+  **Share audio**, one .wav for Files/AirDrop/any player), **Quotes** (read
+  “dialogue” of 4+ words in a second voice), **🎙 Ask** (ask out loud; Ask AI's
+  answer is spoken, then reading continues), **⟲ Recap** (also automatic when a
+  book is picked up again after 6+ hours, if Ask AI is set up) and **🚗 Car mode**
+  (big buttons, screen kept awake, spoken commands: pause, play, back, next,
+  faster, slower, recap, next chapter — anything else is asked as a question). Code blocks are skipped. A pronunciation layer
   speaks acronyms letter-by-letter ("UHI" → "U H I"), expands e.g./i.e./etc.,
   and the 🗣 button adds custom fixes (e.g. "Uniswap" → "you-nee-swap") to a
   per-browser dictionary that's included in backups. Reading continues into the

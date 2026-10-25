@@ -86,6 +86,25 @@ better prompt will.
 
 ---
 
+## Listen: background sound that follows the chapter's mood
+
+**Status: not started** (idea #10 from the audiobook brainstorm, 2026-10-25 — parked
+for later on purpose). Under the Kokoro voice, play a quiet ambient bed — rain, a café,
+a fire, wind — chosen from the chapter's tone, ducked under the speech.
+
+- **Picking the mood:** ask the Ask AI provider once per chapter for one word from a
+  fixed list (`rain | cafe | fire | night | wind | none`) and cache it per chapter id,
+  or let the reader pick it in the Listen bar.
+- **Sound:** a few loopable files (CC0, ~30–60 s each, small Opus/AAC) in `public/ambient/`,
+  played through a second `<audio>` at ~10–15% volume. A Web Audio gain node would let it
+  duck while a sentence plays, but iOS only allows Web Audio after a tap — start it on the
+  same tap as Play.
+- **Gotchas to check first:** the page is cross-origin isolated now (COEP require-corp),
+  so the sound files must be same-origin; two `<audio>` elements on iOS share one audio
+  session, so test that the bed keeps going between sentences and with the screen locked.
+
+---
+
 ## Smaller ideas
 
 - Curated model ids in `AI_PROVIDERS` (`tools/reader-template.html`) go stale as

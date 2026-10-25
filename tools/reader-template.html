@@ -572,6 +572,19 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
 #ttsBar .mini{font-size:12px; color:var(--muted); padding:6px 9px; border-radius:9px; border:1px solid var(--line);}
 #ttsBar .mini.on{color:var(--accent); border-color:var(--accent);}
 #ttsBar optgroup{font-style:normal; font-weight:600; color:var(--muted);}
+#ttsBar .kokoro-only.hidden{display:none;}
+#carMode{position:fixed; inset:0; z-index:70; background:var(--bg); color:var(--fg); display:flex; flex-direction:column;
+  padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom)); gap:14px;}
+#carMode.hidden{display:none;}
+#carMode .car-top{display:flex; align-items:center; gap:12px;}
+#carMode .car-top button{font-size:20px; min-width:56px; height:48px; border-radius:14px; border:1px solid var(--line); color:var(--fg);}
+#carTitle{flex:1; min-width:0; font-size:14px; color:var(--muted); text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#carText{flex:1; overflow:hidden; display:flex; align-items:center; font-size:clamp(22px,6vw,34px); line-height:1.35; font-weight:500;}
+#carStatus{min-height:1.4em; font-size:15px; color:var(--accent); text-align:center;}
+#carMode .car-ctl{display:flex; gap:14px;}
+#carMode .car-ctl button{flex:1; height:min(22vh,150px); border-radius:24px; font-size:44px; background:var(--card); border:1px solid var(--card-line); color:var(--fg);}
+#carMode .car-ctl #carPlay{flex:1.4; background:var(--accent); color:#fff; border-color:var(--accent);}
+#carMic{height:72px; border-radius:20px; border:1px solid var(--line); font-size:15px; color:var(--fg); padding:0 14px;}
 /* while listening, the persistent TTS bar must not cover the page bottom */
 #reader.listening #pageArea{padding-bottom:calc(18px + var(--ttsbar-h,170px));}
 #reader.listening.mode-scroll #content{padding-bottom:calc(8vh + var(--ttsbar-h,170px));}
@@ -798,18 +811,41 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
     </div>
     <div class="slider-row" style="margin-top:10px">
       <span style="font-size:13px;color:var(--muted);min-width:56px">Voice</span>
-      <select id="ttsVoice" title="Heart is the built-in Kokoro voice. Device voices are listed underneath."></select>
+      <select id="ttsVoice" title="Heart, Bella and the rest are Kokoro voices that run on this device. Device voices are listed underneath."></select>
       <button class="icon-btn" id="ttsDictBtn" title="Fix how a word is pronounced">🗣</button>
+    </div>
+    <div class="slider-row kokoro-only" style="margin-top:8px">
+      <span style="font-size:13px;color:var(--muted);min-width:56px">Quotes</span>
+      <select id="ttsDlg" title="Read “dialogue in quotes” in a second voice"></select>
     </div>
     <div class="slider-row" style="margin-top:8px;justify-content:center;gap:8px;flex-wrap:wrap">
       <button class="mini" id="ttsSaveSent" title="Save the sentence being read as a highlight (S)">✎ Keep this sentence</button>
       <button class="mini" id="ttsSkipHead" title="Skip headings, captions and tables while reading">Skip headings</button>
+      <button class="mini kokoro-only" id="ttsSave" title="Make this chapter's audio now and keep it on this device — plays without gaps, offline, and can be shared as an audio file">⬇ Save chapter</button>
+      <button class="mini" id="ttsAsk" title="Ask a question about the book out loud — the answer is spoken, then reading carries on">🎙 Ask</button>
+      <button class="mini" id="ttsRecapBtn" title="A short spoken recap of what you heard last (also plays by itself when you come back after 6+ hours)">⟲ Recap</button>
+      <button class="mini" id="ttsCar" title="Car mode: big buttons, screen stays on, spoken commands">🚗 Car mode</button>
       <button id="ttsVoiceHelp" style="font-size:12px;color:var(--accent)">About voices</button>
     </div>
     <div id="ttsKokoroNote" class="hidden" style="font-size:12px;color:var(--muted);text-align:center;margin-top:6px"></div>
   </footer>
   <audio id="keepAlive" loop preload="auto" playsinline style="display:none"></audio>
   <audio id="ttsAudio" preload="auto" playsinline style="display:none"></audio>
+  <div id="carMode" class="hidden">
+    <div class="car-top">
+      <button id="carClose" title="Leave car mode">✕</button>
+      <div id="carTitle"></div>
+      <button id="carSpeed" title="Speed">1×</button>
+    </div>
+    <div id="carText"></div>
+    <div id="carStatus"></div>
+    <div class="car-ctl">
+      <button id="carBack" title="Previous sentence">⏮</button>
+      <button id="carPlay" title="Play / pause">▶</button>
+      <button id="carFwd" title="Next sentence">⏭</button>
+    </div>
+    <button id="carMic">🎙 Tap, then speak — “pause”, “back”, “next”, “faster”, “recap”, or a question</button>
+  </div>
 
   <div id="scrim" class="hidden"></div>
 
@@ -2183,7 +2219,7 @@ function jumpToElement(el){
 /* ================= text-to-speech (Listen) =================
    Default voice is Kokoro "Heart" (af_heart) — the same neural voice the
    screen tutor speaks with — running in the browser. The model downloads
-   once (~90 MB, q8) and the browser keeps it. iPhone system voices stay
+   once (~170 MB, uint8) and the browser keeps it. iPhone system voices stay
    available underneath. Web Speech is the fallback (and the default for
    books whose language is not English).
    Utterances are cut at sentence ends so a phone can make the next sentence
@@ -2295,17 +2331,39 @@ function ttsCurrentVoice(){
 }
 if(TTS_OK)speechSynthesis.onvoiceschanged=ttsLoadVoices;
 
-/* Kokoro (Heart) runs in a module worker so the page stays usable while a
-   sentence is synthesised. device is always "wasm": Safari's WebGPU path
-   reloads the tab on iPhone once the model finishes loading. q8 is ~90 MB;
-   the q4 file is several times larger and is the wrong choice for a phone. */
+/* Kokoro runs in a module worker so the page stays usable while a sentence
+   is synthesised, always on the CPU ("wasm"): Safari's WebGPU path reloads
+   the tab on iPhone once the model finishes loading.
+   dtype is uint8 (~170 MB). Measured on an M-series Mac, seconds of work per
+   second of speech: q8 1.7 (with or without threads), uint8 1.3 on one
+   thread and 0.45 on four — as fast as fp32 on WebGPU at half the download.
+   q8 was the old default and could not keep up: a sentence took longer to
+   make than to say, so the voice went silent between sentences.
+   The threads need a cross-origin isolated page, which sw.js provides.
+   The player keeps several chunks generating ahead of the one playing, and
+   the first chunk after a start or seek is kept short so the voice begins
+   within a couple of seconds. */
 const KOKORO_URL="https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js";
 const KOKORO_MODEL="onnx-community/Kokoro-82M-v1.0-ONNX";
+const KOKORO_MB=170;
 const KOKORO_WORKER_SRC=`
 import { KokoroTTS } from ${JSON.stringify(KOKORO_URL)};
 const MODEL=${JSON.stringify(KOKORO_MODEL)};
-let tts=null, chain=Promise.resolve();
-function enqueue(fn){ chain=chain.then(fn).catch(()=>{}); }
+// One job at a time. Inference blocks this thread, so messages are only read
+// between jobs — pump() yields a task before each one so a "drop" sent while
+// a sentence was being made is seen before the next stale job starts.
+let tts=null, jobs=[], busy=false;
+function enqueue(fn){ jobs.push(fn); pump(); }
+async function pump(){
+  if(busy)return;
+  busy=true;
+  while(jobs.length){
+    await new Promise(r=>setTimeout(r,0));
+    const fn=jobs.shift();
+    if(fn)try{ await fn(); }catch(e){}
+  }
+  busy=false;
+}
 function pcm16Wav(samples, rate){
   const n=samples.length, buf=new ArrayBuffer(44+n*2), v=new DataView(buf);
   const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
@@ -2326,19 +2384,20 @@ self.onmessage=(e)=>{
   if(m.cmd==="load"){
     enqueue(async()=>{
       try{
-        if(!tts){
-          tts=await KokoroTTS.from_pretrained(MODEL,{
-            dtype:"q8", device:"wasm",
-            progress_callback:p=>self.postMessage({cmd:"progress", p})
-          });
-        }
-        self.postMessage({cmd:"ready"});
+        if(!tts)tts=await KokoroTTS.from_pretrained(MODEL,{
+          dtype:"uint8", device:"wasm",
+          progress_callback:p=>self.postMessage({cmd:"progress", p})
+        });
+        self.postMessage({cmd:"ready", threads:self.crossOriginIsolated});
       }catch(err){ self.postMessage({cmd:"error", message:String(err&&err.message||err)}); }
     });
+  }else if(m.cmd==="drop"){
+    // jobs queued before this point belong to a position the reader left
+    jobs=jobs.filter(j=>!(j.id<m.below&&(self.postMessage({cmd:"dropped", id:j.id}),true)));
   }else if(m.cmd==="speak"){
-    enqueue(async()=>{
+    enqueue(Object.assign(async()=>{
       try{
-        if(!tts) throw new Error("Heart is not loaded yet");
+        if(!tts) throw new Error("Kokoro is not loaded yet");
         const audio=await tts.generate(m.text,{voice:m.voice||"af_heart", speed:m.speed||1});
         let pcm=audio.audio;
         if(pcm&&pcm.data) pcm=pcm.data;
@@ -2346,12 +2405,18 @@ self.onmessage=(e)=>{
         const wav=pcm16Wav(pcm, audio.sampling_rate||24000);
         self.postMessage({cmd:"audio", id:m.id, wav}, [wav]);
       }catch(err){ self.postMessage({cmd:"error", id:m.id, message:String(err&&err.message||err)}); }
-    });
+    },{id:m.id}));
   }
 };
 `;
-let kWorker=null, kLoaded=null, kSeq=0, kEpoch=0, kNext=null, kReady=false, kokoroPausedMid=false;
+let kWorker=null, kLoaded=null, kSeq=0, kEpoch=0, kQueue=[], kCur=null, kReady=false, kokoroPausedMid=false, kMB=KOKORO_MB;
 const kWait=new Map();
+const K_AHEAD=3; // chunks queued right behind the one playing; kokoroPrepRun makes the rest
+let kRtf=0;      // seconds of work per second of speech on this device (running average)
+function kokoroLabel(id){
+  const v=KOKORO_VOICES.find(([x])=>x===(id||kokoroVoiceName()));
+  return v?v[1].split(" · ")[0]:"Heart";
+}
 function kokoroNote(msg){
   const el=$("ttsKokoroNote"); if(!el)return;
   if(!msg){el.classList.add("hidden");el.textContent="";return;}
@@ -2360,24 +2425,30 @@ function kokoroNote(msg){
 function kokoroProgress(p){
   if(!p)return;
   if(p.status==="ready"||p.status==="done"){ if(kReady)kokoroNote(""); return; }
+  if(p.status!=="progress"||!/\.onnx/.test(p.file||""))return; // config/tokenizer files are tiny
   const pct=typeof p.progress==="number"?Math.round(p.progress):null;
-  const mb=p.total?Math.round(p.total/1048576):90;
-  kokoroNote(pct!=null?`Downloading Heart… ${pct}% of ~${mb} MB`:"Downloading Heart voice…");
+  if(p.total)kMB=Math.round(p.total/1048576);
+  kokoroNote(pct!=null?`Downloading the voice… ${pct}% of ~${kMB} MB (first time only)`:"Downloading the voice…");
 }
 function kokoroEnsure(){
   if(kLoaded)return kLoaded;
   const blob=new Blob([KOKORO_WORKER_SRC],{type:"text/javascript"});
   kWorker=new Worker(URL.createObjectURL(blob),{type:"module"});
+  // ask the browser not to evict the model when space runs low (Safari
+  // otherwise clears site storage after a week without a visit)
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}
   kLoaded=new Promise((res,rej)=>{
     kWorker.onmessage=e=>{
       const m=e.data||{};
+      const w=m.id!=null&&kWait.get(m.id);
+      if(w)kWait.delete(m.id);
       if(m.cmd==="progress")kokoroProgress(m.p);
       else if(m.cmd==="ready"){kReady=true;kokoroNote("");res();}
-      else if(m.cmd==="audio"){const w=kWait.get(m.id);if(w){kWait.delete(m.id);w.res(m.wav);}}
+      else if(m.cmd==="audio"){if(w)w.res(m.wav);}
+      else if(m.cmd==="dropped"){if(w)w.rej(Object.assign(new Error("dropped"),{dropped:true}));}
       else if(m.cmd==="error"){
-        const w=m.id!=null&&kWait.get(m.id);
-        if(w){kWait.delete(m.id);w.rej(new Error(m.message||"Kokoro failed"));}
-        else rej(new Error(m.message||"Kokoro failed to start"));
+        if(w)w.rej(new Error(m.message||"Kokoro failed"));
+        else if(m.id==null)rej(new Error(m.message||"Kokoro failed to start"));
       }
     };
     kWorker.onerror=ev=>{rej(new Error(ev.message||"Kokoro failed to start"));};
@@ -2386,13 +2457,269 @@ function kokoroEnsure(){
   kLoaded.catch(()=>{kLoaded=null;kWorker=null;kReady=false;});
   return kLoaded;
 }
-function kokoroGenerate(text, voice, speed){
+/* Always made at 1×: the reading speed is applied by the <audio> element
+   (pitch kept), so saved audio fits every speed and a speed change never
+   has to make anything again. */
+function kokoroGenerate(text, voice){
   const id=++kSeq;
   return kokoroEnsure().then(()=>new Promise((res,rej)=>{
-    kWait.set(id,{res,rej});
-    kWorker.postMessage({cmd:"speak", id, text, voice, speed});
+    const t0=performance.now();
+    kWait.set(id,{res:wav=>{
+      const secs=(wav.byteLength-44)/48000;
+      if(secs>0.5){const r=(performance.now()-t0)/1000/secs; kRtf=kRtf?kRtf*0.7+r*0.3:r;}
+      res(wav);
+    },rej});
+    kWorker.postMessage({cmd:"speak", id, text, voice, speed:1});
   }));
 }
+
+/* ---- saved audio (Cache Storage) ----
+   Every chunk of the chapter "plan" (see ttsMakePlan) is saved once made,
+   keyed by voice + text, so listening again, seeking back, the next chapter
+   and offline listening are instant. 16-bit WAV is ~2.9 MB a minute; the
+   oldest chapters are dropped past K_CACHE_CAP. */
+const K_CACHE="kokoro-audio-v1", K_CACHE_CAP=600*1048576;
+const K_CACHE_OK=("caches" in window)&&window.isSecureContext;
+let kIdx=null, kIdxT=null;
+const kInflight=new Map();
+function kIdxGet(){if(!kIdx)kIdx=new Map(Object.entries(store.get("ttsAudio",{})));return kIdx;}
+function kIdxSave(){clearTimeout(kIdxT);kIdxT=setTimeout(()=>store.set("ttsAudio",Object.fromEntries(kIdxGet())),1500);}
+function kHash(s){ // two FNV-1a passes → 16 hex chars
+  let a=0x811c9dc5,b=0x01000193^s.length;
+  for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a=Math.imul(a^c,16777619);b=Math.imul(b^c,2654435761);}
+  return (a>>>0).toString(16).padStart(8,"0")+(b>>>0).toString(16).padStart(8,"0");
+}
+function kAudioKey(voice,text){return voice+"-"+kHash(text);}
+const kUrl=k=>"./__tts/"+k+".wav";
+function kHas(chunk){return !!chunk.text&&kIdxGet().has(kAudioKey(chunk.voice,chunk.text));}
+async function kCacheGet(k){
+  if(!K_CACHE_OK||!kIdxGet().has(k))return null;
+  try{
+    const r=await (await caches.open(K_CACHE)).match(kUrl(k));
+    if(!r){kIdx.delete(k);kIdxSave();return null;}
+    const e=kIdx.get(k);e.t=Date.now();kIdxSave();
+    return await r.arrayBuffer();
+  }catch(e){return null;}
+}
+async function kCachePut(k,wav,chId){
+  if(!K_CACHE_OK)return;
+  try{
+    await (await caches.open(K_CACHE)).put(kUrl(k),new Response(wav.slice(0),{headers:{"Content-Type":"audio/wav"}}));
+    kIdxGet().set(k,{b:wav.byteLength,c:chId,t:Date.now()});
+    kIdxSave();kEvict();
+  }catch(e){}
+}
+async function kEvict(){
+  const idx=kIdxGet();let total=0;idx.forEach(e=>total+=e.b);
+  if(total<=K_CACHE_CAP)return;
+  const keep=CHAPTERS[cur]?CHAPTERS[cur].id:"";
+  const old=[...idx].filter(([,e])=>e.c!==keep).sort((x,y)=>x[1].t-y[1].t);
+  const c=await caches.open(K_CACHE);
+  for(const [k,e] of old){
+    if(total<=K_CACHE_CAP*0.85)break;
+    await c.delete(kUrl(k));idx.delete(k);total-=e.b;
+  }
+  kIdxSave();
+}
+function kCacheBytes(){let t=0;kIdxGet().forEach(e=>t+=e.b);return t;}
+/* audio for a chunk: saved copy, the copy already being made, or a new one */
+function kokoroAudio(chunk, chId){
+  if(!chunk.text)return Promise.resolve(null);
+  const k=kAudioKey(chunk.voice,chunk.text);
+  if(kInflight.has(k))return kInflight.get(k);
+  const p=kCacheGet(k).then(w=>w||kokoroGenerate(chunk.text,chunk.voice).then(wav=>{
+    if(chunk.plan)kCachePut(k,wav,chId);
+    return wav;
+  }));
+  kInflight.set(k,p);
+  const done=()=>kInflight.delete(k);
+  p.then(done,done);
+  return p;
+}
+
+/* ---- the chapter plan ----
+   Words are cut into fixed chunks from the start of the chapter, so the same
+   chapter always produces the same chunk texts — that is what lets saved
+   audio be found again. Starting mid-chunk (a seek) plays a saved chunk from
+   the right point, or makes short "bridge" chunks up to the next plan edge. */
+let ttsT={texts:[],breaks:[],quote:[]}, ttsPlan=[];
+function ttsChunkOf(T,i,limit,clause,stop){
+  const lim=Math.min(stop==null?T.texts.length:stop,T.texts.length);
+  if(i>=lim)return null;
+  const split=!!S.ttsDlg; // a dialogue voice: quotes and narration go in separate chunks
+  let end=i, chars=0;
+  const cap=Math.max(limit*2, 90);
+  while(end<lim){
+    chars+=T.texts[end].length+1; end++;
+    if(end>=lim)break;
+    if(split&&T.quote[end]!==T.quote[i])break;
+    if(chars>=limit&&(T.breaks[end-1]||clause&&/[,;:—–]$/.test(T.texts[end-1])))break;
+    if(chars>=cap)break;
+  }
+  const weights=[], spoken=[];
+  for(let k=i;k<end;k++){
+    let s=ttsSpokenWord(T.texts[k]);
+    if(T.breaks[k]===2&&s&&!/[.!?…,;:]$/.test(s))s+=".";
+    spoken.push(s);
+    weights.push(Math.max(1,(s||"").replace(/\s/g,"").length));
+  }
+  const narrator=kokoroVoiceName();
+  return {start:i,end,text:spoken.join(" ").replace(/\s+/g," ").trim(),weights,
+          voice:split&&T.quote[i]?S.ttsDlg:narrator};
+}
+function ttsMakePlan(T){
+  const plan=[];let i=0;
+  while(i<T.texts.length){
+    // a short first chunk so a chapter starts speaking quickly
+    const c=ttsChunkOf(T,i,plan.length?120:40,!plan.length);
+    c.plan=true;plan.push(c);i=c.end;
+  }
+  return plan;
+}
+function ttsPlanAt(plan,i){
+  let lo=0,hi=plan.length-1;
+  while(lo<=hi){const m=(lo+hi)>>1;if(plan[m].end<=i)lo=m+1;else if(plan[m].start>i)hi=m-1;else return m;}
+  return -1;
+}
+/* the chunk to play starting at word i */
+function ttsChunkAt(i,fresh){
+  const pi=ttsPlanAt(ttsPlan,i);if(pi<0)return null;
+  const P=ttsPlan[pi];
+  if(i===P.start&&(!fresh||kHas(P)||P.text.length<=70))return P;
+  if(i>P.start&&kHas(P))return Object.assign({},P,{from:i});    // saved: play from inside it
+  return ttsChunkOf(ttsT,i,fresh?40:120,fresh,P.end);           // bridge to the plan edge
+}
+/* same words/plan for a chapter that is not on screen (preparing the next one) */
+const ttsOffPlans=new Map();
+function ttsPlanFor(chIdx){
+  if(chIdx===cur&&ttsWordsFor===cur)return ttsPlan;
+  const c=CHAPTERS[chIdx];if(!c)return [];
+  const key=c.id+"|"+!!S.ttsSkipHead+"|"+(S.ttsDlg||"")+"|"+kokoroVoiceName();
+  if(!ttsOffPlans.has(key)){
+    const div=document.createElement("div");
+    div.innerHTML=htmlCache[c.id]||(htmlCache[c.id]=mdToHtml(c.md));
+    ttsOffPlans.clear();ttsOffPlans.set(key,ttsMakePlan(ttsTokenize(div,false)));
+  }
+  return ttsOffPlans.get(key);
+}
+
+function kokoroKey(){return cur+"|"+kokoroVoiceName()+"|"+(S.ttsDlg||"");}
+/* a queued chunk: the word range plus the promise of its audio */
+function kokoroJob(chunk, key){
+  const job=Object.assign({key, done:false}, chunk);
+  job.promise=kokoroAudio(chunk, CHAPTERS[cur]?CHAPTERS[cur].id:"");
+  job.promise.then(()=>{job.done=true;},()=>{job.done=true;});
+  return job;
+}
+function kokoroDropQueue(){
+  kQueue=[]; kCur=null;
+  if(kWorker)kWorker.postMessage({cmd:"drop", below:kSeq+1});
+}
+function kokoroTopUp(from, key){
+  let next=kQueue.length?kQueue[kQueue.length-1].end:from;
+  while(kQueue.length<K_AHEAD){
+    const c=ttsChunkAt(next,false);
+    if(!c)break;
+    kQueue.push(kokoroJob(c, key));
+    next=c.end;
+  }
+}
+
+/* ---- making audio ahead (ideas 1 + 2) ----
+   While the Listen bar is open the worker never sits idle: after the queue
+   above, it makes the rest of this chapter, then the start of the next one.
+   "Save chapter" makes the whole chapter even with the bar closed. Live
+   chunks always go first — this only posts a job when nothing live waits. */
+let kSave=null, kPrepBusy=false;   // kSave: {ch, plan} — the chapter being saved on request
+function kPrepTargets(){
+  const out=[];
+  if(kSave)out.push({ch:kSave.ch,plan:kSave.plan,from:0});
+  if(ttsActive&&ttsUsesKokoro()&&ttsWordsFor===cur&&ttsPlan.length){
+    out.push({ch:cur,plan:ttsPlan,from:Math.max(0,ttsPlanAt(ttsPlan,ttsIdx))});
+    const j=siblingChapter(1);
+    if(j!==null)out.push({ch:j,plan:null,from:0,count:3});
+  }
+  return out;
+}
+function kPrepNext(){
+  for(const t of kPrepTargets()){
+    const plan=t.plan||ttsPlanFor(t.ch);
+    const to=t.count?Math.min(plan.length,t.from+t.count):plan.length;
+    for(let k=t.from;k<to;k++){
+      const c=plan[k];
+      if(c.text&&!kHas(c)&&!kInflight.has(kAudioKey(c.voice,c.text)))return {chunk:c,ch:t.ch};
+    }
+  }
+  return null;
+}
+const kSleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function kokoroPrepRun(){
+  if(kPrepBusy||!K_CACHE_OK)return;
+  kPrepBusy=true;
+  try{
+    for(;;){
+      // let the chunks someone is waiting to hear go first
+      while(kQueue.some(j=>!j.done)||(kCur&&!kCur.done))await kSleep(300);
+      const t=kPrepNext();
+      if(!t)break;
+      try{await kokoroAudio(t.chunk,CHAPTERS[t.ch].id);}catch(e){if(!(e&&e.dropped))break;}
+      kSaveDone();paintSave();
+    }
+  }finally{kPrepBusy=false;}
+  kSaveDone();paintSave();
+}
+function kSaveDone(){
+  if(kSave&&kSaveCount().done>=kSave.plan.length){kSave=null;toast("Chapter audio saved — it plays offline now, without gaps");}
+}
+function kSaveCount(){
+  const plan=kSave?kSave.plan:(ttsWordsFor===cur?ttsPlan:[]);
+  return {done:plan.filter(c=>!c.text||kHas(c)).length,total:plan.length};
+}
+function paintSave(){
+  const b=$("ttsSave");if(!b)return;
+  if(!ttsUsesKokoro()||!K_CACHE_OK){b.classList.add("hidden");return;}
+  b.classList.remove("hidden");
+  const {done,total}=kSaveCount();
+  if(total&&done>=total){b.textContent="✓ Saved · Share audio";b.classList.add("on");}
+  else if(kSave){b.textContent=`Saving ${Math.round(done/Math.max(1,total)*100)}%…`;b.classList.add("on");}
+  else{b.textContent=done?`⬇ Save chapter (${Math.round(done/Math.max(1,total)*100)}%)`:"⬇ Save chapter";b.classList.remove("on");}
+}
+function ttsSaveChapter(){
+  if(ttsWordsFor!==cur)ttsBuildWords();
+  const {done,total}=kSaveCount();
+  if(total&&done>=total){ttsShareAudio();return;}
+  if(kSave){kSave=null;paintSave();toast("Stopped saving — what's made so far stays");return;}
+  kSave={ch:cur,plan:ttsPlan};
+  kokoroEnsure().catch(()=>{});
+  toast(`Saving this chapter's audio (about ${Math.max(1,Math.round(ttsPlan.reduce((s,c)=>s+c.text.length,0)/900))} min of listening) — keep this tab open until it says saved`);
+  paintSave();kokoroPrepRun();
+}
+/* idea 7: one audio file for the whole chapter, handed to the share sheet
+   (Files, AirDrop, a podcast/audio app) — plays with the screen locked there */
+async function ttsShareAudio(){
+  const parts=[];let n=0;
+  for(const c of ttsPlan){
+    if(!c.text)continue;
+    const w=await kCacheGet(kAudioKey(c.voice,c.text));
+    if(!w){toast("Some of this chapter isn't saved yet");return;}
+    parts.push(new Uint8Array(w,44));n+=w.byteLength-44;
+  }
+  const head=new ArrayBuffer(44),v=new DataView(head);
+  const s=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i));};
+  s(0,"RIFF");v.setUint32(4,36+n,true);s(8,"WAVE");s(12,"fmt ");v.setUint32(16,16,true);
+  v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,24000,true);v.setUint32(28,48000,true);
+  v.setUint16(32,2,true);v.setUint16(34,16,true);s(36,"data");v.setUint32(40,n,true);
+  const c=CHAPTERS[cur],b=bookOf(c);
+  const name=((b?b.title+" - ":"")+c.title).replace(/[\\/:*?"<>|]+/g," ").slice(0,90)+".wav";
+  const file=new File([head,...parts],name,{type:"audio/wav"});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:c.title});return;}
+  }catch(e){if(e&&e.name==="AbortError")return;}
+  const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+}
+
 function kokoroHold(){
   const a=$("ttsAudio"); if(!a)return;
   a.ontimeupdate=null; a.onended=null;
@@ -2405,25 +2732,6 @@ function kokoroStopAudio(){
   a.onended=null; a.ontimeupdate=null;
   try{a.pause();}catch(e){}
   a.dataset.kind="";
-}
-function ttsChunk(i, limit){
-  if(!ttsWords.length||i>=ttsWords.length)return null;
-  let end=i, chars=0;
-  while(end<ttsWords.length){
-    chars+=ttsWords[end].textContent.length+1; end++;
-    if(end>=ttsWords.length)break;
-    if(ttsBreaks[end-1]&&chars>=limit)break;
-    if(chars>=limit*2)break;
-  }
-  const weights=[];
-  const spoken=[];
-  for(let k=i;k<end;k++){
-    let s=ttsSpokenWord(ttsWords[k].textContent);
-    if(ttsBreaks[k]===2&&s&&!/[.!?…,;:]$/.test(s))s+=".";
-    spoken.push(s);
-    weights.push(Math.max(1,(s||"").replace(/\s/g,"").length));
-  }
-  return {start:i,end,text:spoken.join(" ").replace(/\s+/g," ").trim(),weights};
 }
 function kokoroPlay(wav, chunk, epoch){
   const a=$("ttsAudio");
@@ -2443,47 +2751,133 @@ function kokoroPlay(wav, chunk, epoch){
     if(chunk.end>=ttsWords.length)ttsChapterEnded();
     else ttsSpeakKokoro(chunk.end);
   };
+  if(chunk.from>chunk.start){ // a saved chunk entered mid-way (seek)
+    let acc=0;for(let k=chunk.start;k<chunk.from;k++)acc+=weights[k-chunk.start];
+    a.addEventListener("loadedmetadata",()=>{try{a.currentTime=a.duration*acc/total;}catch(e){}},{once:true});
+  }
   a.src=url;
+  a.preservesPitch=true;
+  a.defaultPlaybackRate=a.playbackRate=S.ttsRate||1;
   const p=a.play();
   // iOS may refuse play() once the download took us outside the tap.
   // Keep the audio queued so the next play tap starts it without rebuilding.
   if(p&&p.catch)p.catch(()=>{
     if(epoch!==kEpoch)return;
     kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();
-    toast("Tap play to start Heart");
+    toast("Tap play to start "+kokoroLabel());
   });
 }
 function kokoroFail(from, err){
   console.error("kokoro", err);
-  kokoroFailed=true; kNext=null; kokoroStopAudio(); kokoroNote("");
-  const sys=ttsVoiceList[0];
-  S.ttsVoice=sys?sys.name:"";
-  store.set("settings",S); ttsLoadVoices();
-  toast("Heart needs a connection the first time (~90 MB). Using this phone's voice until then.");
+  const name=kokoroLabel();
+  // for this visit only: S.ttsVoice keeps the Kokoro choice, so the next
+  // visit (or picking it again in the menu) tries it again
+  kokoroFailed=true; kokoroDropQueue(); kokoroStopAudio(); kokoroNote(""); paintSave();
+  toast(kReady?`${name} stopped working (${String(err&&err.message||err).slice(0,80)}). Using this phone's voice for now.`
+              :`${name} needs a connection the first time (~${kMB} MB). Using this phone's voice for now.`);
   if(TTS_OK)ttsSpeakFrom(from);
   else{ttsSpeaking=false;paintTtsPlay();}
 }
+let kSlowTold=false;
 function ttsSpeakKokoro(i){
-  const pending=kNext&&kNext.start===i?kNext.promise:null;
-  kNext=null;
   const epoch=++kEpoch;
   kokoroPausedMid=false;
-  const chunk=ttsChunk(i, 140);
-  if(!chunk){ttsChapterEnded();return;}
-  if(!chunk.text){ttsSpeakKokoro(chunk.end);return;}
-  ttsSetWord(chunk.start);
+  const key=kokoroKey();
+  // kCur: the chunk a pause interrupted while it was still being made
+  const at=j=>j&&(j.from||j.start)===i&&j.key===key;
+  let job=kCur&&!kCur.played&&at(kCur)?kCur:at(kQueue[0])?kQueue.shift():null;
+  if(!job){
+    // a start, seek or voice change: anything queued is for the old spot
+    kokoroDropQueue();
+    const chunk=ttsChunkAt(i,true);
+    if(!chunk){ttsChapterEnded();return;}
+    job=kokoroJob(chunk, key);
+  }
+  kCur=job;
+  kokoroTopUp(job.end, key);
+  kokoroPrepRun();
+  ttsSetWord(job.from||job.start);
   kokoroHold();
-  if(!kReady)kokoroNote("Downloading Heart… first time only, about 90 MB");
-  const voice=kokoroVoiceName();
-  const speed=Math.min(1.6,Math.max(0.7,S.ttsRate||1));
-  const job=pending||kokoroGenerate(chunk.text, voice, speed);
-  job.then(wav=>{
+  if(!kReady&&!job.done)kokoroNote(`Downloading ${kokoroLabel()}… first time only, about ${kMB} MB`);
+  else if(!job.done)setTimeout(()=>{
+    // only say so when the wait is long enough to notice
+    if(epoch!==kEpoch||!ttsSpeaking||job.done)return;
+    kokoroNote(`${kokoroLabel(job.voice)} is preparing the next sentence…`);
+    if(kRtf>1.05&&!kSlowTold){
+      kSlowTold=true;
+      toast(`This device makes ${kokoroLabel()} slower than she speaks right now (Low Power Mode or a busy phone does this). Tap “⬇ Save chapter” and let it run for a bit — saved audio plays without gaps.`,undefined,undefined,12000);
+    }
+  },700);
+  job.promise.then(wav=>{
     if(epoch!==kEpoch||!ttsSpeaking)return;
-    const nxt=ttsChunk(chunk.end, 140);
-    if(nxt&&nxt.text)kNext={start:nxt.start, promise:kokoroGenerate(nxt.text, voice, speed)};
     kokoroNote("");
-    kokoroPlay(wav, chunk, epoch);
-  }).catch(err=>{ if(epoch===kEpoch)kokoroFail(chunk.start, err); });
+    job.played=true;
+    if(wav)kokoroPlay(wav, job, epoch);
+    else if(job.end>=ttsWords.length)ttsChapterEnded();
+    else ttsSpeakKokoro(job.end);  // nothing speakable in this stretch
+  }).catch(err=>{ if(epoch===kEpoch&&!(err&&err.dropped))kokoroFail(job.start, err); });
+}
+
+/* ---- speaking text that isn't the book (answers, recaps) ----
+   Uses the same <audio> element (already unlocked by the play tap) so iOS
+   lets it play after waiting on the network. */
+let kSayTok=0, kSayStop=null;
+function ttsCancelSay(){
+  kSayTok++;
+  if(kSayStop){const f=kSayStop;kSayStop=null;f();}
+  if(TTS_OK&&!ttsUsesKokoro()){try{speechSynthesis.cancel();}catch(e){}}
+}
+function ttsSayParts(text){
+  const out=[];let buf="";
+  plainSpeech(text).split(/(?<=[.!?…])\s+/).forEach(s=>{
+    if(buf&&(buf+" "+s).length>200){out.push(buf);buf=s;}else buf=buf?buf+" "+s:s;
+  });
+  if(buf)out.push(buf);
+  return out;
+}
+function plainSpeech(md){
+  return String(md||"").replace(/```[\s\S]*?```/g," ").replace(/`([^`]*)`/g,"$1")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\[([^\]]*)\]\([^)]*\)/g,"$1")
+    .replace(/^#+\s*/gm,"").replace(/^\s*[-*+]\s+/gm,"").replace(/[*_~>|]+/g,"")
+    .replace(/\s+/g," ").trim();
+}
+async function ttsSay(text){
+  const tok=++kSayTok;
+  kokoroPausedMid=false; // the paused book sentence is about to be replaced in the player
+  const parts=ttsSayParts(text);
+  if(!parts.length)return true;
+  if(ttsUsesKokoro()){
+    kEpoch++;
+    const voice=kokoroVoiceName();
+    let next=kokoroGenerate(parts[0],voice);
+    for(let k=0;k<parts.length;k++){
+      let wav;
+      try{wav=await next;}catch(e){return false;}
+      if(tok!==kSayTok)return false;
+      if(k+1<parts.length)next=kokoroGenerate(parts[k+1],voice);
+      kokoroNote("");
+      await new Promise(res=>{
+        const a=$("ttsAudio");
+        if(a._url)URL.revokeObjectURL(a._url);
+        a._url=URL.createObjectURL(new Blob([wav],{type:"audio/wav"}));
+        a.loop=false;a.volume=1;a.dataset.kind="say";a.ontimeupdate=null;
+        kSayStop=res;a.onended=()=>{kSayStop=null;res();};
+        a.src=a._url;a.preservesPitch=true;a.defaultPlaybackRate=a.playbackRate=S.ttsRate||1;
+        a.play().catch(()=>{kSayStop=null;res();});
+      });
+      if(tok!==kSayTok)return false;
+    }
+    return true;
+  }
+  if(!TTS_OK)return false;
+  return new Promise(res=>{
+    const u=new SpeechSynthesisUtterance(parts.join(" "));
+    u.rate=S.ttsRate;const v=ttsCurrentVoice();if(v){u.voice=v;u.lang=v.lang;}
+    kSayStop=()=>res(false);
+    u.onend=()=>{kSayStop=null;res(tok===kSayTok);};
+    u.onerror=()=>{kSayStop=null;res(false);};
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  });
 }
 
 /* keep-alive: a looping silent <audio> started on the same user gesture as
@@ -2539,10 +2933,13 @@ function ttsStartFallback(end){
   ttsTimer=setTimeout(tick,400+ttsWordMs(ttsWords[ttsIdx]?ttsWords[ttsIdx].textContent:""));
 }
 
-function ttsBuildWords(){
-  ttsWords=[];ttsBreaks=[];
-  const blocks=[];
-  const walker=document.createTreeWalker(content,NodeFilter.SHOW_TEXT);
+/* words of a chapter's DOM, as the voice reads them. wrap: replace the text
+   with one <span class="tts-w"> per word (the chapter on screen); without it
+   the DOM is untouched (a chapter being prepared off screen). Both give the
+   same words, so both give the same plan. */
+function ttsTokenize(root, wrap){
+  const texts=[], blocks=[], spans=[];
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
   const nodes=[];let n;
   while(n=walker.nextNode()){
     if(!n.nodeValue.trim())continue;
@@ -2553,26 +2950,57 @@ function ttsBuildWords(){
   }
   nodes.forEach(node=>{
     const parent=node.parentNode;
-    const blk=node.parentElement.closest("p,h1,h2,h3,h4,h5,h6,li,blockquote,td,th")||content;
+    const blk=node.parentElement.closest("p,h1,h2,h3,h4,h5,h6,li,blockquote,td,th")||root;
     const parts=node.nodeValue.split(/(\s+)/);
-    const frag=document.createDocumentFragment();
+    const frag=wrap?document.createDocumentFragment():null;
     parts.forEach(p=>{
       if(!p)return;
-      if(/^\s+$/.test(p)){frag.appendChild(document.createTextNode(p));return;}
-      const span=document.createElement("span");
-      span.className="tts-w";span.textContent=p;
-      frag.appendChild(span);ttsWords.push(span);blocks.push(blk);
+      if(/^\s+$/.test(p)){if(wrap)frag.appendChild(document.createTextNode(p));return;}
+      texts.push(p);blocks.push(blk);
+      if(wrap){
+        const span=document.createElement("span");
+        span.className="tts-w";span.textContent=p;
+        frag.appendChild(span);spans.push(span);
+      }
     });
-    parent.replaceChild(frag,node);
+    if(wrap)parent.replaceChild(frag,node);
   });
   // break AFTER word i: 2 = end of block (paragraph/heading/cell), 1 = end of sentence
-  ttsBreaks=ttsWords.map((w,i)=>{
-    if(i+1<ttsWords.length&&blocks[i+1]!==blocks[i])return 2;
-    if(/[.!?…]["')\]]*$/.test(w.textContent))return 1;
+  const breaks=texts.map((w,i)=>{
+    if(i+1<texts.length&&blocks[i+1]!==blocks[i])return 2;
+    if(/[.!?…]["'”’)\]]*$/.test(w))return 1;
     return 0;
   });
+  // inside “dialogue” — for the dialogue voice. A quote never runs past its paragraph.
+  const quote=[];let q=false;
+  texts.forEach((w,i)=>{
+    if(i&&blocks[i]!==blocks[i-1])q=false;
+    if(/^[(\[]*[“"]/.test(w))q=true;
+    quote.push(q);
+    if(q&&/[”"][.,!?;:…—–)\]]*$/.test(w)&&!/^[(\[]*[“"]$/.test(w))q=false;
+  });
+  // “scare quotes” and quoted titles are short: only 4+ words count as someone speaking
+  for(let i=0;i<quote.length;){
+    if(!quote[i]){i++;continue;}
+    let e=i;while(e<quote.length&&quote[e]&&(e===i||blocks[e]===blocks[i]))e++;
+    if(e-i<4)for(let k=i;k<e;k++)quote[k]=false;
+    i=e;
+  }
+  return {texts,breaks,quote,spans};
+}
+function ttsBuildWords(){
+  const T=ttsTokenize(content,true);
+  ttsWords=T.spans;ttsBreaks=T.breaks;
+  ttsT={texts:T.texts,breaks:T.breaks,quote:T.quote};
+  ttsPlan=ttsMakePlan(ttsT);
   ttsWordsFor=cur;
   $("ttsSeek").max=Math.max(0,ttsWords.length-1);
+  paintSave();
+}
+/* voice or dialogue setting changed: same words, new chunks */
+function ttsReplan(){
+  if(ttsWordsFor===cur)ttsPlan=ttsMakePlan(ttsT);
+  ttsOffPlans.clear();paintSave();
 }
 function ttsClearCur(){
   const p=content.querySelector(".tts-w.tts-cur");
@@ -2591,6 +3019,7 @@ function ttsPaintSentence(i){
   for(let k=ttsSentCur[0];k<ttsSentCur[1];k++)if(ttsWords[k])ttsWords[k].classList.remove("tts-sent");
   for(let k=s;k<e;k++)ttsWords[k].classList.add("tts-sent");
   ttsSentCur=[s,e];
+  if(carOn)carPaint();
 }
 function ttsSentenceText(i){
   const [s,e]=ttsSentenceRange(i);
@@ -2646,7 +3075,7 @@ function ttsSpeakFrom(i){
     ttsStopTimer();
     ttsSpeakKokoro(i);return;
   }
-  if(kEpoch){kEpoch++;kNext=null;kokoroStopAudio();}
+  if(kEpoch){kEpoch++;kokoroDropQueue();kokoroStopAudio();}
   if(!TTS_OK)return;
   ttsStopTimer();
   speechSynthesis.cancel();
@@ -2736,6 +3165,7 @@ function ttsFlushContinue(){
 }
 function paintTtsPlay(){
   $("ttsPlay").textContent=ttsSpeaking?"⏸":"▶";
+  if(carOn)$("carPlay").textContent=ttsSpeaking?"⏸":"▶";
   if("mediaSession" in navigator){try{navigator.mediaSession.playbackState=ttsSpeaking?"playing":"paused";}catch(e){}}
 }
 function ttsPaintOptions(){
@@ -2773,7 +3203,7 @@ function ttsOpen(autoplay,fromStart){
     reflowKeepingPct(()=>{});
   }
   if(fresh)ttsBuildWords();
-  ttsLoadVoices();ttsPaintOptions();
+  ttsLoadVoices();ttsPaintOptions();ttsPaintKokoroRows();
   $("ttsRateSlider").value=S.ttsRate;$("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
   if("mediaSession" in navigator){
     try{
@@ -2801,8 +3231,10 @@ function ttsOpen(autoplay,fromStart){
   }else if(autoplay)ttsPlay();
 }
 function ttsClose(){
+  if(ttsActive&&ttsSpeaking)ttsMarkListened();
   ttsActive=false;ttsSpeaking=false;
-  kEpoch++;kNext=null;kokoroPausedMid=false;
+  ttsCancelSay();if(carOn)carClose();
+  kEpoch++;kokoroDropQueue();kokoroPausedMid=false;
   ttsStopTimer();
   ttsSleepClear();
   keepAliveStop();
@@ -2844,16 +3276,20 @@ function ttsPlay(){
   if(!ttsWords.length){toast("Nothing to read in this chapter.");return;}
   ttsSpeaking=true;
   if(!ttsUsesKokoro())keepAliveStart();
-  ttsSpeakFrom(Math.min(ttsIdx,ttsWords.length-1));
   paintTtsPlay();
+  if(ttsRecapDue()){ttsRecap(true);return;}
+  ttsMarkListened();
+  ttsSpeakFrom(Math.min(ttsIdx,ttsWords.length-1));
 }
 function ttsPause(){
+  if(ttsSpeaking)ttsMarkListened();
+  ttsCancelSay();
   if(ttsUsesKokoro()){
     const a=$("ttsAudio");
     if(a.dataset.kind==="speech"&&!a.ended){
       a.pause();kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
     }
-    kEpoch++;kNext=null;kokoroStopAudio();kokoroNote("");
+    kEpoch++;kokoroStopAudio();kokoroNote("");
     ttsSpeaking=false;paintTtsPlay();return;
   }
   ttsSpeaking=false;
@@ -2875,6 +3311,7 @@ function ttsKeepSentence(){
 }
 function ttsSeekTo(i){
   if(!ttsWords.length)return;
+  kokoroPausedMid=false; // play after a seek starts at the new spot, not the paused sentence
   ttsIdx=Math.max(0,Math.min(ttsWords.length-1,i));
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
   else ttsSetWord(ttsIdx);
@@ -2903,7 +3340,173 @@ function ttsNudgeRate(d){
   store.set("settings",S);
   $("ttsRateSlider").value=S.ttsRate;
   $("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
+  ttsApplyRate();
+}
+/* Kokoro audio is made at 1× and sped up by the player, so a speed change
+   applies to the sentence already playing; device voices must start over */
+function ttsApplyRate(){
+  if(carOn)carPaint();
+  if(ttsUsesKokoro()){
+    const a=$("ttsAudio");
+    if(a.dataset.kind==="speech"||a.dataset.kind==="say")a.playbackRate=S.ttsRate;
+    return;
+  }
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+}
+
+/* ================= Listen extras: recap, voice questions, car mode ================= */
+async function aiQuick(sys,q){
+  const chain=aiChain();
+  if(!chain.length)throw new Error("Ask AI isn't set up yet (✦ → ⚙).");
+  let last;
+  for(const id of chain){
+    const reply={role:"assistant",content:""};
+    try{await aiAttempt(id,[{role:"system",content:sys},{role:"user",content:q}],reply);if(reply.content)return reply.content;}
+    catch(e){last=e;}
+  }
+  throw last||new Error("No answer came back.");
+}
+/* idea 5: "Previously…" when a book is picked up again after a while */
+const RECAP_GAP=6*3600e3;
+let ttsLast=store.get("ttsLast",{});   // bookId -> when it was last listened to
+function ttsMarkListened(){
+  const c=CHAPTERS[cur],b=c&&bookOf(c);if(!b)return;
+  ttsLast[b.id]=Date.now();store.set("ttsLast",ttsLast);
+}
+function ttsRecapDue(){
+  const c=CHAPTERS[cur],b=c&&bookOf(c);
+  if(!b||!aiChain().length||!ttsLast[b.id])return false;
+  if(Date.now()-ttsLast[b.id]<RECAP_GAP)return false;
+  return ttsIdx>80||b.chapters.indexOf(cur)>0;  // something to recap
+}
+async function ttsRecap(thenRead){
+  ttsMarkListened();
+  if(!aiChain().length){toast("Set up Ask AI first (✦ → ⚙) for recaps");return;}
+  const wasPlaying=thenRead||ttsSpeaking;
+  if(ttsSpeaking&&!thenRead)ttsPause();
+  ttsSpeaking=true;paintTtsPlay();
+  if(ttsUsesKokoro())kokoroHold();else keepAliveStart();
+  const tok=kSayTok;
+  kokoroNote("Getting a recap of where you left off… (⏸ skips it)");
+  const c=CHAPTERS[cur],b=bookOf(c);
+  let heard=ttsT.texts.slice(Math.max(0,ttsIdx-700),ttsIdx).join(" ");
+  if(heard.length<1500){
+    const j=siblingChapter(-1);
+    if(j!==null)heard=stripMd(CHAPTERS[j].md).slice(-2500)+"\n…\n"+heard;
+  }
+  const sys=`You recap audiobooks for a listener who is coming back to "${b.title}" after a break. Write 2–3 short sentences meant to be spoken aloud, starting with "Previously," — plain text only, no markdown. Only use what is in the excerpt; never mention anything after it.`;
+  let ans="";
+  try{ans=await aiQuick(sys,`What the listener heard most recently (chapter "${c.title}"):\n"""${heard.slice(-6000)}"""`);}
+  catch(e){if(tok===kSayTok)toast("No recap: "+String(e.message||e).slice(0,120));}
+  if(tok!==kSayTok||!ttsSpeaking)return;
+  kokoroNote("");
+  const ok=ans?await ttsSay(ans):true;
+  if(!ok||!ttsSpeaking)return;
+  if(wasPlaying)ttsSpeakFrom(ttsIdx);
+  else{ttsSpeaking=false;paintTtsPlay();kokoroStopAudio();keepAliveStop();}
+}
+/* idea 4: ask out loud. ttsHear must be called inside the tap (iOS). */
+const SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+function ttsHear(prompt){
+  return new Promise(res=>{
+    if(!SpeechRec){res(null);return;}
+    let r;try{r=new SpeechRec();}catch(e){res(null);return;}
+    r.lang=bookLang()==="en"?"en-US":bookLang();
+    r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+    let text="",done=false;
+    const fin=v=>{if(done)return;done=true;clearTimeout(cap);res(v);};
+    r.onresult=e=>{text=[...e.results].map(x=>x[0].transcript).join("");kokoroNote("🎙 “"+text+"”");carStatus("“"+text+"”");};
+    r.onerror=e=>fin(/not-allowed|service-not-allowed|audio-capture/.test(e.error)?null:text.trim());
+    r.onend=()=>fin(text.trim());
+    kokoroNote("🎙 "+prompt);carStatus("🎙 "+prompt);
+    const cap=setTimeout(()=>{try{r.stop();}catch(e){}},12000);
+    try{r.start();}catch(e){fin(null);}
+  });
+}
+async function ttsAsk(said,wasPlaying){
+  if(said===undefined){
+    if(!aiChain().length){toast("Set up Ask AI first (✦ → ⚙), then ask by voice");return;}
+    wasPlaying=ttsSpeaking;
+    if(ttsSpeaking)ttsPause();
+    said=await ttsHear("Ask about the book…");
+  }
+  if(said===null){
+    kokoroNote("");carStatus("");
+    toast("No microphone here — type your question instead");
+    aiOpen({text:ttsSentenceText(ttsIdx),para:""});return;
+  }
+  if(!said){kokoroNote("");carStatus("");if(wasPlaying)ttsPlay();return;}
+  if(!aiChain().length){kokoroNote("");carStatus("");toast("Set up Ask AI first (✦ → ⚙)");return;}
+  ttsSpeaking=true;paintTtsPlay();kokoroPausedMid=false;
+  if(ttsUsesKokoro())kokoroHold();else keepAliveStart();
+  const tok=kSayTok;
+  kokoroNote("Thinking about “"+said+"”…");carStatus("Thinking…");
+  const heard=ttsT.texts.slice(Math.max(0,ttsIdx-160),ttsIdx+10).join(" ");
+  const sys=aiSystemPrompt(said)+`\nThe reader is listening to this book read aloud and asked out loud. They just heard:\n"""${heard}"""\nAnswer in 2–4 short sentences meant to be spoken: plain text only — no markdown, lists or headings.`;
+  let ans;
+  try{ans=await aiQuick(sys,said);}
+  catch(e){
+    if(tok!==kSayTok)return;
+    kokoroNote("");carStatus("");toast(String(e.message||e).slice(0,160));
+    ttsSpeaking=false;paintTtsPlay();kokoroStopAudio();return;
+  }
+  if(tok!==kSayTok||!ttsSpeaking)return;
+  aiMsgs.push({role:"user",content:"🎙 "+said},{role:"assistant",content:ans});
+  kokoroNote("");carStatus(ans);
+  const ok=await ttsSay(ans);
+  if(!ok||!ttsSpeaking)return;
+  carStatus("");
+  if(wasPlaying)ttsSpeakFrom(ttsIdx);
+  else{ttsSpeaking=false;paintTtsPlay();kokoroStopAudio();keepAliveStop();}
+}
+/* idea 6: car mode — one big screen, screen kept awake, spoken commands */
+let carOn=false, carLock=null;
+function carPaint(){
+  if(!carOn)return;
+  const c=CHAPTERS[cur],b=c&&bookOf(c);
+  $("carTitle").textContent=c?(b?b.title+" · ":"")+c.title:"";
+  $("carText").textContent=ttsWords.length?ttsSentenceText(ttsIdx):"";
+  $("carSpeed").textContent=(S.ttsRate||1).toFixed(2).replace(/0$/,"")+"×";
+  $("carPlay").textContent=ttsSpeaking?"⏸":"▶";
+}
+function carStatus(msg){const el=$("carStatus");if(el)el.textContent=msg||"";}
+async function carWake(){
+  try{if(carOn&&"wakeLock" in navigator&&document.visibilityState==="visible")carLock=await navigator.wakeLock.request("screen");}catch(e){}
+}
+function carOpen(){
+  if(!ttsActive)ttsOpen(false);
+  carOn=true;$("carMode").classList.remove("hidden");
+  carStatus("");carPaint();carWake();
+}
+function carClose(){
+  carOn=false;$("carMode").classList.add("hidden");
+  try{if(carLock)carLock.release();}catch(e){}
+  carLock=null;
+}
+document.addEventListener("visibilitychange",carWake); // the lock is dropped when the screen turns off
+async function ttsCommand(){
+  const wasPlaying=ttsSpeaking;
+  if(ttsSpeaking)ttsPause();
+  const said=await ttsHear("Say “pause”, “back”, “next”, “faster”, “recap” — or ask a question");
+  kokoroNote("");carStatus("");
+  if(said===null){toast("Voice commands need the microphone");return;}
+  const t=said.toLowerCase().replace(/[.!?]/g,"").trim();
+  if(!t){if(wasPlaying)ttsPlay();return;}
+  const short=t.split(/\s+/).length<=3;
+  if(short&&/^(pause|stop|wait|hold)/.test(t))return;
+  if(short&&/^(play|resume|continue|go on|start|read)/.test(t)){ttsPlay();return;}
+  if(/next chapter/.test(t)){
+    const j=siblingChapter(1);if(j===null){toast("This is the last chapter");return;}
+    ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
+    if(ttsUsesKokoro())kokoroHold();
+    nav(chapterHash(CHAPTERS[j]));return;
+  }
+  if(short&&/^(back|go back|repeat|again|previous|rewind)/.test(t)){ttsSentence(-1);ttsPlay();return;}
+  if(short&&/^(next|skip|forward)/.test(t)){ttsSentence(1);ttsPlay();return;}
+  if(short&&/slow/.test(t)){ttsNudgeRate(-0.2);if(wasPlaying)ttsPlay();return;}
+  if(short&&/fast|quick/.test(t)){ttsNudgeRate(0.2);if(wasPlaying)ttsPlay();return;}
+  if(short&&/recap|summar/.test(t)){ttsRecap(wasPlaying);return;}
+  ttsAsk(said,wasPlaying);
 }
 
 /* ================= highlights (marking + popup) ================= */
@@ -3815,6 +4418,35 @@ $("btnListen").addEventListener("click",()=>{ttsUnlock();ttsActive?ttsClose():tt
 $("ttsClose").addEventListener("click",ttsClose);
 $("ttsPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
 $("ttsSaveSent").addEventListener("click",ttsKeepSentence);
+$("ttsSave").addEventListener("click",ttsSaveChapter);
+$("ttsAsk").addEventListener("click",()=>ttsAsk());
+$("ttsRecapBtn").addEventListener("click",()=>ttsRecap(false));
+$("ttsCar").addEventListener("click",carOpen);
+$("carClose").addEventListener("click",carClose);
+$("carPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
+$("carBack").addEventListener("click",()=>ttsSentence(-1));
+$("carFwd").addEventListener("click",()=>ttsSentence(1));
+$("carMic").addEventListener("click",ttsCommand);
+$("carSpeed").addEventListener("click",()=>{
+  const steps=[0.8,1,1.25,1.5,1.75,2];
+  const k=steps.findIndex(x=>x>(S.ttsRate||1)+0.01);
+  ttsNudgeRate((k<0?steps[0]:steps[k])-(S.ttsRate||1));
+});
+/* idea 3: a second voice for “dialogue” */
+function ttsPaintKokoroRows(){
+  const k=ttsUsesKokoro();
+  document.querySelectorAll("#ttsBar .kokoro-only").forEach(el=>el.classList.toggle("hidden",!k));
+  const sel=$("ttsDlg");
+  if(!sel.options.length)sel.innerHTML=`<option value="">Same voice</option>`+KOKORO_VOICES.map(([id,n])=>`<option value="${id}">${esc(n)}</option>`).join("");
+  sel.value=S.ttsDlg||"";
+  paintSave();
+}
+$("ttsDlg").addEventListener("change",e=>{
+  S.ttsDlg=e.target.value;store.set("settings",S);
+  ttsReplan();
+  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  toast(S.ttsDlg?`Quotes are read by ${kokoroLabel(S.ttsDlg)}`:"Quotes use the same voice");
+});
 $("ttsSkipHead").addEventListener("click",()=>{
   S.ttsSkipHead=!S.ttsSkipHead;store.set("settings",S);ttsPaintOptions();
   toast(S.ttsSkipHead?"Skipping headings & tables":"Reading headings & tables");
@@ -3824,7 +4456,7 @@ $("ttsSkipHead").addEventListener("click",()=>{
   if(wasSpeaking){
     ttsSpeaking=false;
     if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
-    kEpoch++;kNext=null;kokoroPausedMid=false;kokoroStopAudio();
+    kEpoch++;kokoroDropQueue();kokoroPausedMid=false;kokoroStopAudio();
   }
   renderChapter(cur);                       // rebuilds the word spans in its own frame
   requestAnimationFrame(()=>{
@@ -3848,14 +4480,29 @@ $("ttsRateSlider").addEventListener("input",e=>{
 });
 $("ttsRateSlider").addEventListener("change",e=>{
   S.ttsRate=parseFloat(e.target.value);store.set("settings",S);
-  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  ttsApplyRate();
 });
 $("ttsVoice").addEventListener("change",e=>{
   S.ttsVoice=e.target.value;store.set("settings",S);
   if(e.target.value.startsWith("kokoro:"))kokoroFailed=false;
+  ttsReplan();ttsPaintKokoroRows();
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
-  else if(e.target.value.startsWith("kokoro:"))
-    kokoroNote(kReady?"Heart is ready.":"Heart downloads once (~90 MB) the first time you press play, then stays on this phone.");
+  else if(e.target.value.startsWith("kokoro:")){
+    if(!kReady){kokoroNote(`${kokoroLabel()} downloads once (~${kMB} MB) the first time you press play, then stays on this device.`);return;}
+    // a short sample in the new voice, through the same <audio> the book uses
+    kokoroNote(`${kokoroLabel()} is getting ready…`);
+    const epoch=++kEpoch;
+    kokoroHold();
+    kokoroGenerate(`Hi, I'm ${kokoroLabel()}. I'll read your books to you.`,kokoroVoiceName()).then(wav=>{
+      if(epoch!==kEpoch||ttsSpeaking)return;
+      kokoroNote("");
+      const a=$("ttsAudio");
+      if(a._url)URL.revokeObjectURL(a._url);
+      a._url=URL.createObjectURL(new Blob([wav],{type:"audio/wav"}));
+      a.loop=false;a.volume=1;a.dataset.kind="";a.onended=null;a.ontimeupdate=null;
+      a.src=a._url;a.preservesPitch=true;a.playbackRate=S.ttsRate||1;a.play().catch(()=>{});
+    }).catch(()=>kokoroNote(""));
+  }
   else if(TTS_OK){ // quick preview of the newly chosen device voice
     kokoroNote("");
     const u=new SpeechSynthesisUtterance("This voice will read your books.");
@@ -3906,7 +4553,7 @@ function voiceHelpHtml(){
   else if(/Windows/i.test(ua))order=[win,mac,ios,and];
   return `<h2>Voices</h2>
     <p>The default is <b>Heart</b> — the same Kokoro voice the screen tutor uses.
-    The first time you press play it downloads about 90&nbsp;MB, then it stays on
+    The first time you press play it downloads about 170&nbsp;MB, then it stays on
     this phone and works with no connection. It is much closer to a person than
     the voices iOS ships with.</p>
     <p class="dim">Heart runs in a safe mode on iPhone on purpose. Safari's faster

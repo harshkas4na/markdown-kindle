@@ -572,6 +572,19 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
 #ttsBar .mini{font-size:12px; color:var(--muted); padding:6px 9px; border-radius:9px; border:1px solid var(--line);}
 #ttsBar .mini.on{color:var(--accent); border-color:var(--accent);}
 #ttsBar optgroup{font-style:normal; font-weight:600; color:var(--muted);}
+#ttsBar .kokoro-only.hidden{display:none;}
+#carMode{position:fixed; inset:0; z-index:70; background:var(--bg); color:var(--fg); display:flex; flex-direction:column;
+  padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom)); gap:14px;}
+#carMode.hidden{display:none;}
+#carMode .car-top{display:flex; align-items:center; gap:12px;}
+#carMode .car-top button{font-size:20px; min-width:56px; height:48px; border-radius:14px; border:1px solid var(--line); color:var(--fg);}
+#carTitle{flex:1; min-width:0; font-size:14px; color:var(--muted); text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#carText{flex:1; overflow:hidden; display:flex; align-items:center; font-size:clamp(22px,6vw,34px); line-height:1.35; font-weight:500;}
+#carStatus{min-height:1.4em; font-size:15px; color:var(--accent); text-align:center;}
+#carMode .car-ctl{display:flex; gap:14px;}
+#carMode .car-ctl button{flex:1; height:min(22vh,150px); border-radius:24px; font-size:44px; background:var(--card); border:1px solid var(--card-line); color:var(--fg);}
+#carMode .car-ctl #carPlay{flex:1.4; background:var(--accent); color:#fff; border-color:var(--accent);}
+#carMic{height:72px; border-radius:20px; border:1px solid var(--line); font-size:15px; color:var(--fg); padding:0 14px;}
 /* while listening, the persistent TTS bar must not cover the page bottom */
 #reader.listening #pageArea{padding-bottom:calc(18px + var(--ttsbar-h,170px));}
 #reader.listening.mode-scroll #content{padding-bottom:calc(8vh + var(--ttsbar-h,170px));}
@@ -798,18 +811,41 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
     </div>
     <div class="slider-row" style="margin-top:10px">
       <span style="font-size:13px;color:var(--muted);min-width:56px">Voice</span>
-      <select id="ttsVoice" title="Heart is the built-in Kokoro voice. Device voices are listed underneath."></select>
+      <select id="ttsVoice" title="Heart, Bella and the rest are Kokoro voices that run on this device. Device voices are listed underneath."></select>
       <button class="icon-btn" id="ttsDictBtn" title="Fix how a word is pronounced">🗣</button>
+    </div>
+    <div class="slider-row kokoro-only" style="margin-top:8px">
+      <span style="font-size:13px;color:var(--muted);min-width:56px">Quotes</span>
+      <select id="ttsDlg" title="Read “dialogue in quotes” in a second voice"></select>
     </div>
     <div class="slider-row" style="margin-top:8px;justify-content:center;gap:8px;flex-wrap:wrap">
       <button class="mini" id="ttsSaveSent" title="Save the sentence being read as a highlight (S)">✎ Keep this sentence</button>
       <button class="mini" id="ttsSkipHead" title="Skip headings, captions and tables while reading">Skip headings</button>
+      <button class="mini kokoro-only" id="ttsSave" title="Make this chapter's audio now and keep it on this device — plays without gaps, offline, and can be shared as an audio file">⬇ Save chapter</button>
+      <button class="mini" id="ttsAsk" title="Ask a question about the book out loud — the answer is spoken, then reading carries on">🎙 Ask</button>
+      <button class="mini" id="ttsRecapBtn" title="A short spoken recap of what you heard last (also plays by itself when you come back after 6+ hours)">⟲ Recap</button>
+      <button class="mini" id="ttsCar" title="Car mode: big buttons, screen stays on, spoken commands">🚗 Car mode</button>
       <button id="ttsVoiceHelp" style="font-size:12px;color:var(--accent)">About voices</button>
     </div>
     <div id="ttsKokoroNote" class="hidden" style="font-size:12px;color:var(--muted);text-align:center;margin-top:6px"></div>
   </footer>
   <audio id="keepAlive" loop preload="auto" playsinline style="display:none"></audio>
   <audio id="ttsAudio" preload="auto" playsinline style="display:none"></audio>
+  <div id="carMode" class="hidden">
+    <div class="car-top">
+      <button id="carClose" title="Leave car mode">✕</button>
+      <div id="carTitle"></div>
+      <button id="carSpeed" title="Speed">1×</button>
+    </div>
+    <div id="carText"></div>
+    <div id="carStatus"></div>
+    <div class="car-ctl">
+      <button id="carBack" title="Previous sentence">⏮</button>
+      <button id="carPlay" title="Play / pause">▶</button>
+      <button id="carFwd" title="Next sentence">⏭</button>
+    </div>
+    <button id="carMic">🎙 Tap, then speak — “pause”, “back”, “next”, “faster”, “recap”, or a question</button>
+  </div>
 
   <div id="scrim" class="hidden"></div>
 
@@ -940,7 +976,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
 const LIB = [{"id":"01-hookathon","title":"Hookathon — Uniswap v4","books":[{"id":"01-hookathon/01-research","title":"Research: What To Build (2026)","author":"Hookathon research pack","description":"What Uniswap is struggling with in 2026 that no hook has solved — unsolved problems, new whitepapers explained simply, DeFi trends, and a ranked shortlist of project ideas.","chapters":[0,1,2,3,4]},{"id":"01-hookathon/02-learn-the-basics","title":"Learn the Basics","author":"Hookathon study notes","description":"From zero to Uniswap v4 hooks in 25 chapters: AMMs, liquidity, MEV, oracles, the hook system, dev environment, common hook patterns, and security pitfalls.","chapters":[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]},{"id":"01-hookathon/03-hook-directory","title":"Hook Directory: 556 Past Projects","author":"UHI cohorts 1–8, organized","description":"Every project from the Uniswap Hook Incubator directory, grouped into 16 categories and explained in plain language — what people tried, what's saturated, and where the gaps are.","chapters":[30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48]},{"id":"01-hookathon/04-market-hours-hook-explained","title":"Market Hours Hook — The Codebase Explained","author":"UHI10 build notes","description":"The complete deep-dive into the first UHI10 build: an AMM that knows when Wall Street is closed. The problem (weekend LVR, no circuit breakers, the Monday-open massacre), every concept it uses (dynamic fees, Q96 price math, flash accounting, on-chain DST-correct date math), then NYSECalendar.sol and MarketHoursHook.sol line by line — including the internal-crossing reopening auction — plus what every test proves and how the deployment and demo UI work.","chapters":[49,50,51,52,53,54,55]},{"id":"01-hookathon/05-mev-tax-hook-explained","title":"MEV Tax Hook — The Codebase Explained","author":"UHI10 build notes","description":"The deep-dive into the second UHI10 build: the LP-first MEV tax on Unichain. Why an arbitrageur's priority fee is a truthful confession of its profit, how beforeSwapReturnDelta charges the swapper and donate pays in-range LPs with the two cancelling inside the flash-accounting lock (the hook never touches a token), the whole contract line by line, the tests that simulate a gas-market arms race, and the priority-fee-slider demo. Plus: a full competitive-landscape study against 126 prior MEV/LVR hooks and the live UHI9/UHI10 field, a plain-language walkthrough of that research, six concrete upgrade paths explained in depth, and every hard skeptical question (bots, sandwich attacks, PFDA, Guard Hook, backrunning) answered directly.","chapters":[56,57,58,59,60,61,62,63,64,65]},{"id":"01-hookathon/06-guard-hook-explained","title":"Guard Hook — The Codebase Explained","author":"UHI10 build notes","description":"The deep-dive into the third UHI10 build: a circuit breaker for other hooks, built after Bunni proved audits don't bound blast radius. The all-14-flags wrapper pattern, raw-call forwarding with a fail-open/fail-closed dial, the six invariants (fee firewall, delta firewall, outflow caps with automatic cooldown, price band, pause switch, and LP exits that nothing can block), GuardHook.sol and the GuardedHook base line by line, the four adversary mocks, the tests, and the rogue-hook demo.","chapters":[66,67,68,69,70,71]},{"id":"01-hookathon/07-uniswap-advanced-deep-dive","title":"Uniswap & Hooks — The Advanced Deep Dive","author":"Study notes, researched & compiled 2026","description":"The full story of automated market making, told from first principles to the 2026 frontier: the math of x·y=k, v2's architecture, v3's concentrated liquidity and tick machinery, the hidden taxes of MEV and LVR, v4's singleton and flash accounting, the complete hook system (permissions, deltas, custom curves), building and testing hooks with Foundry, how hooks get hacked, and where AMM research is heading. Each chapter starts with a fast overview, then goes deep — and every chapter connects back to the ones before it.","chapters":[72,73,74,75,76,77,78,79,80,81,82,83,84,85]}]},{"id":"02-books","title":"Books","books":[{"id":"02-books/01-the-4-hour-body","title":"The 4-hour body","author":"Tim Ferris","description":"","chapters":[86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104]},{"id":"02-books/show-your-work","title":"Show Your Work!","author":"Austin Kleon","description":"10 ways to share your creativity and get discovered. Chapter-by-chapter study notes on why sharing your process — not just your finished product — is how people find you and your work.","chapters":[105,106,107,108,109,110,111,112,113,114,115,116,117]},{"id":"02-books/steal-like-an-artist","title":"Steal Like an Artist","author":"Austin Kleon","description":"10 things nobody told you about being creative. Chapter-by-chapter study notes on Kleon's argument that originality is a myth — creative work comes from honestly digesting and remixing what came before it. The prequel to Show Your Work!","chapters":[118,119,120,121,122,123,124,125,126,127,128]},{"id":"02-books/the-4-hour-body","title":"The 4-Hour Body","author":"Timothy Ferriss","description":"An unusual human's exhaustive self-experimentation on fat loss, muscle, sleep, sex, and longevity, boiled down to the minimum effective dose for each. These are thematically organized study notes on the book's core protocols and philosophy, not a literal chapter-by-chapter mirror of the print edition.","chapters":[129,130,131,132,133,134,135,136,137,138,139,140,141,142]},{"id":"02-books/the-48-laws-of-power","title":"The 48 Laws of Power","author":"Robert Greene","description":"Greene's read is descriptive, not prescriptive: this is how power has actually operated across history and courts and boardrooms, whether we like it or not, distilled into 48 recurring patterns. These are original notes and commentary on each law's logic and use — not the book's text.","chapters":[143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190]}]},{"id":"03-hld","title":"HLD — System Design","books":[{"id":"03-hld/01-scaling","title":"The Scaling Arc","author":"","description":"How Shadow's one server stops being enough, and what to do about it: capacity estimation, vertical vs horizontal scaling, statelessness, load balancers, autoscaling, and the actual trigger for microservices. Personal study notes, not a script — deep enough that 10% of it can become a video.","chapters":[191,192,193,194,195,196,197,198,199,200]},{"id":"03-hld/02-designing-data-intensive-applications","title":"Designing Data-Intensive Applications","author":"Martin Kleppmann","description":"The engineering discipline behind reliable, scalable, and maintainable data systems — how databases, caches, queues, and stream processors actually work under the hood, and the real tradeoffs behind replication, partitioning, transactions, and consistency in distributed systems.","chapters":[201,202,203,204,205,206,207,208,209,210,211,212]},{"id":"03-hld/03-system-design-the-advanced-deep-dive","title":"System Design — The Advanced Deep Dive","author":"Study notes, researched & compiled 2026","description":"The story of how one server becomes a planet-scale system, told so each idea creates the need for the next: the life of a request, the scaling arc, storage engines (B-trees vs LSM), replication and its anomalies, partitioning, transactions and isolation, time and consensus (Raft), caching, logs and streams (Kafka), derived data and search, the traffic layer (load balancing, rate limiting, idempotency), observability and graceful failure — ending with full worked case studies and the back-of-envelope toolkit. Fast overview first in every chapter, then the deep dive, always connecting dots backward.","chapters":[213,214,215,216,217,218,219,220,221,222,223,224,225,226]}]},{"id":"04-go","title":"Go","books":[{"id":"04-go/01-go-the-complete-deep-dive","title":"Go — The Complete Deep Dive","author":"Study notes, researched & compiled 2026","description":"The Go programming language from first principles to production: the spec's own vocabulary for types, declarations, and scope; the truth about slices, interfaces, and pointers; the GMP scheduler, channels, and the memory model that make goroutines safe; error handling as a design discipline instead of exceptions; the standard library idioms (io, testing, net/http) that make Go code composable; how to build and ship a real web service; and how production systems like Docker, Kubernetes, and etcd are actually built and maintained in Go. Each chapter opens with a fast overview, then goes deep — and every chapter connects back to the ones before it, the same way the Uniswap deep dive does.","chapters":[227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264]}]},{"id":"05-career","title":"Career","books":[{"id":"05-career/01-get-hired-in-2026","title":"Get Hired in 2026","author":"Field notes for Harsh Kasana","description":"A working playbook — not theory — for going from 'strong portfolio, unclear path' to an offer: how YC's job board, LinkedIn referrals, and direct company applications actually work in 2026, what's changed in the AI era, and a specific plan for someone with deep Web3/Reactive Network experience and self-taught backend/infra skills but no traditional 'big company' resume line.","chapters":[265,266,267,268,269,270,271,272,273,274,275,276,277]},{"id":"05-career/02-acca-get-hired-in-2026","title":"ACCA — Get Hired in 2026","author":"Field notes for Hrithik Kasana","description":"A working playbook for a part-qualified ACCA candidate (11 of 12 papers passed, ATX-UK and SBR done) with real hands-on US tax compliance experience and UK tax/IFRS exam depth, sorting out the actual blockers standing between him and a UK-facing accounting or tax career in 2026: a Practical Experience Requirement clock that may not have even started, a UK graduate-hiring market visibly being compressed by AI, a visa-sponsorship math problem that has nothing to do with resume quality, and a two-resume identity problem that's been hiding his strongest asset — the US-UK cross-border tax combination almost nobody else applying has.","chapters":[278,279,280,281,282,283,284,285,286,287,288]},{"id":"05-career/02-jobops-manual","title":"JobOps: The Operator's Manual","author":"Field notes for Harsh Kasana","description":"How your job-application system actually works and how to run it daily — the pipeline in PROJECTS/Me/job-ops, the five moments it stops for you, the GitHub layer that taps your phone, the learning loop that makes every application better than the last, and the psychology every generated message is built to trigger.","chapters":[289,290,291,292,293,294]},{"id":"05-career/03-hackops-manual","title":"HackOps: The Operator's Manual","author":"Field notes for Harsh Kasana","description":"How your hackathon system actually works and how to run it so you spend your weeks building instead of tracking — the pipeline in PROJECTS/Me/hack-ops, why selection matters more than speed, the thin-track theory your own record proves, what to build and how to find it, and the downstream layer where the real money has always been.","chapters":[295,296,297,298,299,300,301]},{"id":"05-career/04-lifelog-manual","title":"Lifelog: The Operator's Manual","author":"Field notes for Harsh Kasana","description":"How the log that keeps every other system honest actually works and how to run it — the append-only stream in ~/.lifelog, why a cursor beats a timestamp, what only you can capture and what records itself, how decay stops skills.md from lying about you, and the sync loop that turns fourteen months of commits into a profile you didn't have to remember.","chapters":[302,303,304,305,306,307,308,309]},{"id":"05-career/05-xops-manual","title":"X-Ops: The Operator's Manual","author":"Field notes for Harsh Kasana","description":"How the companion that sits in your X tab actually works and how to run it — the pipeline in PROJECTS/Me/x-ops, why an edit is worth more than a like, the two ledgers that keep it honest, drafting one reply end to end, the relationship layer that turns 'engage and see who engages back' into a real experiment, your own post series, and the rules that never bend no matter how good a draft looks.","chapters":[310,311,312,313,314,315,316,317]}]},{"id":"06-exams","title":"Exams","books":[{"id":"06-exams/01-ctet-upper-primary-science-last-5-years-pyqs","title":"CTET Upper Primary Science: Last 5 Years PYQs","author":"Compiled from official CBSE CTET papers","description":"Every Paper II (Upper Primary, Science/Maths stream) question from the last 5 CTET sessions — Feb 2026, Dec 2024, July 2024, Jan 2024, and Aug 2023 — sourced from the official CBSE question papers and final answer keys on ctet.nic.in. Each session gives you the full paper (Child Development & Pedagogy, Language I, Language II, Mathematics & Science) to attempt cold, followed by a separate answers-and-explanations chapter so you're not tempted to peek.","chapters":[318,319,320,321,322,323,324,325,326,327,328]}]},{"id":"07-epub","title":"EPUB","books":[{"id":"07-epub/01-steal-like-an-artist","title":"Steal Like an Artist","author":"Austin Kleon","description":"","chapters":[329,330,331,332,333,334,335,336,337,338,339,340,341,342]},{"id":"07-epub/02-the-4-hour-body-an-uncommon-guide-to-rapid-fat-loss-incredible-sex-and-becoming-superhuman","title":"The 4-Hour Body: An Uncommon Guide to Rapid Fat-Loss, Incredible Sex, and Becoming Superhuman","author":"Timothy Ferriss","description":"Downloaded from z-lib.org","chapters":[343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404]},{"id":"07-epub/03-show-your-work","title":"Show Your Work!","author":"Austin Kleon","description":"In his New York Times bestseller Steal Like an Artist, Austin Kleon showed readers how to unlock their creativity by \"stealing\" from the community of other movers and shakers. Now, in an even more forward-thinking and necessary book, he shows how to take that critical next step on a creative journey—getting known. Show Your Work! is about why generosity trumps genius. It's about getting findable, about using the network instead of wasting time \"networking.\" It's not self-promotion, it's self-discovery—let others into your process, then let them steal from you. Filled with illustrations, quotes, stories, and examples, Show Your Work! offers ten transformative rules for being open, generous, brave, productive. In chapters such as You Don't Have to Be a Genius ; Share Something Small Every Day ; and Stick Around , Kleon creates a user's manual for embracing the communal nature of creativity— what he...","chapters":[405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422]}]},{"id":"08-body","title":"Body","books":[{"id":"08-body/01-the-strength-protocol","title":"The Strength Protocol","author":"Field notes for Harsh Kasana","description":"A gym manual built around one idea: you cannot look up what your body does, you can only measure it. Charts for typing yourself honestly (frame, body fat, training age, response profile), a program you can actually run, the eating rules that have real numbers behind them, and a 12-week experiment loop for finding your own answers — with what the research, the standard books, and thousands of Reddit and Quora progress reports agree on, and where they don't.","chapters":[423,424,425,426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448]}]},{"id":"09-ai","title":"AI Engineering","books":[{"id":"09-ai/00-the-gap-map","title":"The Gap Map","author":"Compiled from the JobOps application corpus, August 2026","description":"The short book you read first. Forty-plus applications went out of JobOps between June and August 2026, and the AI-shaped ones asked for the same eight things over and over. This book counts them, sets them against what Harsh has actually shipped, writes the honest-gap answer for each one so it is said the same way every time, orders the rest of the shelf by how often an interviewer will reach for it, and ends with the question bank the other seven books are the answers to.","chapters":[449,450,451,452,453,454]},{"id":"09-ai/01-llm-foundations","title":"LLM Foundations for Engineers","author":"Study notes, researched & compiled 2026","description":"The model facts that change how you build, and no more than that. What a token really is and why your JSON costs three times what your prose does; what the model is doing when it produces the next one; why context is quadratic in attention and linear in your bill; how sampling works and why temperature 0 is not determinism; what an embedding is and why two models' embeddings are mutually unintelligible; how to get JSON you can parse without a try/except around it; prompting treated as version-controlled engineering rather than folklore; and the arithmetic of cost, latency and model choice that every downstream architecture decision quietly depends on.","chapters":[455,456,457,458,459,460,461,462,463,464,465,466]},{"id":"09-ai/02-rag-in-production","title":"RAG in Production","author":"Study notes, researched & compiled 2026","description":"The most-demanded skill in the whole application corpus, taken from a demo pipeline to a system with numbers on it. Parsing and ingestion, where more RAG projects die than anywhere else; chunking as the decision that quietly caps your ceiling; embedding models and the migration you cannot undo; HNSW, IVF and what ef_search really trades; pgvector versus a dedicated store; hybrid search and reciprocal rank fusion; cross-encoder reranking and what it costs in p95; query rewriting, HyDE and multi-query; context assembly and citations; and the chapter the others exist for, measuring retrieval separately from generation so that 'it hallucinated' becomes a component and a number.","chapters":[467,468,469,470,471,472,473,474,475,476,477,478,479,480,481]},{"id":"09-ai/03-agents-and-orchestration","title":"Agents, Tools and Orchestration","author":"Study notes, researched & compiled 2026","description":"Twenty of forty-four companies in the application corpus are building agents, which makes this the second-largest topic and the one with the widest gap between what is claimed and what is understood. The agent loop written from scratch before any framework touches it; tool design, where the description fails more often than the code; ReAct, plan-and-execute and reflection, with the honest case against each; state, memory and context that grows without bound; what LangChain is and is not; LangGraph as a state machine with checkpoints; human-in-the-loop as architecture rather than a prompt; multi-agent systems and the cost you always pay; MCP; and how to debug a run that went wrong at step nine.","chapters":[482,483,484,485,486,487,488,489,490,491,492,493,494,495]},{"id":"09-ai/04-evals-and-harnesses","title":"Evals and Harnesses","author":"Study notes, researched & compiled 2026","description":"The widest gap and the highest bar. Thirteen dossiers name evals, and in seven of them the seat exists to build them — golden sets, prompt unit tests, offline checks, online A/Bs, eval harnesses and guardrails an autonomous agent can be trusted behind. This book builds the thing: why a suite of cases that should pass measures nothing, how to construct a golden set and who labels it, deterministic scorers before judges, LLM-as-judge with its three biases and how to measure the judge itself, sample sizes and when a difference is real, per-slice reporting and the aggregate that lies, the regression gate in CI, evaluating retrieval and agent trajectories, online evaluation where offline cannot see, drift, and the ninety-day plan the dossiers already promised seven companies.","chapters":[496,497,498,499,500,501,502,503,504,505,506,507,508,509,510]}]},{"id":"10-javascript","title":"JavaScript","books":[{"id":"10-javascript/01-book","title":"JavaScript Mastery","author":"","description":"","chapters":[511,512,513,514,515,516,517,518,519,520,521,522,523,524,525]}]},{"id":"11-nextjs","title":"Next.js","books":[{"id":"11-nextjs/01-book","title":"Next.js Mastery","author":"","description":"","chapters":[526,527,528,529,530,531,532,533,534,535,536,537,538]}]},{"id":"12-systems","title":"Systems I Built","books":[{"id":"12-systems/01-agent-memory","title":"The Agent Forgets","author":"Built and written 2026-08-30","description":"Every Claude session on this machine started from zero and ended by throwing everything away. Two hundred and forty-six of them, ninety hours in job-ops alone, and not one line survived. This is the book about the thing built to stop that: a git-shaped, append-only store of what the agent learned, why the git shape is a real answer rather than an aesthetic one, the admission rule that keeps it from becoming a transcript copy, the three guards that stop it lying to the next session, and the measurement it agreed to be judged on before a line of it was written.","chapters":[539,540,541,542,543,544,545,546,547,548]}]}];
 const CHAPTERS = JSON.parse(document.getElementById("chapterData").textContent);
 const ACCESS_HASH = "b618775157f444e590e25d543a31b9b28a725b4a515c6965b0e2931eab9a2291";   // sha256 hex of the site key; null = open to everyone
-const BUILD_ID = "20261025-114457";
+const BUILD_ID = "20261025-191205";
 const OFFLINE_CACHE = "library-offline-v5";
 const SHARE_INBOX = "library-share-inbox";
 const BOOKS = {};
@@ -2183,7 +2219,7 @@ function jumpToElement(el){
 /* ================= text-to-speech (Listen) =================
    Default voice is Kokoro "Heart" (af_heart) — the same neural voice the
    screen tutor speaks with — running in the browser. The model downloads
-   once (~90 MB, q8) and the browser keeps it. iPhone system voices stay
+   once (~170 MB, uint8) and the browser keeps it. iPhone system voices stay
    available underneath. Web Speech is the fallback (and the default for
    books whose language is not English).
    Utterances are cut at sentence ends so a phone can make the next sentence
@@ -2295,17 +2331,39 @@ function ttsCurrentVoice(){
 }
 if(TTS_OK)speechSynthesis.onvoiceschanged=ttsLoadVoices;
 
-/* Kokoro (Heart) runs in a module worker so the page stays usable while a
-   sentence is synthesised. device is always "wasm": Safari's WebGPU path
-   reloads the tab on iPhone once the model finishes loading. q8 is ~90 MB;
-   the q4 file is several times larger and is the wrong choice for a phone. */
+/* Kokoro runs in a module worker so the page stays usable while a sentence
+   is synthesised, always on the CPU ("wasm"): Safari's WebGPU path reloads
+   the tab on iPhone once the model finishes loading.
+   dtype is uint8 (~170 MB). Measured on an M-series Mac, seconds of work per
+   second of speech: q8 1.7 (with or without threads), uint8 1.3 on one
+   thread and 0.45 on four — as fast as fp32 on WebGPU at half the download.
+   q8 was the old default and could not keep up: a sentence took longer to
+   make than to say, so the voice went silent between sentences.
+   The threads need a cross-origin isolated page, which sw.js provides.
+   The player keeps several chunks generating ahead of the one playing, and
+   the first chunk after a start or seek is kept short so the voice begins
+   within a couple of seconds. */
 const KOKORO_URL="https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js";
 const KOKORO_MODEL="onnx-community/Kokoro-82M-v1.0-ONNX";
+const KOKORO_MB=170;
 const KOKORO_WORKER_SRC=`
 import { KokoroTTS } from ${JSON.stringify(KOKORO_URL)};
 const MODEL=${JSON.stringify(KOKORO_MODEL)};
-let tts=null, chain=Promise.resolve();
-function enqueue(fn){ chain=chain.then(fn).catch(()=>{}); }
+// One job at a time. Inference blocks this thread, so messages are only read
+// between jobs — pump() yields a task before each one so a "drop" sent while
+// a sentence was being made is seen before the next stale job starts.
+let tts=null, jobs=[], busy=false;
+function enqueue(fn){ jobs.push(fn); pump(); }
+async function pump(){
+  if(busy)return;
+  busy=true;
+  while(jobs.length){
+    await new Promise(r=>setTimeout(r,0));
+    const fn=jobs.shift();
+    if(fn)try{ await fn(); }catch(e){}
+  }
+  busy=false;
+}
 function pcm16Wav(samples, rate){
   const n=samples.length, buf=new ArrayBuffer(44+n*2), v=new DataView(buf);
   const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
@@ -2326,19 +2384,20 @@ self.onmessage=(e)=>{
   if(m.cmd==="load"){
     enqueue(async()=>{
       try{
-        if(!tts){
-          tts=await KokoroTTS.from_pretrained(MODEL,{
-            dtype:"q8", device:"wasm",
-            progress_callback:p=>self.postMessage({cmd:"progress", p})
-          });
-        }
-        self.postMessage({cmd:"ready"});
+        if(!tts)tts=await KokoroTTS.from_pretrained(MODEL,{
+          dtype:"uint8", device:"wasm",
+          progress_callback:p=>self.postMessage({cmd:"progress", p})
+        });
+        self.postMessage({cmd:"ready", threads:self.crossOriginIsolated});
       }catch(err){ self.postMessage({cmd:"error", message:String(err&&err.message||err)}); }
     });
+  }else if(m.cmd==="drop"){
+    // jobs queued before this point belong to a position the reader left
+    jobs=jobs.filter(j=>!(j.id<m.below&&(self.postMessage({cmd:"dropped", id:j.id}),true)));
   }else if(m.cmd==="speak"){
-    enqueue(async()=>{
+    enqueue(Object.assign(async()=>{
       try{
-        if(!tts) throw new Error("Heart is not loaded yet");
+        if(!tts) throw new Error("Kokoro is not loaded yet");
         const audio=await tts.generate(m.text,{voice:m.voice||"af_heart", speed:m.speed||1});
         let pcm=audio.audio;
         if(pcm&&pcm.data) pcm=pcm.data;
@@ -2346,12 +2405,18 @@ self.onmessage=(e)=>{
         const wav=pcm16Wav(pcm, audio.sampling_rate||24000);
         self.postMessage({cmd:"audio", id:m.id, wav}, [wav]);
       }catch(err){ self.postMessage({cmd:"error", id:m.id, message:String(err&&err.message||err)}); }
-    });
+    },{id:m.id}));
   }
 };
 `;
-let kWorker=null, kLoaded=null, kSeq=0, kEpoch=0, kNext=null, kReady=false, kokoroPausedMid=false;
+let kWorker=null, kLoaded=null, kSeq=0, kEpoch=0, kQueue=[], kCur=null, kReady=false, kokoroPausedMid=false, kMB=KOKORO_MB;
 const kWait=new Map();
+const K_AHEAD=3; // chunks queued right behind the one playing; kokoroPrepRun makes the rest
+let kRtf=0;      // seconds of work per second of speech on this device (running average)
+function kokoroLabel(id){
+  const v=KOKORO_VOICES.find(([x])=>x===(id||kokoroVoiceName()));
+  return v?v[1].split(" · ")[0]:"Heart";
+}
 function kokoroNote(msg){
   const el=$("ttsKokoroNote"); if(!el)return;
   if(!msg){el.classList.add("hidden");el.textContent="";return;}
@@ -2360,24 +2425,30 @@ function kokoroNote(msg){
 function kokoroProgress(p){
   if(!p)return;
   if(p.status==="ready"||p.status==="done"){ if(kReady)kokoroNote(""); return; }
+  if(p.status!=="progress"||!/\.onnx/.test(p.file||""))return; // config/tokenizer files are tiny
   const pct=typeof p.progress==="number"?Math.round(p.progress):null;
-  const mb=p.total?Math.round(p.total/1048576):90;
-  kokoroNote(pct!=null?`Downloading Heart… ${pct}% of ~${mb} MB`:"Downloading Heart voice…");
+  if(p.total)kMB=Math.round(p.total/1048576);
+  kokoroNote(pct!=null?`Downloading the voice… ${pct}% of ~${kMB} MB (first time only)`:"Downloading the voice…");
 }
 function kokoroEnsure(){
   if(kLoaded)return kLoaded;
   const blob=new Blob([KOKORO_WORKER_SRC],{type:"text/javascript"});
   kWorker=new Worker(URL.createObjectURL(blob),{type:"module"});
+  // ask the browser not to evict the model when space runs low (Safari
+  // otherwise clears site storage after a week without a visit)
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}
   kLoaded=new Promise((res,rej)=>{
     kWorker.onmessage=e=>{
       const m=e.data||{};
+      const w=m.id!=null&&kWait.get(m.id);
+      if(w)kWait.delete(m.id);
       if(m.cmd==="progress")kokoroProgress(m.p);
       else if(m.cmd==="ready"){kReady=true;kokoroNote("");res();}
-      else if(m.cmd==="audio"){const w=kWait.get(m.id);if(w){kWait.delete(m.id);w.res(m.wav);}}
+      else if(m.cmd==="audio"){if(w)w.res(m.wav);}
+      else if(m.cmd==="dropped"){if(w)w.rej(Object.assign(new Error("dropped"),{dropped:true}));}
       else if(m.cmd==="error"){
-        const w=m.id!=null&&kWait.get(m.id);
-        if(w){kWait.delete(m.id);w.rej(new Error(m.message||"Kokoro failed"));}
-        else rej(new Error(m.message||"Kokoro failed to start"));
+        if(w)w.rej(new Error(m.message||"Kokoro failed"));
+        else if(m.id==null)rej(new Error(m.message||"Kokoro failed to start"));
       }
     };
     kWorker.onerror=ev=>{rej(new Error(ev.message||"Kokoro failed to start"));};
@@ -2386,13 +2457,269 @@ function kokoroEnsure(){
   kLoaded.catch(()=>{kLoaded=null;kWorker=null;kReady=false;});
   return kLoaded;
 }
-function kokoroGenerate(text, voice, speed){
+/* Always made at 1×: the reading speed is applied by the <audio> element
+   (pitch kept), so saved audio fits every speed and a speed change never
+   has to make anything again. */
+function kokoroGenerate(text, voice){
   const id=++kSeq;
   return kokoroEnsure().then(()=>new Promise((res,rej)=>{
-    kWait.set(id,{res,rej});
-    kWorker.postMessage({cmd:"speak", id, text, voice, speed});
+    const t0=performance.now();
+    kWait.set(id,{res:wav=>{
+      const secs=(wav.byteLength-44)/48000;
+      if(secs>0.5){const r=(performance.now()-t0)/1000/secs; kRtf=kRtf?kRtf*0.7+r*0.3:r;}
+      res(wav);
+    },rej});
+    kWorker.postMessage({cmd:"speak", id, text, voice, speed:1});
   }));
 }
+
+/* ---- saved audio (Cache Storage) ----
+   Every chunk of the chapter "plan" (see ttsMakePlan) is saved once made,
+   keyed by voice + text, so listening again, seeking back, the next chapter
+   and offline listening are instant. 16-bit WAV is ~2.9 MB a minute; the
+   oldest chapters are dropped past K_CACHE_CAP. */
+const K_CACHE="kokoro-audio-v1", K_CACHE_CAP=600*1048576;
+const K_CACHE_OK=("caches" in window)&&window.isSecureContext;
+let kIdx=null, kIdxT=null;
+const kInflight=new Map();
+function kIdxGet(){if(!kIdx)kIdx=new Map(Object.entries(store.get("ttsAudio",{})));return kIdx;}
+function kIdxSave(){clearTimeout(kIdxT);kIdxT=setTimeout(()=>store.set("ttsAudio",Object.fromEntries(kIdxGet())),1500);}
+function kHash(s){ // two FNV-1a passes → 16 hex chars
+  let a=0x811c9dc5,b=0x01000193^s.length;
+  for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a=Math.imul(a^c,16777619);b=Math.imul(b^c,2654435761);}
+  return (a>>>0).toString(16).padStart(8,"0")+(b>>>0).toString(16).padStart(8,"0");
+}
+function kAudioKey(voice,text){return voice+"-"+kHash(text);}
+const kUrl=k=>"./__tts/"+k+".wav";
+function kHas(chunk){return !!chunk.text&&kIdxGet().has(kAudioKey(chunk.voice,chunk.text));}
+async function kCacheGet(k){
+  if(!K_CACHE_OK||!kIdxGet().has(k))return null;
+  try{
+    const r=await (await caches.open(K_CACHE)).match(kUrl(k));
+    if(!r){kIdx.delete(k);kIdxSave();return null;}
+    const e=kIdx.get(k);e.t=Date.now();kIdxSave();
+    return await r.arrayBuffer();
+  }catch(e){return null;}
+}
+async function kCachePut(k,wav,chId){
+  if(!K_CACHE_OK)return;
+  try{
+    await (await caches.open(K_CACHE)).put(kUrl(k),new Response(wav.slice(0),{headers:{"Content-Type":"audio/wav"}}));
+    kIdxGet().set(k,{b:wav.byteLength,c:chId,t:Date.now()});
+    kIdxSave();kEvict();
+  }catch(e){}
+}
+async function kEvict(){
+  const idx=kIdxGet();let total=0;idx.forEach(e=>total+=e.b);
+  if(total<=K_CACHE_CAP)return;
+  const keep=CHAPTERS[cur]?CHAPTERS[cur].id:"";
+  const old=[...idx].filter(([,e])=>e.c!==keep).sort((x,y)=>x[1].t-y[1].t);
+  const c=await caches.open(K_CACHE);
+  for(const [k,e] of old){
+    if(total<=K_CACHE_CAP*0.85)break;
+    await c.delete(kUrl(k));idx.delete(k);total-=e.b;
+  }
+  kIdxSave();
+}
+function kCacheBytes(){let t=0;kIdxGet().forEach(e=>t+=e.b);return t;}
+/* audio for a chunk: saved copy, the copy already being made, or a new one */
+function kokoroAudio(chunk, chId){
+  if(!chunk.text)return Promise.resolve(null);
+  const k=kAudioKey(chunk.voice,chunk.text);
+  if(kInflight.has(k))return kInflight.get(k);
+  const p=kCacheGet(k).then(w=>w||kokoroGenerate(chunk.text,chunk.voice).then(wav=>{
+    if(chunk.plan)kCachePut(k,wav,chId);
+    return wav;
+  }));
+  kInflight.set(k,p);
+  const done=()=>kInflight.delete(k);
+  p.then(done,done);
+  return p;
+}
+
+/* ---- the chapter plan ----
+   Words are cut into fixed chunks from the start of the chapter, so the same
+   chapter always produces the same chunk texts — that is what lets saved
+   audio be found again. Starting mid-chunk (a seek) plays a saved chunk from
+   the right point, or makes short "bridge" chunks up to the next plan edge. */
+let ttsT={texts:[],breaks:[],quote:[]}, ttsPlan=[];
+function ttsChunkOf(T,i,limit,clause,stop){
+  const lim=Math.min(stop==null?T.texts.length:stop,T.texts.length);
+  if(i>=lim)return null;
+  const split=!!S.ttsDlg; // a dialogue voice: quotes and narration go in separate chunks
+  let end=i, chars=0;
+  const cap=Math.max(limit*2, 90);
+  while(end<lim){
+    chars+=T.texts[end].length+1; end++;
+    if(end>=lim)break;
+    if(split&&T.quote[end]!==T.quote[i])break;
+    if(chars>=limit&&(T.breaks[end-1]||clause&&/[,;:—–]$/.test(T.texts[end-1])))break;
+    if(chars>=cap)break;
+  }
+  const weights=[], spoken=[];
+  for(let k=i;k<end;k++){
+    let s=ttsSpokenWord(T.texts[k]);
+    if(T.breaks[k]===2&&s&&!/[.!?…,;:]$/.test(s))s+=".";
+    spoken.push(s);
+    weights.push(Math.max(1,(s||"").replace(/\s/g,"").length));
+  }
+  const narrator=kokoroVoiceName();
+  return {start:i,end,text:spoken.join(" ").replace(/\s+/g," ").trim(),weights,
+          voice:split&&T.quote[i]?S.ttsDlg:narrator};
+}
+function ttsMakePlan(T){
+  const plan=[];let i=0;
+  while(i<T.texts.length){
+    // a short first chunk so a chapter starts speaking quickly
+    const c=ttsChunkOf(T,i,plan.length?120:40,!plan.length);
+    c.plan=true;plan.push(c);i=c.end;
+  }
+  return plan;
+}
+function ttsPlanAt(plan,i){
+  let lo=0,hi=plan.length-1;
+  while(lo<=hi){const m=(lo+hi)>>1;if(plan[m].end<=i)lo=m+1;else if(plan[m].start>i)hi=m-1;else return m;}
+  return -1;
+}
+/* the chunk to play starting at word i */
+function ttsChunkAt(i,fresh){
+  const pi=ttsPlanAt(ttsPlan,i);if(pi<0)return null;
+  const P=ttsPlan[pi];
+  if(i===P.start&&(!fresh||kHas(P)||P.text.length<=70))return P;
+  if(i>P.start&&kHas(P))return Object.assign({},P,{from:i});    // saved: play from inside it
+  return ttsChunkOf(ttsT,i,fresh?40:120,fresh,P.end);           // bridge to the plan edge
+}
+/* same words/plan for a chapter that is not on screen (preparing the next one) */
+const ttsOffPlans=new Map();
+function ttsPlanFor(chIdx){
+  if(chIdx===cur&&ttsWordsFor===cur)return ttsPlan;
+  const c=CHAPTERS[chIdx];if(!c)return [];
+  const key=c.id+"|"+!!S.ttsSkipHead+"|"+(S.ttsDlg||"")+"|"+kokoroVoiceName();
+  if(!ttsOffPlans.has(key)){
+    const div=document.createElement("div");
+    div.innerHTML=htmlCache[c.id]||(htmlCache[c.id]=mdToHtml(c.md));
+    ttsOffPlans.clear();ttsOffPlans.set(key,ttsMakePlan(ttsTokenize(div,false)));
+  }
+  return ttsOffPlans.get(key);
+}
+
+function kokoroKey(){return cur+"|"+kokoroVoiceName()+"|"+(S.ttsDlg||"");}
+/* a queued chunk: the word range plus the promise of its audio */
+function kokoroJob(chunk, key){
+  const job=Object.assign({key, done:false}, chunk);
+  job.promise=kokoroAudio(chunk, CHAPTERS[cur]?CHAPTERS[cur].id:"");
+  job.promise.then(()=>{job.done=true;},()=>{job.done=true;});
+  return job;
+}
+function kokoroDropQueue(){
+  kQueue=[]; kCur=null;
+  if(kWorker)kWorker.postMessage({cmd:"drop", below:kSeq+1});
+}
+function kokoroTopUp(from, key){
+  let next=kQueue.length?kQueue[kQueue.length-1].end:from;
+  while(kQueue.length<K_AHEAD){
+    const c=ttsChunkAt(next,false);
+    if(!c)break;
+    kQueue.push(kokoroJob(c, key));
+    next=c.end;
+  }
+}
+
+/* ---- making audio ahead (ideas 1 + 2) ----
+   While the Listen bar is open the worker never sits idle: after the queue
+   above, it makes the rest of this chapter, then the start of the next one.
+   "Save chapter" makes the whole chapter even with the bar closed. Live
+   chunks always go first — this only posts a job when nothing live waits. */
+let kSave=null, kPrepBusy=false;   // kSave: {ch, plan} — the chapter being saved on request
+function kPrepTargets(){
+  const out=[];
+  if(kSave)out.push({ch:kSave.ch,plan:kSave.plan,from:0});
+  if(ttsActive&&ttsUsesKokoro()&&ttsWordsFor===cur&&ttsPlan.length){
+    out.push({ch:cur,plan:ttsPlan,from:Math.max(0,ttsPlanAt(ttsPlan,ttsIdx))});
+    const j=siblingChapter(1);
+    if(j!==null)out.push({ch:j,plan:null,from:0,count:3});
+  }
+  return out;
+}
+function kPrepNext(){
+  for(const t of kPrepTargets()){
+    const plan=t.plan||ttsPlanFor(t.ch);
+    const to=t.count?Math.min(plan.length,t.from+t.count):plan.length;
+    for(let k=t.from;k<to;k++){
+      const c=plan[k];
+      if(c.text&&!kHas(c)&&!kInflight.has(kAudioKey(c.voice,c.text)))return {chunk:c,ch:t.ch};
+    }
+  }
+  return null;
+}
+const kSleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function kokoroPrepRun(){
+  if(kPrepBusy||!K_CACHE_OK)return;
+  kPrepBusy=true;
+  try{
+    for(;;){
+      // let the chunks someone is waiting to hear go first
+      while(kQueue.some(j=>!j.done)||(kCur&&!kCur.done))await kSleep(300);
+      const t=kPrepNext();
+      if(!t)break;
+      try{await kokoroAudio(t.chunk,CHAPTERS[t.ch].id);}catch(e){if(!(e&&e.dropped))break;}
+      kSaveDone();paintSave();
+    }
+  }finally{kPrepBusy=false;}
+  kSaveDone();paintSave();
+}
+function kSaveDone(){
+  if(kSave&&kSaveCount().done>=kSave.plan.length){kSave=null;toast("Chapter audio saved — it plays offline now, without gaps");}
+}
+function kSaveCount(){
+  const plan=kSave?kSave.plan:(ttsWordsFor===cur?ttsPlan:[]);
+  return {done:plan.filter(c=>!c.text||kHas(c)).length,total:plan.length};
+}
+function paintSave(){
+  const b=$("ttsSave");if(!b)return;
+  if(!ttsUsesKokoro()||!K_CACHE_OK){b.classList.add("hidden");return;}
+  b.classList.remove("hidden");
+  const {done,total}=kSaveCount();
+  if(total&&done>=total){b.textContent="✓ Saved · Share audio";b.classList.add("on");}
+  else if(kSave){b.textContent=`Saving ${Math.round(done/Math.max(1,total)*100)}%…`;b.classList.add("on");}
+  else{b.textContent=done?`⬇ Save chapter (${Math.round(done/Math.max(1,total)*100)}%)`:"⬇ Save chapter";b.classList.remove("on");}
+}
+function ttsSaveChapter(){
+  if(ttsWordsFor!==cur)ttsBuildWords();
+  const {done,total}=kSaveCount();
+  if(total&&done>=total){ttsShareAudio();return;}
+  if(kSave){kSave=null;paintSave();toast("Stopped saving — what's made so far stays");return;}
+  kSave={ch:cur,plan:ttsPlan};
+  kokoroEnsure().catch(()=>{});
+  toast(`Saving this chapter's audio (about ${Math.max(1,Math.round(ttsPlan.reduce((s,c)=>s+c.text.length,0)/900))} min of listening) — keep this tab open until it says saved`);
+  paintSave();kokoroPrepRun();
+}
+/* idea 7: one audio file for the whole chapter, handed to the share sheet
+   (Files, AirDrop, a podcast/audio app) — plays with the screen locked there */
+async function ttsShareAudio(){
+  const parts=[];let n=0;
+  for(const c of ttsPlan){
+    if(!c.text)continue;
+    const w=await kCacheGet(kAudioKey(c.voice,c.text));
+    if(!w){toast("Some of this chapter isn't saved yet");return;}
+    parts.push(new Uint8Array(w,44));n+=w.byteLength-44;
+  }
+  const head=new ArrayBuffer(44),v=new DataView(head);
+  const s=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i));};
+  s(0,"RIFF");v.setUint32(4,36+n,true);s(8,"WAVE");s(12,"fmt ");v.setUint32(16,16,true);
+  v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,24000,true);v.setUint32(28,48000,true);
+  v.setUint16(32,2,true);v.setUint16(34,16,true);s(36,"data");v.setUint32(40,n,true);
+  const c=CHAPTERS[cur],b=bookOf(c);
+  const name=((b?b.title+" - ":"")+c.title).replace(/[\\/:*?"<>|]+/g," ").slice(0,90)+".wav";
+  const file=new File([head,...parts],name,{type:"audio/wav"});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:c.title});return;}
+  }catch(e){if(e&&e.name==="AbortError")return;}
+  const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+}
+
 function kokoroHold(){
   const a=$("ttsAudio"); if(!a)return;
   a.ontimeupdate=null; a.onended=null;
@@ -2405,25 +2732,6 @@ function kokoroStopAudio(){
   a.onended=null; a.ontimeupdate=null;
   try{a.pause();}catch(e){}
   a.dataset.kind="";
-}
-function ttsChunk(i, limit){
-  if(!ttsWords.length||i>=ttsWords.length)return null;
-  let end=i, chars=0;
-  while(end<ttsWords.length){
-    chars+=ttsWords[end].textContent.length+1; end++;
-    if(end>=ttsWords.length)break;
-    if(ttsBreaks[end-1]&&chars>=limit)break;
-    if(chars>=limit*2)break;
-  }
-  const weights=[];
-  const spoken=[];
-  for(let k=i;k<end;k++){
-    let s=ttsSpokenWord(ttsWords[k].textContent);
-    if(ttsBreaks[k]===2&&s&&!/[.!?…,;:]$/.test(s))s+=".";
-    spoken.push(s);
-    weights.push(Math.max(1,(s||"").replace(/\s/g,"").length));
-  }
-  return {start:i,end,text:spoken.join(" ").replace(/\s+/g," ").trim(),weights};
 }
 function kokoroPlay(wav, chunk, epoch){
   const a=$("ttsAudio");
@@ -2443,47 +2751,133 @@ function kokoroPlay(wav, chunk, epoch){
     if(chunk.end>=ttsWords.length)ttsChapterEnded();
     else ttsSpeakKokoro(chunk.end);
   };
+  if(chunk.from>chunk.start){ // a saved chunk entered mid-way (seek)
+    let acc=0;for(let k=chunk.start;k<chunk.from;k++)acc+=weights[k-chunk.start];
+    a.addEventListener("loadedmetadata",()=>{try{a.currentTime=a.duration*acc/total;}catch(e){}},{once:true});
+  }
   a.src=url;
+  a.preservesPitch=true;
+  a.defaultPlaybackRate=a.playbackRate=S.ttsRate||1;
   const p=a.play();
   // iOS may refuse play() once the download took us outside the tap.
   // Keep the audio queued so the next play tap starts it without rebuilding.
   if(p&&p.catch)p.catch(()=>{
     if(epoch!==kEpoch)return;
     kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();
-    toast("Tap play to start Heart");
+    toast("Tap play to start "+kokoroLabel());
   });
 }
 function kokoroFail(from, err){
   console.error("kokoro", err);
-  kokoroFailed=true; kNext=null; kokoroStopAudio(); kokoroNote("");
-  const sys=ttsVoiceList[0];
-  S.ttsVoice=sys?sys.name:"";
-  store.set("settings",S); ttsLoadVoices();
-  toast("Heart needs a connection the first time (~90 MB). Using this phone's voice until then.");
+  const name=kokoroLabel();
+  // for this visit only: S.ttsVoice keeps the Kokoro choice, so the next
+  // visit (or picking it again in the menu) tries it again
+  kokoroFailed=true; kokoroDropQueue(); kokoroStopAudio(); kokoroNote(""); paintSave();
+  toast(kReady?`${name} stopped working (${String(err&&err.message||err).slice(0,80)}). Using this phone's voice for now.`
+              :`${name} needs a connection the first time (~${kMB} MB). Using this phone's voice for now.`);
   if(TTS_OK)ttsSpeakFrom(from);
   else{ttsSpeaking=false;paintTtsPlay();}
 }
+let kSlowTold=false;
 function ttsSpeakKokoro(i){
-  const pending=kNext&&kNext.start===i?kNext.promise:null;
-  kNext=null;
   const epoch=++kEpoch;
   kokoroPausedMid=false;
-  const chunk=ttsChunk(i, 140);
-  if(!chunk){ttsChapterEnded();return;}
-  if(!chunk.text){ttsSpeakKokoro(chunk.end);return;}
-  ttsSetWord(chunk.start);
+  const key=kokoroKey();
+  // kCur: the chunk a pause interrupted while it was still being made
+  const at=j=>j&&(j.from||j.start)===i&&j.key===key;
+  let job=kCur&&!kCur.played&&at(kCur)?kCur:at(kQueue[0])?kQueue.shift():null;
+  if(!job){
+    // a start, seek or voice change: anything queued is for the old spot
+    kokoroDropQueue();
+    const chunk=ttsChunkAt(i,true);
+    if(!chunk){ttsChapterEnded();return;}
+    job=kokoroJob(chunk, key);
+  }
+  kCur=job;
+  kokoroTopUp(job.end, key);
+  kokoroPrepRun();
+  ttsSetWord(job.from||job.start);
   kokoroHold();
-  if(!kReady)kokoroNote("Downloading Heart… first time only, about 90 MB");
-  const voice=kokoroVoiceName();
-  const speed=Math.min(1.6,Math.max(0.7,S.ttsRate||1));
-  const job=pending||kokoroGenerate(chunk.text, voice, speed);
-  job.then(wav=>{
+  if(!kReady&&!job.done)kokoroNote(`Downloading ${kokoroLabel()}… first time only, about ${kMB} MB`);
+  else if(!job.done)setTimeout(()=>{
+    // only say so when the wait is long enough to notice
+    if(epoch!==kEpoch||!ttsSpeaking||job.done)return;
+    kokoroNote(`${kokoroLabel(job.voice)} is preparing the next sentence…`);
+    if(kRtf>1.05&&!kSlowTold){
+      kSlowTold=true;
+      toast(`This device makes ${kokoroLabel()} slower than she speaks right now (Low Power Mode or a busy phone does this). Tap “⬇ Save chapter” and let it run for a bit — saved audio plays without gaps.`,undefined,undefined,12000);
+    }
+  },700);
+  job.promise.then(wav=>{
     if(epoch!==kEpoch||!ttsSpeaking)return;
-    const nxt=ttsChunk(chunk.end, 140);
-    if(nxt&&nxt.text)kNext={start:nxt.start, promise:kokoroGenerate(nxt.text, voice, speed)};
     kokoroNote("");
-    kokoroPlay(wav, chunk, epoch);
-  }).catch(err=>{ if(epoch===kEpoch)kokoroFail(chunk.start, err); });
+    job.played=true;
+    if(wav)kokoroPlay(wav, job, epoch);
+    else if(job.end>=ttsWords.length)ttsChapterEnded();
+    else ttsSpeakKokoro(job.end);  // nothing speakable in this stretch
+  }).catch(err=>{ if(epoch===kEpoch&&!(err&&err.dropped))kokoroFail(job.start, err); });
+}
+
+/* ---- speaking text that isn't the book (answers, recaps) ----
+   Uses the same <audio> element (already unlocked by the play tap) so iOS
+   lets it play after waiting on the network. */
+let kSayTok=0, kSayStop=null;
+function ttsCancelSay(){
+  kSayTok++;
+  if(kSayStop){const f=kSayStop;kSayStop=null;f();}
+  if(TTS_OK&&!ttsUsesKokoro()){try{speechSynthesis.cancel();}catch(e){}}
+}
+function ttsSayParts(text){
+  const out=[];let buf="";
+  plainSpeech(text).split(/(?<=[.!?…])\s+/).forEach(s=>{
+    if(buf&&(buf+" "+s).length>200){out.push(buf);buf=s;}else buf=buf?buf+" "+s:s;
+  });
+  if(buf)out.push(buf);
+  return out;
+}
+function plainSpeech(md){
+  return String(md||"").replace(/```[\s\S]*?```/g," ").replace(/`([^`]*)`/g,"$1")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\[([^\]]*)\]\([^)]*\)/g,"$1")
+    .replace(/^#+\s*/gm,"").replace(/^\s*[-*+]\s+/gm,"").replace(/[*_~>|]+/g,"")
+    .replace(/\s+/g," ").trim();
+}
+async function ttsSay(text){
+  const tok=++kSayTok;
+  kokoroPausedMid=false; // the paused book sentence is about to be replaced in the player
+  const parts=ttsSayParts(text);
+  if(!parts.length)return true;
+  if(ttsUsesKokoro()){
+    kEpoch++;
+    const voice=kokoroVoiceName();
+    let next=kokoroGenerate(parts[0],voice);
+    for(let k=0;k<parts.length;k++){
+      let wav;
+      try{wav=await next;}catch(e){return false;}
+      if(tok!==kSayTok)return false;
+      if(k+1<parts.length)next=kokoroGenerate(parts[k+1],voice);
+      kokoroNote("");
+      await new Promise(res=>{
+        const a=$("ttsAudio");
+        if(a._url)URL.revokeObjectURL(a._url);
+        a._url=URL.createObjectURL(new Blob([wav],{type:"audio/wav"}));
+        a.loop=false;a.volume=1;a.dataset.kind="say";a.ontimeupdate=null;
+        kSayStop=res;a.onended=()=>{kSayStop=null;res();};
+        a.src=a._url;a.preservesPitch=true;a.defaultPlaybackRate=a.playbackRate=S.ttsRate||1;
+        a.play().catch(()=>{kSayStop=null;res();});
+      });
+      if(tok!==kSayTok)return false;
+    }
+    return true;
+  }
+  if(!TTS_OK)return false;
+  return new Promise(res=>{
+    const u=new SpeechSynthesisUtterance(parts.join(" "));
+    u.rate=S.ttsRate;const v=ttsCurrentVoice();if(v){u.voice=v;u.lang=v.lang;}
+    kSayStop=()=>res(false);
+    u.onend=()=>{kSayStop=null;res(tok===kSayTok);};
+    u.onerror=()=>{kSayStop=null;res(false);};
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  });
 }
 
 /* keep-alive: a looping silent <audio> started on the same user gesture as
@@ -2539,10 +2933,13 @@ function ttsStartFallback(end){
   ttsTimer=setTimeout(tick,400+ttsWordMs(ttsWords[ttsIdx]?ttsWords[ttsIdx].textContent:""));
 }
 
-function ttsBuildWords(){
-  ttsWords=[];ttsBreaks=[];
-  const blocks=[];
-  const walker=document.createTreeWalker(content,NodeFilter.SHOW_TEXT);
+/* words of a chapter's DOM, as the voice reads them. wrap: replace the text
+   with one <span class="tts-w"> per word (the chapter on screen); without it
+   the DOM is untouched (a chapter being prepared off screen). Both give the
+   same words, so both give the same plan. */
+function ttsTokenize(root, wrap){
+  const texts=[], blocks=[], spans=[];
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
   const nodes=[];let n;
   while(n=walker.nextNode()){
     if(!n.nodeValue.trim())continue;
@@ -2553,26 +2950,57 @@ function ttsBuildWords(){
   }
   nodes.forEach(node=>{
     const parent=node.parentNode;
-    const blk=node.parentElement.closest("p,h1,h2,h3,h4,h5,h6,li,blockquote,td,th")||content;
+    const blk=node.parentElement.closest("p,h1,h2,h3,h4,h5,h6,li,blockquote,td,th")||root;
     const parts=node.nodeValue.split(/(\s+)/);
-    const frag=document.createDocumentFragment();
+    const frag=wrap?document.createDocumentFragment():null;
     parts.forEach(p=>{
       if(!p)return;
-      if(/^\s+$/.test(p)){frag.appendChild(document.createTextNode(p));return;}
-      const span=document.createElement("span");
-      span.className="tts-w";span.textContent=p;
-      frag.appendChild(span);ttsWords.push(span);blocks.push(blk);
+      if(/^\s+$/.test(p)){if(wrap)frag.appendChild(document.createTextNode(p));return;}
+      texts.push(p);blocks.push(blk);
+      if(wrap){
+        const span=document.createElement("span");
+        span.className="tts-w";span.textContent=p;
+        frag.appendChild(span);spans.push(span);
+      }
     });
-    parent.replaceChild(frag,node);
+    if(wrap)parent.replaceChild(frag,node);
   });
   // break AFTER word i: 2 = end of block (paragraph/heading/cell), 1 = end of sentence
-  ttsBreaks=ttsWords.map((w,i)=>{
-    if(i+1<ttsWords.length&&blocks[i+1]!==blocks[i])return 2;
-    if(/[.!?…]["')\]]*$/.test(w.textContent))return 1;
+  const breaks=texts.map((w,i)=>{
+    if(i+1<texts.length&&blocks[i+1]!==blocks[i])return 2;
+    if(/[.!?…]["'”’)\]]*$/.test(w))return 1;
     return 0;
   });
+  // inside “dialogue” — for the dialogue voice. A quote never runs past its paragraph.
+  const quote=[];let q=false;
+  texts.forEach((w,i)=>{
+    if(i&&blocks[i]!==blocks[i-1])q=false;
+    if(/^[(\[]*[“"]/.test(w))q=true;
+    quote.push(q);
+    if(q&&/[”"][.,!?;:…—–)\]]*$/.test(w)&&!/^[(\[]*[“"]$/.test(w))q=false;
+  });
+  // “scare quotes” and quoted titles are short: only 4+ words count as someone speaking
+  for(let i=0;i<quote.length;){
+    if(!quote[i]){i++;continue;}
+    let e=i;while(e<quote.length&&quote[e]&&(e===i||blocks[e]===blocks[i]))e++;
+    if(e-i<4)for(let k=i;k<e;k++)quote[k]=false;
+    i=e;
+  }
+  return {texts,breaks,quote,spans};
+}
+function ttsBuildWords(){
+  const T=ttsTokenize(content,true);
+  ttsWords=T.spans;ttsBreaks=T.breaks;
+  ttsT={texts:T.texts,breaks:T.breaks,quote:T.quote};
+  ttsPlan=ttsMakePlan(ttsT);
   ttsWordsFor=cur;
   $("ttsSeek").max=Math.max(0,ttsWords.length-1);
+  paintSave();
+}
+/* voice or dialogue setting changed: same words, new chunks */
+function ttsReplan(){
+  if(ttsWordsFor===cur)ttsPlan=ttsMakePlan(ttsT);
+  ttsOffPlans.clear();paintSave();
 }
 function ttsClearCur(){
   const p=content.querySelector(".tts-w.tts-cur");
@@ -2591,6 +3019,7 @@ function ttsPaintSentence(i){
   for(let k=ttsSentCur[0];k<ttsSentCur[1];k++)if(ttsWords[k])ttsWords[k].classList.remove("tts-sent");
   for(let k=s;k<e;k++)ttsWords[k].classList.add("tts-sent");
   ttsSentCur=[s,e];
+  if(carOn)carPaint();
 }
 function ttsSentenceText(i){
   const [s,e]=ttsSentenceRange(i);
@@ -2646,7 +3075,7 @@ function ttsSpeakFrom(i){
     ttsStopTimer();
     ttsSpeakKokoro(i);return;
   }
-  if(kEpoch){kEpoch++;kNext=null;kokoroStopAudio();}
+  if(kEpoch){kEpoch++;kokoroDropQueue();kokoroStopAudio();}
   if(!TTS_OK)return;
   ttsStopTimer();
   speechSynthesis.cancel();
@@ -2736,6 +3165,7 @@ function ttsFlushContinue(){
 }
 function paintTtsPlay(){
   $("ttsPlay").textContent=ttsSpeaking?"⏸":"▶";
+  if(carOn)$("carPlay").textContent=ttsSpeaking?"⏸":"▶";
   if("mediaSession" in navigator){try{navigator.mediaSession.playbackState=ttsSpeaking?"playing":"paused";}catch(e){}}
 }
 function ttsPaintOptions(){
@@ -2773,7 +3203,7 @@ function ttsOpen(autoplay,fromStart){
     reflowKeepingPct(()=>{});
   }
   if(fresh)ttsBuildWords();
-  ttsLoadVoices();ttsPaintOptions();
+  ttsLoadVoices();ttsPaintOptions();ttsPaintKokoroRows();
   $("ttsRateSlider").value=S.ttsRate;$("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
   if("mediaSession" in navigator){
     try{
@@ -2801,8 +3231,10 @@ function ttsOpen(autoplay,fromStart){
   }else if(autoplay)ttsPlay();
 }
 function ttsClose(){
+  if(ttsActive&&ttsSpeaking)ttsMarkListened();
   ttsActive=false;ttsSpeaking=false;
-  kEpoch++;kNext=null;kokoroPausedMid=false;
+  ttsCancelSay();if(carOn)carClose();
+  kEpoch++;kokoroDropQueue();kokoroPausedMid=false;
   ttsStopTimer();
   ttsSleepClear();
   keepAliveStop();
@@ -2844,16 +3276,20 @@ function ttsPlay(){
   if(!ttsWords.length){toast("Nothing to read in this chapter.");return;}
   ttsSpeaking=true;
   if(!ttsUsesKokoro())keepAliveStart();
-  ttsSpeakFrom(Math.min(ttsIdx,ttsWords.length-1));
   paintTtsPlay();
+  if(ttsRecapDue()){ttsRecap(true);return;}
+  ttsMarkListened();
+  ttsSpeakFrom(Math.min(ttsIdx,ttsWords.length-1));
 }
 function ttsPause(){
+  if(ttsSpeaking)ttsMarkListened();
+  ttsCancelSay();
   if(ttsUsesKokoro()){
     const a=$("ttsAudio");
     if(a.dataset.kind==="speech"&&!a.ended){
       a.pause();kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
     }
-    kEpoch++;kNext=null;kokoroStopAudio();kokoroNote("");
+    kEpoch++;kokoroStopAudio();kokoroNote("");
     ttsSpeaking=false;paintTtsPlay();return;
   }
   ttsSpeaking=false;
@@ -2875,6 +3311,7 @@ function ttsKeepSentence(){
 }
 function ttsSeekTo(i){
   if(!ttsWords.length)return;
+  kokoroPausedMid=false; // play after a seek starts at the new spot, not the paused sentence
   ttsIdx=Math.max(0,Math.min(ttsWords.length-1,i));
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
   else ttsSetWord(ttsIdx);
@@ -2903,7 +3340,173 @@ function ttsNudgeRate(d){
   store.set("settings",S);
   $("ttsRateSlider").value=S.ttsRate;
   $("ttsRateVal").textContent=S.ttsRate.toFixed(1)+"×";
+  ttsApplyRate();
+}
+/* Kokoro audio is made at 1× and sped up by the player, so a speed change
+   applies to the sentence already playing; device voices must start over */
+function ttsApplyRate(){
+  if(carOn)carPaint();
+  if(ttsUsesKokoro()){
+    const a=$("ttsAudio");
+    if(a.dataset.kind==="speech"||a.dataset.kind==="say")a.playbackRate=S.ttsRate;
+    return;
+  }
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+}
+
+/* ================= Listen extras: recap, voice questions, car mode ================= */
+async function aiQuick(sys,q){
+  const chain=aiChain();
+  if(!chain.length)throw new Error("Ask AI isn't set up yet (✦ → ⚙).");
+  let last;
+  for(const id of chain){
+    const reply={role:"assistant",content:""};
+    try{await aiAttempt(id,[{role:"system",content:sys},{role:"user",content:q}],reply);if(reply.content)return reply.content;}
+    catch(e){last=e;}
+  }
+  throw last||new Error("No answer came back.");
+}
+/* idea 5: "Previously…" when a book is picked up again after a while */
+const RECAP_GAP=6*3600e3;
+let ttsLast=store.get("ttsLast",{});   // bookId -> when it was last listened to
+function ttsMarkListened(){
+  const c=CHAPTERS[cur],b=c&&bookOf(c);if(!b)return;
+  ttsLast[b.id]=Date.now();store.set("ttsLast",ttsLast);
+}
+function ttsRecapDue(){
+  const c=CHAPTERS[cur],b=c&&bookOf(c);
+  if(!b||!aiChain().length||!ttsLast[b.id])return false;
+  if(Date.now()-ttsLast[b.id]<RECAP_GAP)return false;
+  return ttsIdx>80||b.chapters.indexOf(cur)>0;  // something to recap
+}
+async function ttsRecap(thenRead){
+  ttsMarkListened();
+  if(!aiChain().length){toast("Set up Ask AI first (✦ → ⚙) for recaps");return;}
+  const wasPlaying=thenRead||ttsSpeaking;
+  if(ttsSpeaking&&!thenRead)ttsPause();
+  ttsSpeaking=true;paintTtsPlay();
+  if(ttsUsesKokoro())kokoroHold();else keepAliveStart();
+  const tok=kSayTok;
+  kokoroNote("Getting a recap of where you left off… (⏸ skips it)");
+  const c=CHAPTERS[cur],b=bookOf(c);
+  let heard=ttsT.texts.slice(Math.max(0,ttsIdx-700),ttsIdx).join(" ");
+  if(heard.length<1500){
+    const j=siblingChapter(-1);
+    if(j!==null)heard=stripMd(CHAPTERS[j].md).slice(-2500)+"\n…\n"+heard;
+  }
+  const sys=`You recap audiobooks for a listener who is coming back to "${b.title}" after a break. Write 2–3 short sentences meant to be spoken aloud, starting with "Previously," — plain text only, no markdown. Only use what is in the excerpt; never mention anything after it.`;
+  let ans="";
+  try{ans=await aiQuick(sys,`What the listener heard most recently (chapter "${c.title}"):\n"""${heard.slice(-6000)}"""`);}
+  catch(e){if(tok===kSayTok)toast("No recap: "+String(e.message||e).slice(0,120));}
+  if(tok!==kSayTok||!ttsSpeaking)return;
+  kokoroNote("");
+  const ok=ans?await ttsSay(ans):true;
+  if(!ok||!ttsSpeaking)return;
+  if(wasPlaying)ttsSpeakFrom(ttsIdx);
+  else{ttsSpeaking=false;paintTtsPlay();kokoroStopAudio();keepAliveStop();}
+}
+/* idea 4: ask out loud. ttsHear must be called inside the tap (iOS). */
+const SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+function ttsHear(prompt){
+  return new Promise(res=>{
+    if(!SpeechRec){res(null);return;}
+    let r;try{r=new SpeechRec();}catch(e){res(null);return;}
+    r.lang=bookLang()==="en"?"en-US":bookLang();
+    r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+    let text="",done=false;
+    const fin=v=>{if(done)return;done=true;clearTimeout(cap);res(v);};
+    r.onresult=e=>{text=[...e.results].map(x=>x[0].transcript).join("");kokoroNote("🎙 “"+text+"”");carStatus("“"+text+"”");};
+    r.onerror=e=>fin(/not-allowed|service-not-allowed|audio-capture/.test(e.error)?null:text.trim());
+    r.onend=()=>fin(text.trim());
+    kokoroNote("🎙 "+prompt);carStatus("🎙 "+prompt);
+    const cap=setTimeout(()=>{try{r.stop();}catch(e){}},12000);
+    try{r.start();}catch(e){fin(null);}
+  });
+}
+async function ttsAsk(said,wasPlaying){
+  if(said===undefined){
+    if(!aiChain().length){toast("Set up Ask AI first (✦ → ⚙), then ask by voice");return;}
+    wasPlaying=ttsSpeaking;
+    if(ttsSpeaking)ttsPause();
+    said=await ttsHear("Ask about the book…");
+  }
+  if(said===null){
+    kokoroNote("");carStatus("");
+    toast("No microphone here — type your question instead");
+    aiOpen({text:ttsSentenceText(ttsIdx),para:""});return;
+  }
+  if(!said){kokoroNote("");carStatus("");if(wasPlaying)ttsPlay();return;}
+  if(!aiChain().length){kokoroNote("");carStatus("");toast("Set up Ask AI first (✦ → ⚙)");return;}
+  ttsSpeaking=true;paintTtsPlay();kokoroPausedMid=false;
+  if(ttsUsesKokoro())kokoroHold();else keepAliveStart();
+  const tok=kSayTok;
+  kokoroNote("Thinking about “"+said+"”…");carStatus("Thinking…");
+  const heard=ttsT.texts.slice(Math.max(0,ttsIdx-160),ttsIdx+10).join(" ");
+  const sys=aiSystemPrompt(said)+`\nThe reader is listening to this book read aloud and asked out loud. They just heard:\n"""${heard}"""\nAnswer in 2–4 short sentences meant to be spoken: plain text only — no markdown, lists or headings.`;
+  let ans;
+  try{ans=await aiQuick(sys,said);}
+  catch(e){
+    if(tok!==kSayTok)return;
+    kokoroNote("");carStatus("");toast(String(e.message||e).slice(0,160));
+    ttsSpeaking=false;paintTtsPlay();kokoroStopAudio();return;
+  }
+  if(tok!==kSayTok||!ttsSpeaking)return;
+  aiMsgs.push({role:"user",content:"🎙 "+said},{role:"assistant",content:ans});
+  kokoroNote("");carStatus(ans);
+  const ok=await ttsSay(ans);
+  if(!ok||!ttsSpeaking)return;
+  carStatus("");
+  if(wasPlaying)ttsSpeakFrom(ttsIdx);
+  else{ttsSpeaking=false;paintTtsPlay();kokoroStopAudio();keepAliveStop();}
+}
+/* idea 6: car mode — one big screen, screen kept awake, spoken commands */
+let carOn=false, carLock=null;
+function carPaint(){
+  if(!carOn)return;
+  const c=CHAPTERS[cur],b=c&&bookOf(c);
+  $("carTitle").textContent=c?(b?b.title+" · ":"")+c.title:"";
+  $("carText").textContent=ttsWords.length?ttsSentenceText(ttsIdx):"";
+  $("carSpeed").textContent=(S.ttsRate||1).toFixed(2).replace(/0$/,"")+"×";
+  $("carPlay").textContent=ttsSpeaking?"⏸":"▶";
+}
+function carStatus(msg){const el=$("carStatus");if(el)el.textContent=msg||"";}
+async function carWake(){
+  try{if(carOn&&"wakeLock" in navigator&&document.visibilityState==="visible")carLock=await navigator.wakeLock.request("screen");}catch(e){}
+}
+function carOpen(){
+  if(!ttsActive)ttsOpen(false);
+  carOn=true;$("carMode").classList.remove("hidden");
+  carStatus("");carPaint();carWake();
+}
+function carClose(){
+  carOn=false;$("carMode").classList.add("hidden");
+  try{if(carLock)carLock.release();}catch(e){}
+  carLock=null;
+}
+document.addEventListener("visibilitychange",carWake); // the lock is dropped when the screen turns off
+async function ttsCommand(){
+  const wasPlaying=ttsSpeaking;
+  if(ttsSpeaking)ttsPause();
+  const said=await ttsHear("Say “pause”, “back”, “next”, “faster”, “recap” — or ask a question");
+  kokoroNote("");carStatus("");
+  if(said===null){toast("Voice commands need the microphone");return;}
+  const t=said.toLowerCase().replace(/[.!?]/g,"").trim();
+  if(!t){if(wasPlaying)ttsPlay();return;}
+  const short=t.split(/\s+/).length<=3;
+  if(short&&/^(pause|stop|wait|hold)/.test(t))return;
+  if(short&&/^(play|resume|continue|go on|start|read)/.test(t)){ttsPlay();return;}
+  if(/next chapter/.test(t)){
+    const j=siblingChapter(1);if(j===null){toast("This is the last chapter");return;}
+    ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
+    if(ttsUsesKokoro())kokoroHold();
+    nav(chapterHash(CHAPTERS[j]));return;
+  }
+  if(short&&/^(back|go back|repeat|again|previous|rewind)/.test(t)){ttsSentence(-1);ttsPlay();return;}
+  if(short&&/^(next|skip|forward)/.test(t)){ttsSentence(1);ttsPlay();return;}
+  if(short&&/slow/.test(t)){ttsNudgeRate(-0.2);if(wasPlaying)ttsPlay();return;}
+  if(short&&/fast|quick/.test(t)){ttsNudgeRate(0.2);if(wasPlaying)ttsPlay();return;}
+  if(short&&/recap|summar/.test(t)){ttsRecap(wasPlaying);return;}
+  ttsAsk(said,wasPlaying);
 }
 
 /* ================= highlights (marking + popup) ================= */
@@ -3815,6 +4418,35 @@ $("btnListen").addEventListener("click",()=>{ttsUnlock();ttsActive?ttsClose():tt
 $("ttsClose").addEventListener("click",ttsClose);
 $("ttsPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
 $("ttsSaveSent").addEventListener("click",ttsKeepSentence);
+$("ttsSave").addEventListener("click",ttsSaveChapter);
+$("ttsAsk").addEventListener("click",()=>ttsAsk());
+$("ttsRecapBtn").addEventListener("click",()=>ttsRecap(false));
+$("ttsCar").addEventListener("click",carOpen);
+$("carClose").addEventListener("click",carClose);
+$("carPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
+$("carBack").addEventListener("click",()=>ttsSentence(-1));
+$("carFwd").addEventListener("click",()=>ttsSentence(1));
+$("carMic").addEventListener("click",ttsCommand);
+$("carSpeed").addEventListener("click",()=>{
+  const steps=[0.8,1,1.25,1.5,1.75,2];
+  const k=steps.findIndex(x=>x>(S.ttsRate||1)+0.01);
+  ttsNudgeRate((k<0?steps[0]:steps[k])-(S.ttsRate||1));
+});
+/* idea 3: a second voice for “dialogue” */
+function ttsPaintKokoroRows(){
+  const k=ttsUsesKokoro();
+  document.querySelectorAll("#ttsBar .kokoro-only").forEach(el=>el.classList.toggle("hidden",!k));
+  const sel=$("ttsDlg");
+  if(!sel.options.length)sel.innerHTML=`<option value="">Same voice</option>`+KOKORO_VOICES.map(([id,n])=>`<option value="${id}">${esc(n)}</option>`).join("");
+  sel.value=S.ttsDlg||"";
+  paintSave();
+}
+$("ttsDlg").addEventListener("change",e=>{
+  S.ttsDlg=e.target.value;store.set("settings",S);
+  ttsReplan();
+  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  toast(S.ttsDlg?`Quotes are read by ${kokoroLabel(S.ttsDlg)}`:"Quotes use the same voice");
+});
 $("ttsSkipHead").addEventListener("click",()=>{
   S.ttsSkipHead=!S.ttsSkipHead;store.set("settings",S);ttsPaintOptions();
   toast(S.ttsSkipHead?"Skipping headings & tables":"Reading headings & tables");
@@ -3824,7 +4456,7 @@ $("ttsSkipHead").addEventListener("click",()=>{
   if(wasSpeaking){
     ttsSpeaking=false;
     if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
-    kEpoch++;kNext=null;kokoroPausedMid=false;kokoroStopAudio();
+    kEpoch++;kokoroDropQueue();kokoroPausedMid=false;kokoroStopAudio();
   }
   renderChapter(cur);                       // rebuilds the word spans in its own frame
   requestAnimationFrame(()=>{
@@ -3848,14 +4480,29 @@ $("ttsRateSlider").addEventListener("input",e=>{
 });
 $("ttsRateSlider").addEventListener("change",e=>{
   S.ttsRate=parseFloat(e.target.value);store.set("settings",S);
-  if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  ttsApplyRate();
 });
 $("ttsVoice").addEventListener("change",e=>{
   S.ttsVoice=e.target.value;store.set("settings",S);
   if(e.target.value.startsWith("kokoro:"))kokoroFailed=false;
+  ttsReplan();ttsPaintKokoroRows();
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
-  else if(e.target.value.startsWith("kokoro:"))
-    kokoroNote(kReady?"Heart is ready.":"Heart downloads once (~90 MB) the first time you press play, then stays on this phone.");
+  else if(e.target.value.startsWith("kokoro:")){
+    if(!kReady){kokoroNote(`${kokoroLabel()} downloads once (~${kMB} MB) the first time you press play, then stays on this device.`);return;}
+    // a short sample in the new voice, through the same <audio> the book uses
+    kokoroNote(`${kokoroLabel()} is getting ready…`);
+    const epoch=++kEpoch;
+    kokoroHold();
+    kokoroGenerate(`Hi, I'm ${kokoroLabel()}. I'll read your books to you.`,kokoroVoiceName()).then(wav=>{
+      if(epoch!==kEpoch||ttsSpeaking)return;
+      kokoroNote("");
+      const a=$("ttsAudio");
+      if(a._url)URL.revokeObjectURL(a._url);
+      a._url=URL.createObjectURL(new Blob([wav],{type:"audio/wav"}));
+      a.loop=false;a.volume=1;a.dataset.kind="";a.onended=null;a.ontimeupdate=null;
+      a.src=a._url;a.preservesPitch=true;a.playbackRate=S.ttsRate||1;a.play().catch(()=>{});
+    }).catch(()=>kokoroNote(""));
+  }
   else if(TTS_OK){ // quick preview of the newly chosen device voice
     kokoroNote("");
     const u=new SpeechSynthesisUtterance("This voice will read your books.");
@@ -3906,7 +4553,7 @@ function voiceHelpHtml(){
   else if(/Windows/i.test(ua))order=[win,mac,ios,and];
   return `<h2>Voices</h2>
     <p>The default is <b>Heart</b> — the same Kokoro voice the screen tutor uses.
-    The first time you press play it downloads about 90&nbsp;MB, then it stays on
+    The first time you press play it downloads about 170&nbsp;MB, then it stays on
     this phone and works with no connection. It is much closer to a person than
     the voices iOS ships with.</p>
     <p class="dim">Heart runs in a safe mode on iPhone on purpose. Safari's faster
