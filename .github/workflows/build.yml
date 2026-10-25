@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - "library/**"
+      - "audio/**"
       - "tools/**"
       - ".github/workflows/build.yml"
 

@@ -1,0 +1,29 @@
+{
+ "book": "02-books/show-your-work",
+ "chapters": [
+  {
+   "id": "library/02-books/show-your-work/00-about-these-notes.md",
+   "n": 1,
+   "title": "About These Notes",
+   "file": "01-about-these-notes.m4a",
+   "map": "01-about-these-notes.json",
+   "dur": 202.0,
+   "hash": "f38194860dee6750",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 1504503
+  },
+  {
+   "id": "library/02-books/show-your-work/00a-introduction-a-new-way-of-operating.md",
+   "n": 2,
+   "title": "A New Way of Operating",
+   "file": "02-a-new-way-of-operating.m4a",
+   "map": "02-a-new-way-of-operating.json",
+   "dur": 233.0,
+   "hash": "f455969b5cde8242",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 1754553
+  }
+ ]
+}

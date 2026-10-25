@@ -24,3 +24,7 @@ __pycache__/
 # Podcast generator deps (tools/podcast/podcast.mjs)
 /tools/podcast/node_modules/
 /podcast/*/.tmp.wav
+
+# Studio narration scratch files (tools/narrate/narrate.py)
+/audio/*/*.tmp.wav
+/tools/narrate/.venv/

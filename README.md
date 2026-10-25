@@ -378,10 +378,11 @@ already reads with no connection. The only thing that needs the network is
 *opening the live-link URL itself* — so the build turns the site into a small PWA
 that fixes exactly that:
 
-- **`sw.js`** — a service worker (network-first, cache fallback). Online you always
-  get fresh content; offline it serves the cached page. It's regenerated on every
-  build and only runs over http(s) — a harmless no-op when you open `index.html`
-  as a `file://`.
+- **`sw.js`** — a service worker (network-first, cache fallback; studio audio under
+  `audio/` is cache-first and answers the phone's byte-range requests from the
+  cached file). Online you always get fresh content; offline it serves the cached
+  page. It's regenerated on every build and only runs over http(s) — a harmless
+  no-op when you open `index.html` as a `file://`.
 - **`manifest.webmanifest`** — makes the app installable ("Add to Home Screen")
   with an icon; also regenerated each build.
 
@@ -398,6 +399,79 @@ next visit.
 
 All three files (`index.html`, `sw.js`, `manifest.webmanifest`) must be deployed
 together at the same path (GitHub Pages serves the repo root, so this is automatic).
+
+## Archiving and deleting books from the phone
+
+The ⋯ button on a book's page opens its menu:
+
+- **Archive on this device** hides the book from the shelves (an *Archived* filter
+  chip appears). Nothing is deleted; unarchive from the same menu.
+- **Archive in the repo** moves the book's folder (and its studio audio / podcast)
+  to `library-archive/`, `audio-archive/`, `podcast-archive/` in one commit. The
+  build ignores those folders, so the book disappears from the site once the
+  GitHub Action has rebuilt it (a minute or two). Move the folder back to bring
+  it back.
+- **Delete from the library** removes those files from the repo for good (git
+  history still has them).
+- Imported books get **Remove from device** instead of the repo actions.
+
+The repo actions need a GitHub token, asked for the first time and kept in the
+browser only: a *fine-grained personal access token* scoped to this repo with
+**Contents: read and write**. The commit is made with the Git Data API directly
+from the page, so it works from the phone with no server.
+
+Two more habit helpers on the Home screen: the *Continue reading* card has a
+🎧 button that opens the chapter straight into Listen, and when the app is
+launched from the home screen it opens on the page you were reading (toggle
+*Open where I left off* in the tools row).
+
+## Studio narration (the good audiobook voice)
+
+Listen's live voices (Kokoro Heart, the phone's own voices) are made *on the
+phone*, sentence by sentence, which is why they stall: an iPhone's CPU makes
+Kokoro about as fast as it speaks, and nothing bigger fits in a browser at all.
+Studio narration moves the work to the Mac. `tools/narrate/narrate.py` renders a
+book's chapters with a large narration model (Qwen3-TTS 1.7B or Chatterbox
+Turbo, via Apple's MLX) and writes, next to `index.html`:
+
+```
+audio/<section>-<book>/NN-<slug>.m4a    the chapter — AAC mono, ~0.4 MB a minute
+audio/<section>-<book>/NN-<slug>.json   timing map: which words play when
+audio/<section>-<book>/index.json       what was made from which text (skips unchanged chapters)
+```
+
+The build embeds a chapter → audio table in `index.html`; in the reader a
+**Studio** entry appears at the top of the Voice menu and is the default for
+any chapter that has it. The phone then only *plays*: it starts at once, skipping
+or dragging the seek bar is instant, highlights follow the voice from the timing
+map, and the service worker keeps heard chapters (plus the next one) for offline.
+Chapters that have no studio audio yet are read live by Heart as before.
+
+```bash
+# once
+cd tools/narrate && uv venv --python 3.12 .venv && source .venv/bin/activate
+uv pip install mlx-audio soundfile && cd ../..          # also: ffmpeg, Chrome, tools/podcast `npm install`
+
+python3 tools/build-reader.py                            # the plan is read from the built reader
+tools/narrate/.venv/bin/python tools/narrate/narrate.py 02-books/show-your-work --voice ryan
+tools/narrate/.venv/bin/python tools/narrate/narrate.py 02-books/show-your-work --chapters 1-3
+python3 tools/build-reader.py && git add audio index.html && git commit && git push
+```
+
+Voices: `ryan`, `aiden` (Qwen3-TTS presets with a narrator style line), `nora`
+(a Qwen3-TTS VoiceDesign description), `chatterbox`. Add your own in `VOICES` at
+the top of `narrate.py`. A book can opt in for good with `"narrate": true` (and
+`"narrateVoice": "ryan"`) in its `book.json`; then plain `narrate.py` does every
+opted-in book. Rendering runs at roughly real time on an M3 (a 20-minute chapter
+takes 20–30 minutes), so narrate a book overnight and only re-run for chapters you
+change — unchanged ones are skipped by text hash. `tools/narrate/bench.py` renders
+one passage in every candidate voice to pick by ear.
+
+**Hosting:** audio is committed to the repo and served by GitHub Pages like
+everything else. Pages wants the site under 1 GB and single files under 100 MB;
+at ~25 MB per hour of speech that is roughly 40 hours of narration. Past that,
+move `audio/` to Cloudflare R2 (10 GB free, no egress fees) and point the URLs
+in `NARRATED` at it — the player only needs a URL that supports range requests.
 
 ## Podcast feeds (public)
 

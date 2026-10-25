@@ -186,6 +186,12 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
   border-radius:var(--radius-lg); padding:13px 14px; margin:0 0 22px; box-shadow:0 6px 22px var(--shadow);
   transition:transform .15s var(--ease), border-color .15s;}
 .continue:active{transform:scale(.985);}
+.continue-wrap{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:stretch; margin:0 0 22px;}
+.continue-wrap .continue{margin:0; gap:11px; padding:13px 11px;}
+.continue-wrap .continue .p{white-space:normal;}
+.continue-wrap .cc-listen{width:50px; border-radius:var(--radius-lg); background:var(--card); border:1px solid var(--card-line);
+  font-size:24px; box-shadow:0 6px 22px var(--shadow); transition:transform .15s var(--ease);}
+.continue-wrap .cc-listen:active{transform:scale(.95);}
 .continue .cc-cover{width:58px; flex-shrink:0; aspect-ratio:2/3; border-radius:7px; position:relative;
   display:grid; place-items:center; overflow:hidden; color:#fff;
   box-shadow:0 5px 14px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.08);}
@@ -1045,6 +1051,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
 const LIB = __LIB_DATA__;
 const CHAPTERS = JSON.parse(document.getElementById("chapterData").textContent);
 const ACCESS_HASH = __ACCESS_HASH__;   // sha256 hex of the site key; null = open to everyone
+const NARRATED = __NARRATED__;         // chapter id -> {u,m,d,l}: studio audio made on the Mac (tools/narrate)
 const BUILD_ID = "__BUILD_ID__";
 const OFFLINE_CACHE = "__OFFLINE_CACHE__";
 const SHARE_INBOX = "__SHARE_INBOX__";
@@ -1534,9 +1541,115 @@ async function boot(){
     try{await loadLocalBooks();}catch(e){console.warn("local books unavailable",e);}
     rebuildQuickOpen();
   }
+  // opened from the home screen with no destination: go straight back to the
+  // page you were on (ui.openLast — "Open where I left off" in the tools row)
+  if(!location.hash&&!share&&ui.openLast!==false&&STANDALONE&&last&&chapterById(last.id)&&!isArchived(chapterById(last.id).book))
+    history.replaceState(null,"",chHash(last.id));
   route();
   registerServiceWorker();
   intakeSharedFiles();
+}
+/* ---- archive / remove books ----
+   Archiving on this device just hides a book (ui.archived); it stays in the
+   repo. "Delete from library" and "Archive in repo" change the repo itself
+   through the GitHub API with a token kept on this device (ui.ghToken): one
+   commit that removes or moves the book's folder; the site rebuilds itself. */
+function isArchived(id){return !!(ui.archived&&ui.archived[id]);}
+function setArchived(id,on){
+  ui.archived=ui.archived||{};
+  if(on)ui.archived[id]=true;else delete ui.archived[id];
+  store.set("ui",ui);
+}
+function isGone(id){return !!(ui.removed&&ui.removed[id]);}
+function ghRepo(){
+  // owner/repo from a github.io host, else what was saved
+  const m=location.hostname.match(/^([^.]+)\.github\.io$/);
+  if(m){const seg=location.pathname.split("/").filter(Boolean)[0];if(seg)return m[1]+"/"+seg;}
+  return ui.ghRepo||"";
+}
+async function ghToken(){
+  if(ui.ghToken)return ui.ghToken;
+  const r=await sheet({title:"GitHub token",multiline:false,placeholder:"github_pat_…",ok:"Save",
+    hint:"Changes to the library are commits. Make a <b>fine-grained token</b> at github.com → Settings → Developer settings, for this repo only, with <b>Contents: read and write</b>. It is kept on this device only."});
+  if(!r||!r.value)return "";
+  ui.ghToken=r.value.trim();
+  if(!ghRepo()){
+    const q=await sheet({title:"Which repo?",multiline:false,placeholder:"owner/repo",ok:"Save"});
+    if(!q||!/^[^/]+\/[^/]+$/.test(q.value.trim())){delete ui.ghToken;return "";}
+    ui.ghRepo=q.value.trim();
+  }
+  store.set("ui",ui);return ui.ghToken;
+}
+async function gh(method,path,body){
+  const r=await fetch("https://api.github.com"+path,{method,headers:{Authorization:"Bearer "+ui.ghToken,Accept:"application/vnd.github+json","Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+  if(!r.ok){const t=await r.text().catch(()=>"");throw new Error(`GitHub ${r.status}${/Bad credentials|Resource not accessible/.test(t)?" — check the token's repo access":""}`);}
+  return r.json();
+}
+/* one commit on main: delete the book's files, or move them under library-archive/ */
+async function ghRemoveBook(b,archive){
+  if(!await ghToken())return false;
+  const repo=ghRepo();
+  const slug=b.id.replace(/\//g,"-");
+  const prefixes=[`library/${b.id}/`,`audio/${slug}/`,`podcast/${slug}/`], files=[`library/${b.id}.md`];
+  const ref=await gh("GET",`/repos/${repo}/git/ref/heads/main`);
+  const head=ref.object.sha;
+  const commit=await gh("GET",`/repos/${repo}/git/commits/${head}`);
+  const tree=await gh("GET",`/repos/${repo}/git/trees/${commit.tree.sha}?recursive=1`);
+  const hit=tree.tree.filter(e=>e.type==="blob"&&(prefixes.some(p=>e.path.startsWith(p))||files.includes(e.path)));
+  if(!hit.length)throw new Error("Nothing found in the repo for this book — was it already removed?");
+  const entries=[];
+  hit.forEach(e=>{
+    entries.push({path:e.path,mode:e.mode,type:"blob",sha:null});
+    if(archive)entries.push({path:e.path.replace(/^(library|audio|podcast)\//,"$1-archive/"),mode:e.mode,type:"blob",sha:e.sha});
+  });
+  const newTree=await gh("POST",`/repos/${repo}/git/trees`,{base_tree:commit.tree.sha,tree:entries});
+  const msg=(archive?"Archive ":"Remove ")+b.title+" (from the reader)\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>";
+  const c=await gh("POST",`/repos/${repo}/git/commits`,{message:msg,tree:newTree.sha,parents:[head]});
+  await gh("PATCH",`/repos/${repo}/git/ref/heads/main`,{sha:c.sha});
+  ui.removed=ui.removed||{};ui.removed[b.id]=true;store.set("ui",ui); // hidden until the rebuilt site arrives
+  return true;
+}
+function bookMenu(b){
+  const p=bookPct(b), arch=isArchived(b.id);
+  const items=[
+    {icon:p>=.95?"○":"✓",label:p>=.95?"Mark as unread":"Mark as finished",fn:()=>{
+      if(p>=.95){b.chapters.forEach(i=>{delete progress[CHAPTERS[i].id];});delete stats.finished[b.id];}
+      else{b.chapters.forEach(i=>{progress[CHAPTERS[i].id]={pct:1};});stats.finished[b.id]=todayKey();}
+      store.set("progress",progress);store.set("stats",stats);renderToc(b);}},
+    {icon:"↺",label:"Reset progress",sub:"Highlights and bookmarks stay",fn:async()=>{
+      const ok=await sheet({title:`Reset progress in “${b.title}”?`,noInput:true,ok:"Reset"});if(!ok)return;
+      b.chapters.forEach(i=>{delete progress[CHAPTERS[i].id];});delete stats.finished[b.id];delete lastByBook[b.id];
+      if(last&&chapterById(last.id)&&chapterById(last.id).book===b.id){last=null;store.set("last",last);}
+      store.set("progress",progress);store.set("stats",stats);store.set("lastBook",lastByBook);renderToc(b);}},
+    {icon:arch?"📤":"📦",label:arch?"Unarchive":"Archive on this device",sub:arch?"Back on the shelves":"Hidden from the shelves; nothing is deleted",fn:()=>{
+      setArchived(b.id,!arch);toast(arch?"Back on the shelf":"Archived — find it under the Archived filter");nav("");}},
+  ];
+  if(b.local){
+    items.push({icon:"🗑",label:"Remove from device",sub:"Deletes this imported book from this browser",fn:async()=>{
+      const ok=await sheet({title:`Remove “${b.title}” from this device?`,noInput:true,ok:"Remove",
+        hint:"The imported book and its text are deleted from this browser. Highlights and progress are kept in case you import it again."});
+      if(!ok)return;await deleteLocalBook(b.id);setArchived(b.id,false);toast("Removed");nav("");}});
+  }else{
+    items.push({icon:"🗄",label:"Archive in the repo",sub:"Moves its folder to library-archive/ — one commit, the site rebuilds",fn:()=>ghAction(b,true)});
+    items.push({icon:"🗑",label:"Delete from the library",sub:"Removes its folder, audio and podcast from the repo for good",fn:()=>ghAction(b,false)});
+  }
+  actionMenu(b.title,items);
+}
+async function ghAction(b,archive){
+  const ok=await sheet({title:(archive?"Archive":"Delete")+` “${b.title}”?`,noInput:true,ok:archive?"Archive":"Delete for good",
+    hint:archive?"Its files move to <b>library-archive/</b> in the repo, out of the build. Bring it back by moving the folder again.":
+                 "Its markdown, studio audio and podcast files are <b>removed from the repo</b>. Only git history keeps a copy."});
+  if(!ok)return;
+  toast((archive?"Archiving":"Deleting")+"…");
+  try{
+    if(!await ghRemoveBook(b,archive))return;
+    setArchived(b.id,false);
+    toast((archive?"Archived":"Deleted")+" — the site rebuilds in a minute or two; it is hidden here meanwhile",undefined,undefined,6000);
+    nav("");
+  }catch(e){
+    if(/401|403/.test(String(e.message))){delete ui.ghToken;store.set("ui",ui);}
+    toast("Couldn't change the repo: "+String(e.message||e).slice(0,120),undefined,undefined,8000);
+  }
 }
 function showView(v){
   home.classList.toggle("hidden",v!=="home");
@@ -1575,7 +1688,7 @@ function bookCardHtml(b){
   const who=b.author||`${b.chapters.length} chapter${b.chapters.length===1?"":"s"}`;
   const cap=p>=.95?`Finished · ${esc(who)}`:(p>0?`${Math.round(p*100)}% · ${esc(who)}`:esc(who));
   return `<button class="bookcard" data-book="${esc(b.id)}" title="${esc(b.title)}" aria-label="${esc(b.title)}${b.author?" by "+esc(b.author):""}, ${p>=.95?"finished":Math.round(p*100)+"% read"}">${coverHtml(b)}
-    <span class="cap ${p>=.95?"done":""}">${cap}</span></button>`;
+    <span class="cap ${p>=.95?"done":""}">${bookHasStudio(b)?"🎧 ":""}${cap}</span></button>`;
 }
 function inProgressBooks(){
   // books started but not finished, most recently read first
@@ -1594,14 +1707,19 @@ function bookState(b){
   return "unread";
 }
 function renderHome(){
-  const all=Object.values(BOOKS);
-  const nBooks=all.length;
+  // books removed from the repo through the reader stay hidden until the
+  // rebuilt site no longer has them
+  if(ui.removed){let dirty=false;Object.keys(ui.removed).forEach(id=>{if(!BOOKS[id]){delete ui.removed[id];dirty=true;}});if(dirty)store.set("ui",ui);}
+  const all=Object.values(BOOKS).filter(b=>!isGone(b.id));
+  const nArch=all.filter(b=>isArchived(b.id)).length;
+  const live=all.filter(b=>!isArchived(b.id));
+  const nBooks=live.length;
   const streak=readingStreak(),todayW=stats.days[todayKey()]||0;
-  const counts={all:nBooks,reading:0,unread:0,finished:0};
-  all.forEach(b=>counts[bookState(b)]++);
+  const counts={all:nBooks,reading:0,unread:0,finished:0,archived:nArch};
+  live.forEach(b=>counts[bookState(b)]++);
   let filter=ui.filter||"all";
-  if(!["all","reading","unread","finished"].includes(filter))filter="all";
-  const pass=b=>filter==="all"||bookState(b)===filter;
+  if(!["all","reading","unread","finished","archived"].includes(filter)||(filter==="archived"&&!nArch))filter="all";
+  const pass=b=>!isGone(b.id)&&(filter==="archived"?isArchived(b.id):!isArchived(b.id)&&(filter==="all"||bookState(b)===filter));
   let h=`<div class="home-head"><div><h1>Library</h1>
     <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
     <div class="acts" style="display:flex;gap:8px;">
@@ -1617,26 +1735,24 @@ function renderHome(){
       <button id="homeStats">Reading stats →</button></div>
     <div id="sresults" class="hidden"></div>
     <div id="shelves">
-    <div id="offlineBar"></div>
     <div id="importBar"></div>`;
-  if(IS_IOS&&!STANDALONE&&!ui.hideInstall&&location.protocol!=="file:")
-    h+=`<div class="hint"><span>📲</span><span><b>Add to Home Screen</b> for a full-screen reader that opens offline:
-      tap Share <span style="font-size:15px">⎙</span> then “Add to Home Screen”. Imported books stay on this device — open the app regularly so Safari does not evict them.</span><button id="hideInstall" title="Dismiss">✕</button></div>`;
-  if(IS_MOBILE&&IMPORT_OK)
-    if(!ui.hideImportTip)h+=`<div class="hint"><span>📥</span><span><b>Import from this phone.</b> Tap Import a book and pick an <b>.epub</b> from Files or iCloud Drive. Conversion happens here — nothing is uploaded. Apple Books / Kindle store files are DRM-locked and will not convert.</span><button id="hideImportTip" title="Dismiss">✕</button></div>`;
+  // the book you were in comes first: one tap to read, one tap to listen
   if(last&&(filter==="all"||filter==="reading")){
     const c=chapterById(last.id);
-    if(c){const b=BOOKS[c.book],bp=bookPct(b);
-      h+=`<button class="continue" data-ch="${esc(c.id)}" aria-label="Continue reading ${esc(c.title)}">
+    if(c&&!isArchived(c.book)&&!isGone(c.book)){const b=BOOKS[c.book],bp=bookPct(b),cp=chPct(c.id);
+      const mins=Math.max(1,Math.round(c.words*(1-cp)/230));
+      h+=`<div class="continue-wrap"><button class="continue" data-ch="${esc(c.id)}" aria-label="Continue reading ${esc(c.title)}">
         <div class="cc-cover" style="${coverStyle(b.title)}"><span>${esc((b.title.match(/[A-Za-z0-9]/)||["B"])[0].toUpperCase())}</span></div>
         <div class="cc-main"><span class="lbl">Continue reading</span>
           <div class="t">${esc(c.title)}</div>
-          <div class="p">${esc(b.title)} · ${Math.round(bp*100)}% of book</div>
+          <div class="p">${esc(b.title)} · ${Math.round(bp*100)}% of book · ${mins} min left in chapter</div>
           <div class="cc-bar"><i style="width:${Math.round(bp*100)}%"></i></div></div>
-        <span class="cc-go">Resume</span></button>`;}
+        <span class="cc-go">Resume</span></button>
+        <button class="cc-listen" data-listen="${esc(c.id)}" title="Listen from here${studioFor(CHAPTERS.indexOf(c))?" — studio audiobook":""}" aria-label="Listen from here">🎧</button></div>`;}
   }
   h+=`<div class="chips" role="tablist" aria-label="Filter library">`;
-  [["all","All"],["reading","Reading"],["unread","Unread"],["finished","Finished"]].forEach(([k,label])=>{
+  [["all","All"],["reading","Reading"],["unread","Unread"],["finished","Finished"],["archived","Archived"]].forEach(([k,label])=>{
+    if(k==="archived"&&!nArch)return;
     h+=`<button data-filter="${k}" class="${filter===k?"on":""}" role="tab" aria-selected="${filter===k}">${label} <span style="opacity:.7">${counts[k]}</span></button>`;
   });
   h+=`</div>`;
@@ -1655,12 +1771,20 @@ function renderHome(){
     books.forEach(b=>{h+=bookCardHtml(b);});
     h+=`</div>`;
   });
-  if(!shown)h+=`<div class="shelf"><div class="empty">Nothing in this filter yet.</div></div>`;
+  if(!shown)h+=`<div class="shelf"><div class="empty">${filter==="archived"?"Nothing archived.":"Nothing in this filter yet."}</div></div>`;
+  // housekeeping lives under the shelves, where it doesn't get in the way of reading
+  h+=`<div id="offlineBar"></div>`;
+  if(IS_IOS&&!STANDALONE&&!ui.hideInstall&&location.protocol!=="file:")
+    h+=`<div class="hint"><span>📲</span><span><b>Add to Home Screen</b> for a full-screen reader that opens offline, straight to your page:
+      tap Share <span style="font-size:15px">⎙</span> then “Add to Home Screen”.</span><button id="hideInstall" title="Dismiss">✕</button></div>`;
+  if(IS_MOBILE&&IMPORT_OK&&!ui.hideImportTip)
+    h+=`<div class="hint"><span>📥</span><span><b>Import from this phone:</b> Import a book → pick an <b>.epub</b> from Files. It is converted here and kept on this device only.</span><button id="hideImportTip" title="Dismiss">✕</button></div>`;
   h+=`<div class="tools-row">
     <button id="btnImportBook" title="Add an .epub / .md / .txt from this device — it is converted here, in the browser, and stored on this device only">📥 Import a book</button>
     ${vocab.length?`<button id="btnVocab" title="Words you looked up while reading">🔤 Vocabulary (${vocab.length})</button>`:""}
     <button id="btnExport" title="Download progress, highlights, bookmarks, vocabulary, Ask AI keys and imported books as JSON">⬇ Back up my data</button>
     <button id="btnRestore" title="Restore a previously downloaded backup">⬆ Restore backup</button>
+    ${STANDALONE?`<button id="btnOpenLast" title="When the app opens with no link, go straight to the page you were on">${ui.openLast===false?"○":"✓"} Open where I left off</button>`:""}
     <button id="btnHelp" title="Keyboard shortcuts & tips">? Help</button>
   </div>
   <p class="sub" style="margin-top:14px;font-size:11px">Build ${BUILD_ID}${IMPORT_OK?"":" · in-browser import needs a newer browser (Safari 16.4+, Chrome 103+)"}</p></div>`;
@@ -1669,6 +1793,15 @@ function renderHome(){
     ()=>nav(bookHash(BOOKS[el.dataset.book]))));
   home.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+  home.querySelectorAll("[data-listen]").forEach(el=>el.addEventListener("click",e=>{
+    e.stopPropagation();
+    if(ttsUsesAudio())kokoroHold();else ttsUnlock();   // unlock audio on this tap
+    pendingListen=true;nav("#c/"+encodeURIComponent(el.dataset.listen));
+  }));
+  if($("btnOpenLast"))$("btnOpenLast").addEventListener("click",()=>{
+    ui.openLast=ui.openLast===false;store.set("ui",ui);renderHome();
+    toast(ui.openLast===false?"The app will open on the Library":"The app will open on the page you were reading");
+  });
   home.querySelectorAll("[data-filter]").forEach(el=>el.addEventListener("click",()=>{
     ui.filter=el.dataset.filter;store.set("ui",ui);renderHome();
   }));
@@ -1955,7 +2088,7 @@ function renderToc(b){
     <div class="hero-cover">${coverHtml(b)}</div>
     <h1>${esc(b.title)}</h1>
     ${b.author?`<p class="author">${esc(b.author)}</p>`:""}
-    <p class="meta">${esc(b.section)} · ${b.chapters.length} chapter${b.chapters.length===1?"":"s"} · ~${time}
+    <p class="meta">${esc(b.section)} · ${b.chapters.length} chapter${b.chapters.length===1?"":"s"} · ~${time}${bookHasStudio(b)?" · 🎧 audiobook":""}${isArchived(b.id)?" · archived":""}
       ${stats.finished[b.id]?` · ✓ finished ${stats.finished[b.id]}`:(p>0?` · ${Math.round(p*100)}% read${left}`:"")}</p>
   </div>
   <div class="toc-body">
@@ -1976,7 +2109,7 @@ function renderToc(b){
   if(b.local&&!share)
     h+=`<div class="tools-row" style="margin:0 0 18px">
       <button id="locExport" title="Download this book as one markdown file with chapter markers — drop it into tools/import-book.py to add it to the repo">⬇ Export as Markdown</button>
-      <button id="locDelete" title="Remove this imported book from this device">🗑 Remove from device</button></div>`;
+      <button id="locDelete" title="Archive or remove this imported book">🗑 Archive / remove…</button></div>`;
   const marks=bookmarks.filter(m=>{const c=chapterById(m.ch);return c&&c.book===b.id;});
   if(marks.length){
     h+=`<div class="section-h">Bookmarks</div><div class="chapter-list">`;
@@ -2044,31 +2177,15 @@ function renderToc(b){
   if($("tocNavBack"))$("tocNavBack").addEventListener("click",()=>goBack(""));
   if($("tocListen"))$("tocListen").addEventListener("click",e=>{
     // unlock audio inside this tap (iOS), then open the chapter and start
-    if(ttsUsesKokoro())kokoroHold();else ttsUnlock();
+    if(ttsUsesAudio())kokoroHold();else ttsUnlock();
     pendingListen=true;nav(chHash(e.currentTarget.dataset.listen));
   });
   if($("tocPodcast"))$("tocPodcast").addEventListener("click",()=>podcastMenu(b));
   if($("tocQk"))$("tocQk").addEventListener("click",qkOpen);
   if($("tocShare"))$("tocShare").addEventListener("click",()=>copyShare("#s/b/"+encodeURIComponent(b.id),$("tocShare")));
-  if($("tocMore"))$("tocMore").addEventListener("click",async()=>{
-    const r=await sheet({title:b.title,noInput:true,ok:p>=.95?"Mark as unread":"Mark as finished",danger:"Reset progress",
-      hint:"<b>Mark as finished</b> ticks every chapter. <b>Reset progress</b> clears this book's reading positions (highlights and bookmarks stay)."});
-    if(!r)return;
-    if(r.danger){b.chapters.forEach(i=>{delete progress[CHAPTERS[i].id];});delete stats.finished[b.id];delete lastByBook[b.id];
-      if(last&&chapterById(last.id)&&chapterById(last.id).book===b.id){last=null;store.set("last",last);}}
-    else if(p>=.95){b.chapters.forEach(i=>{delete progress[CHAPTERS[i].id];});delete stats.finished[b.id];}
-    else{b.chapters.forEach(i=>{progress[CHAPTERS[i].id]={pct:1};});stats.finished[b.id]=todayKey();}
-    store.set("progress",progress);store.set("stats",stats);store.set("lastBook",lastByBook);
-    renderToc(b);
-  });
+  if($("tocMore"))$("tocMore").addEventListener("click",()=>bookMenu(b));
   if($("locExport"))$("locExport").addEventListener("click",()=>exportLocalBook(b));
-  if($("locDelete"))$("locDelete").addEventListener("click",async()=>{
-    const ok=await sheet({title:`Remove “${b.title}” from this device?`,noInput:true,ok:"Remove",
-      hint:"The imported book and its text are deleted from this browser. Your highlights and progress for it are kept in case you import it again."});
-    if(!ok)return;
-    await deleteLocalBook(b.id);
-    toast("Removed");nav("");
-  });
+  if($("locDelete"))$("locDelete").addEventListener("click",()=>bookMenu(b));
   $("tocTheme").addEventListener("click",()=>{cycleTheme();});
 }
 
@@ -2443,17 +2560,37 @@ const KOKORO_VOICES=[
   ["bf_emma","Emma · British"],
   ["bm_george","George · British"],
 ];
-let kokoroFailed=false;
+let kokoroFailed=false, studioFailed=false;
+/* "Studio" = a chapter's audio made on the Mac (tools/narrate/narrate.py) and
+   shipped with the site: the phone only plays it, so it starts at once, seeks
+   anywhere and works offline. It is the default wherever it exists; a chapter
+   without it falls back to Kokoro Heart. */
+function studioFor(i){const c=CHAPTERS[i];return (c&&!studioFailed&&NARRATED[c.id])||null;}
+function bookHasStudio(b){return !!b&&b.chapters.some(i=>!!NARRATED[CHAPTERS[i].id]);}
 function ttsVoiceId(){
   if(S.ttsVoice)return S.ttsVoice;
+  if(studioFor(cur))return "studio";
   return bookLang()==="en"?"kokoro:af_heart":"";
 }
-function ttsUsesKokoro(){return KOKORO_OK&&!kokoroFailed&&ttsVoiceId().startsWith("kokoro:");}
+function ttsUsesStudio(){return ttsVoiceId()==="studio"&&!!studioFor(cur);}
+function ttsUsesKokoro(){
+  const id=ttsVoiceId();
+  if(!KOKORO_OK||kokoroFailed)return false;
+  if(id==="studio")return !studioFor(cur);   // studio chosen, but this chapter has none: Heart reads it
+  return id.startsWith("kokoro:");
+}
+function ttsUsesAudio(){return ttsUsesKokoro()||ttsUsesStudio();} // speech comes from the <audio> element
 function kokoroVoiceName(){return (ttsVoiceId().split(":")[1]||"af_heart");}
 function ttsLoadVoices(){
   const sel=$("ttsVoice");if(!sel)return;
   const want=bookLang();
-  let h=`<optgroup label="Kokoro — saved on this phone">`;
+  let h="";
+  const c=CHAPTERS[cur],b=c&&bookOf(c);
+  if(bookHasStudio(b)){
+    const n=studioFor(cur)||NARRATED[CHAPTERS[b.chapters.find(i=>NARRATED[CHAPTERS[i].id])].id];
+    h+=`<optgroup label="Studio — made on the Mac"><option value="studio">${esc(n.l)} · studio</option></optgroup>`;
+  }
+  h+=`<optgroup label="Kokoro — saved on this phone">`;
   KOKORO_VOICES.forEach(([id,name])=>{h+=`<option value="kokoro:${id}">${esc(name)}</option>`;});
   h+=`</optgroup>`;
   ttsVoiceList=[];
@@ -2482,7 +2619,7 @@ function ttsLoadVoices(){
 }
 function ttsCurrentVoice(){
   if(!ttsVoiceList.length)ttsLoadVoices();
-  if(S.ttsVoice&&!S.ttsVoice.startsWith("kokoro:")){const v=ttsVoiceList.find(x=>x.name===S.ttsVoice);if(v)return v;}
+  if(S.ttsVoice&&!S.ttsVoice.startsWith("kokoro:")&&S.ttsVoice!=="studio"){const v=ttsVoiceList.find(x=>x.name===S.ttsVoice);if(v)return v;}
   return ttsVoiceList[0]||null;
 }
 if(TTS_OK)speechSynthesis.onvoiceschanged=ttsLoadVoices;
@@ -2878,6 +3015,9 @@ async function ttsShareAudio(){
 
 function kokoroHold(){
   const a=$("ttsAudio"); if(!a)return;
+  // a studio chapter already in the element was unlocked by an earlier tap;
+  // keep it loaded so play/seek within it never has to fetch again
+  if(a.dataset.kind==="studio"&&a._studio){try{a.pause();}catch(e){}return;}
   a.ontimeupdate=null; a.onended=null;
   a.loop=true; a.volume=0.01; a.dataset.kind="hold";
   if(a.src!==SILENT_WAV)a.src=SILENT_WAV;
@@ -2888,6 +3028,116 @@ function kokoroStopAudio(){
   a.onended=null; a.ontimeupdate=null;
   try{a.pause();}catch(e){}
   a.dataset.kind="";
+  studioStopTick();
+}
+
+/* ---- studio playback ----
+   One <audio> per chapter (AAC, a few MB) plus a timing map: for each chunk
+   of the chapter plan, its [start,end) words and [t0,t1) seconds. Words
+   inside a chunk are spread over its time by spoken length, like Kokoro. */
+let stMap=null, stMapFor="", stTimer=null;
+const stMaps=new Map();
+function studioMap(i){
+  const n=studioFor(i); if(!n)return Promise.resolve(null);
+  if(stMaps.has(n.m))return stMaps.get(n.m);
+  const p=fetch(n.m).then(r=>{if(!r.ok)throw new Error("timing map "+r.status);return r.json();})
+    .then(m=>{m.chunks.forEach(c=>{c.w=null;});return m;});
+  stMaps.set(n.m,p); p.catch(()=>stMaps.delete(n.m));
+  return p;
+}
+function studioWeights(c){
+  if(!c.w){c.w=[];for(let k=c[0];k<c[1];k++)c.w.push(Math.max(1,ttsSpokenWord(ttsT.texts[k]||"").replace(/\s/g,"").length));}
+  return c.w;
+}
+/* chunk index holding word i (or the next chunk after a gap) */
+function studioChunkAt(map,i){
+  const ch=map.chunks;let lo=0,hi=ch.length-1,ans=ch.length-1;
+  while(lo<=hi){const m=(lo+hi)>>1;if(ch[m][1]<=i)lo=m+1;else{ans=m;hi=m-1;}}
+  return ans;
+}
+function studioTimeOf(map,i){
+  const c=map.chunks[studioChunkAt(map,i)]; if(!c)return 0;
+  if(i<c[0])return c[2];
+  const w=studioWeights(c);let acc=0,total=0;
+  for(let k=0;k<w.length;k++){total+=w[k];if(c[0]+k<i)acc+=w[k];}
+  return c[2]+(c[3]-c[2])*(total?acc/total:0);
+}
+function studioWordAt(map,t){
+  const ch=map.chunks;let lo=0,hi=ch.length-1,ans=0;
+  while(lo<=hi){const m=(lo+hi)>>1;if(ch[m][2]<=t){ans=m;lo=m+1;}else hi=m-1;}
+  const c=ch[ans]; if(!c)return 0;
+  const f=Math.max(0,Math.min(1,(t-c[2])/Math.max(0.01,c[3]-c[2])));
+  const w=studioWeights(c),total=w.reduce((s,x)=>s+x,0)||1;
+  let acc=0,k=0;for(;k<w.length-1;k++){acc+=w[k];if(acc/total>f)break;}
+  return Math.min(ttsWords.length-1,c[0]+k);
+}
+function studioStopTick(){if(stTimer){clearInterval(stTimer);stTimer=null;}}
+function studioTick(epoch,map){
+  studioStopTick();
+  const a=$("ttsAudio");
+  stTimer=setInterval(()=>{
+    if(epoch!==kEpoch||a.dataset.kind!=="studio"){studioStopTick();return;}
+    if(a.paused||!a.duration)return;
+    const w=studioWordAt(map,a.currentTime);
+    if(w!==ttsIdx)ttsSetWord(w);
+    if("mediaSession"in navigator&&navigator.mediaSession.setPositionState){
+      try{navigator.mediaSession.setPositionState({duration:a.duration,playbackRate:a.playbackRate,position:Math.min(a.currentTime,a.duration)});}catch(e){}
+    }
+  },150);
+}
+/* warm the cache for this chapter and the next one (the service worker keeps them) */
+const stWarmed=new Set();
+function studioWarm(i){
+  const n=studioFor(i); if(!n||stWarmed.has(n.u)||!navigator.onLine)return;
+  stWarmed.add(n.u);
+  studioMap(i).catch(()=>{});
+  fetch(n.u).then(r=>r.ok&&r.arrayBuffer()).catch(()=>stWarmed.delete(n.u));
+}
+function studioFail(from,err){
+  console.error("studio",err);
+  studioFailed=true; // this visit only
+  kokoroStopAudio();
+  const a=$("ttsAudio");a._studio="";
+  toast("The studio audio didn't load (" +String(err&&err.message||err).slice(0,60)+"). Heart reads this chapter instead.");
+  ttsLoadVoices();ttsPaintKokoroRows();
+  ttsSpeakFrom(from);
+}
+function ttsSpeakStudio(i){
+  const epoch=++kEpoch;
+  kokoroPausedMid=false; kokoroDropQueue(); ttsStopTimer(); studioStopTick();
+  const n=studioFor(cur), a=$("ttsAudio");
+  ttsSetWord(i);
+  kokoroNote("");
+  const slow=setTimeout(()=>{if(epoch===kEpoch&&ttsSpeaking)kokoroNote("Loading this chapter's audio…");},900);
+  studioMap(cur).then(map=>{
+    clearTimeout(slow);
+    if(epoch!==kEpoch||!ttsSpeaking)return;
+    kokoroNote("");
+    a.onended=()=>{ if(epoch!==kEpoch||!ttsSpeaking)return; ttsChapterEnded(); };
+    a.ontimeupdate=null;
+    const start=()=>{
+      if(epoch!==kEpoch)return;
+      a.loop=false; a.volume=1; a.dataset.kind="studio";
+      try{a.currentTime=studioTimeOf(map,i);}catch(e){}
+      a.preservesPitch=true;
+      a.defaultPlaybackRate=a.playbackRate=S.ttsRate||1;
+      const p=a.play();
+      if(p&&p.catch)p.catch(()=>{
+        if(epoch!==kEpoch)return;
+        kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();
+        toast("Tap play to start");
+      });
+      studioTick(epoch,map);
+      const j=siblingChapter(1); if(j!==null)setTimeout(()=>studioWarm(j),4000);
+    };
+    if(a._studio!==n.u||!a.duration){
+      if(a._url){URL.revokeObjectURL(a._url);a._url=null;}
+      a._studio=n.u; a.dataset.kind="studio"; a.loop=false;
+      a.onerror=()=>{if(epoch===kEpoch)studioFail(i,new Error("audio failed"));};
+      a.addEventListener("loadedmetadata",start,{once:true});
+      a.src=n.u; a.load();
+    }else start();
+  }).catch(err=>{clearTimeout(slow);if(epoch===kEpoch)studioFail(i,err);});
 }
 function kokoroPlay(wav, chunk, epoch){
   const a=$("ttsAudio");
@@ -2981,7 +3231,7 @@ let kSayTok=0, kSayStop=null;
 function ttsCancelSay(){
   kSayTok++;
   if(kSayStop){const f=kSayStop;kSayStop=null;f();}
-  if(TTS_OK&&!ttsUsesKokoro()){try{speechSynthesis.cancel();}catch(e){}}
+  if(TTS_OK&&!ttsUsesAudio()){try{speechSynthesis.cancel();}catch(e){}}
 }
 function ttsSayParts(text){
   const out=[];let buf="";
@@ -3002,8 +3252,9 @@ async function ttsSay(text){
   kokoroPausedMid=false; // the paused book sentence is about to be replaced in the player
   const parts=ttsSayParts(text);
   if(!parts.length)return true;
-  if(ttsUsesKokoro()){
-    kEpoch++;
+  if(ttsUsesAudio()&&KOKORO_OK&&!kokoroFailed){ // studio chapters: answers and recaps are spoken live by Heart
+    kEpoch++;studioStopTick();
+    const a0=$("ttsAudio");if(a0.dataset.kind==="studio"){a0.dataset.kind="";a0._studio="";}
     const voice=kokoroVoiceName();
     let next=kokoroGenerate(parts[0],voice);
     for(let k=0;k<parts.length;k++){
@@ -3060,9 +3311,9 @@ function ttsWatchVisibility(){
   // "speaking" but silent, or wedged in a paused state. Re-speak from the
   // current word so the user hears it continue instead of having to fiddle.
   if(document.visibilityState!=="visible"||!ttsActive||!ttsSpeaking)return;
-  if(ttsUsesKokoro()){
+  if(ttsUsesAudio()){
     const a=$("ttsAudio");
-    if(a&&a.dataset.kind==="speech"&&a.paused)a.play().catch(()=>{});
+    if(a&&(a.dataset.kind==="speech"||a.dataset.kind==="studio")&&a.paused)a.play().catch(()=>{});
     return;
   }
   if(!TTS_OK)return;
@@ -3101,7 +3352,7 @@ function ttsTokenize(root, wrap){
     if(!n.nodeValue.trim())continue;
     const pe=n.parentElement;
     if(pe&&pe.closest("pre,figcaption,.imgcap,sup.fn,.ch-end"))continue; // don't read code / captions / footnote marks / the end card
-    if(S.ttsSkipHead&&pe&&pe.closest("h1,h2,h3,h4,h5,h6,table"))continue;
+    if(S.ttsSkipHead&&!ttsUsesStudio()&&pe&&pe.closest("h1,h2,h3,h4,h5,h6,table"))continue; // studio audio was made with headings in, so its word numbering keeps them
     nodes.push(n);
   }
   nodes.forEach(node=>{
@@ -3226,9 +3477,15 @@ function ttsSetWord(i){
   }
 }
 function ttsSpeakFrom(i){
+  if(ttsUsesStudio()){
+    if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
+    if(!ttsWords.length||i>=ttsWords.length){ttsChapterEnded();return;}
+    ttsSpeakStudio(i);return;
+  }
   if(ttsUsesKokoro()){
     if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
     ttsStopTimer();
+    if(S.ttsVoice==="studio"||(!S.ttsVoice&&bookHasStudio(bookOf(CHAPTERS[cur]))))kokoroNote("No studio audio for this chapter yet — Heart reads it.");
     ttsSpeakKokoro(i);return;
   }
   if(kEpoch){kEpoch++;kokoroDropQueue();kokoroStopAudio();}
@@ -3290,7 +3547,8 @@ function ttsChapterEnded(){
   const j=siblingChapter(1);
   if(j!==null){
     ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
-    if(ttsUsesKokoro())kokoroHold();
+    if(ttsUsesStudio()){const a=$("ttsAudio");a.dataset.kind="";a._studio="";kokoroHold();}
+    else if(ttsUsesKokoro())kokoroHold();
     else ttsHoldUntilReady();
     navReplace(chapterHash(CHAPTERS[j]));
   }else{
@@ -3315,7 +3573,7 @@ function ttsFlushContinue(){
   if(!ttsResumeAfterRender||!ttsActive||ttsWordsFor!==cur||!ttsWords.length)return;
   ttsResumeAfterRender=false;
   ttsSpeaking=true;
-  if(!ttsUsesKokoro())keepAliveStart();
+  if(!ttsUsesAudio())keepAliveStart();
   ttsSpeakFrom(0);
   paintTtsPlay();
 }
@@ -3343,8 +3601,14 @@ function ttsUnlock(){
 }
 function ttsOpen(autoplay,fromStart){
   if(!TTS_OK&&!KOKORO_OK){toast("Reading aloud isn't supported in this browser.");return;}
-  if(ttsUsesKokoro())kokoroHold();
+  // first studio chapter on this device: a saved Kokoro choice gives way to it, once
+  if(!ui.studioIntro&&studioFor(cur)&&(!S.ttsVoice||S.ttsVoice.startsWith("kokoro:"))){
+    S.ttsVoice="studio";store.set("settings",S);ui.studioIntro=true;store.set("ui",ui);
+    toast("This chapter has studio audio made on the Mac — it's the voice now. The Voice menu switches back.",undefined,undefined,7000);
+  }
+  if(ttsUsesAudio())kokoroHold();
   else ttsUnlock();
+  if(ttsUsesStudio())studioWarm(cur);
   const fresh=ttsWordsFor!==cur;
   ttsActive=true;
   $("btnListen").classList.add("on");
@@ -3416,23 +3680,23 @@ function ttsClose(){
    The engine's own pause()/resume() is broken on Android and can wedge Chrome. */
 function ttsPlay(){
   if(!ttsActive){
-    if(ttsUsesKokoro())kokoroHold();
+    if(ttsUsesAudio())kokoroHold();
     else ttsUnlock();
     ttsOpen(true);return;
   }
   // Resume the sentence already in the audio element. Calling kokoroHold
   // first would replace that audio with silence.
-  if(ttsUsesKokoro()&&kokoroPausedMid){
+  if(ttsUsesAudio()&&kokoroPausedMid){
     kokoroPausedMid=false;ttsSpeaking=true;
     const p=$("ttsAudio").play(); if(p&&p.catch)p.catch(()=>{});
     paintTtsPlay();return;
   }
-  if(ttsUsesKokoro())kokoroHold();
+  if(ttsUsesAudio())kokoroHold();
   else ttsUnlock();
   if(ttsWordsFor!==cur)ttsBuildWords();
   if(!ttsWords.length){toast("Nothing to read in this chapter.");return;}
   ttsSpeaking=true;
-  if(!ttsUsesKokoro())keepAliveStart();
+  if(!ttsUsesAudio())keepAliveStart();
   paintTtsPlay();
   if(ttsRecapDue()){ttsRecap(true);return;}
   ttsMarkListened();
@@ -3441,9 +3705,9 @@ function ttsPlay(){
 function ttsPause(){
   if(ttsSpeaking)ttsMarkListened();
   ttsCancelSay();
-  if(ttsUsesKokoro()){
+  if(ttsUsesAudio()){
     const a=$("ttsAudio");
-    if(a.dataset.kind==="speech"&&!a.ended){
+    if((a.dataset.kind==="speech"||a.dataset.kind==="studio")&&!a.ended){
       a.pause();kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
     }
     kEpoch++;kokoroStopAudio();kokoroNote("");
@@ -3503,9 +3767,9 @@ function ttsNudgeRate(d){
    applies to the sentence already playing; device voices must start over */
 function ttsApplyRate(){
   if(carOn)carPaint();
-  if(ttsUsesKokoro()){
+  if(ttsUsesAudio()){
     const a=$("ttsAudio");
-    if(a.dataset.kind==="speech"||a.dataset.kind==="say")a.playbackRate=S.ttsRate;
+    if(a.dataset.kind==="speech"||a.dataset.kind==="say"||a.dataset.kind==="studio")a.playbackRate=S.ttsRate;
     return;
   }
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
@@ -3542,7 +3806,7 @@ async function ttsRecap(thenRead){
   const wasPlaying=thenRead||ttsSpeaking;
   if(ttsSpeaking&&!thenRead)ttsPause();
   ttsSpeaking=true;paintTtsPlay();
-  if(ttsUsesKokoro())kokoroHold();else keepAliveStart();
+  if(ttsUsesAudio())kokoroHold();else keepAliveStart();
   const tok=kSayTok;
   kokoroNote("Getting a recap of where you left off… (⏸ skips it)");
   const c=CHAPTERS[cur],b=bookOf(c);
@@ -4684,6 +4948,8 @@ $("carSpeed").addEventListener("click",()=>{
 function ttsPaintKokoroRows(){
   const k=ttsUsesKokoro();
   document.querySelectorAll("#ttsBar .kokoro-only").forEach(el=>el.classList.toggle("hidden",!k));
+  $("ttsSkipHead").classList.toggle("hidden",ttsUsesStudio()); // studio audio always includes headings
+  $("ttsDictBtn").classList.toggle("hidden",ttsUsesStudio());  // ...and its pronunciations are fixed on the Mac
   const sel=$("ttsDlg");
   if(!sel.options.length)sel.innerHTML=`<option value="">Same voice</option>`+KOKORO_VOICES.map(([id,n])=>`<option value="${id}">${esc(n)}</option>`).join("");
   sel.value=S.ttsDlg||"";
@@ -4698,7 +4964,10 @@ $("ttsDlg").addEventListener("change",e=>{
 $("ttsSkipHead").addEventListener("click",()=>{
   S.ttsSkipHead=!S.ttsSkipHead;store.set("settings",S);ttsPaintOptions();
   toast(S.ttsSkipHead?"Skipping headings & tables":"Reading headings & tables");
-  // rebuild the word list, keeping the place
+  ttsRebuildKeepingPlace();
+});
+/* rebuild the word list (headings in or out), keeping the place */
+function ttsRebuildKeepingPlace(){
   const was=ttsWords[ttsIdx],wasSpeaking=ttsSpeaking;
   const anchorText=was?was.textContent:"";
   if(wasSpeaking){
@@ -4714,7 +4983,7 @@ $("ttsSkipHead").addEventListener("click",()=>{
     if(ttsWords.length)ttsSetWord(ttsIdx);
     if(wasSpeaking)ttsPlay();
   });
-});
+}
 $("ttsSeek").addEventListener("input",e=>{
   ttsSeekDragging=true; // stop boundary events yanking the thumb mid-drag
   ttsClearCur();
@@ -4731,10 +5000,18 @@ $("ttsRateSlider").addEventListener("change",e=>{
   ttsApplyRate();
 });
 $("ttsVoice").addEventListener("change",e=>{
+  const wasStudio=ttsUsesStudio();
   S.ttsVoice=e.target.value;store.set("settings",S);
   if(e.target.value.startsWith("kokoro:"))kokoroFailed=false;
+  if(e.target.value==="studio")studioFailed=false;
   ttsReplan();ttsPaintKokoroRows();
+  if(wasStudio!==ttsUsesStudio()){
+    // studio audio counts headings, Kokoro may skip them: the word list differs
+    const a=$("ttsAudio");if(a.dataset.kind==="studio"){kokoroStopAudio();a._studio="";}
+    if(S.ttsSkipHead){ttsRebuildKeepingPlace();return;}
+  }
   if(ttsSpeaking)ttsSpeakFrom(ttsIdx);
+  else if(e.target.value==="studio"){kokoroNote("");studioWarm(cur);}
   else if(e.target.value.startsWith("kokoro:")){
     if(!kReady){kokoroNote(`${kokoroLabel()} downloads once (~${kMB} MB) the first time you press play, then stays on this device.`);return;}
     // a short sample in the new voice, through the same <audio> the book uses
@@ -4800,7 +5077,12 @@ function voiceHelpHtml(){
   else if(/Macintosh/i.test(ua))order=[mac,win,ios,and];
   else if(/Windows/i.test(ua))order=[win,mac,ios,and];
   return `<h2>Voices</h2>
-    <p>The default is <b>Heart</b> — the same Kokoro voice the screen tutor uses.
+    <p><b>Studio</b> voices are the best ones: a chapter's audio is made in advance on the Mac
+    with a large narration model (<code>tools/narrate/narrate.py</code>) and shipped with the
+    site, so the phone only plays it — it starts at once, you can skip anywhere, and it works
+    offline once heard. It is the default wherever it exists; chapters without it are read live
+    by Heart.</p>
+    <p>Otherwise the default is <b>Heart</b> — the same Kokoro voice the screen tutor uses.
     The first time you press play it downloads about 170&nbsp;MB, then it stays on
     this phone and works with no connection. It is much closer to a person than
     the voices iOS ships with.</p>
