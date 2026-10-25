@@ -1834,21 +1834,6 @@ import { KokoroTTS } from ${JSON.stringify(KOKORO_URL)};
 const MODEL=${JSON.stringify(KOKORO_MODEL)};
 let tts=null, chain=Promise.resolve();
 function enqueue(fn){ chain=chain.then(fn).catch(()=>{}); }
-function pcm16Wav(samples, rate){
-  const n=samples.length, buf=new ArrayBuffer(44+n*2), v=new DataView(buf);
-  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
-  w(0,"RIFF"); v.setUint32(4,36+n*2,true); w(8,"WAVE"); w(12,"fmt ");
-  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
-  v.setUint32(24,rate,true); v.setUint32(28,rate*2,true);
-  v.setUint16(32,2,true); v.setUint16(34,16,true);
-  w(36,"data"); v.setUint32(40,n*2,true);
-  let o=44;
-  for(let i=0;i<n;i++){
-    const x=Math.max(-1,Math.min(1,samples[i]||0));
-    v.setInt16(o, x<0?x*0x8000:x*0x7fff, true); o+=2;
-  }
-  return buf;
-}
 self.onmessage=(e)=>{
   const m=e.data||{};
   if(m.cmd==="load"){
@@ -1871,14 +1856,15 @@ self.onmessage=(e)=>{
         let pcm=audio.audio;
         if(pcm&&pcm.data) pcm=pcm.data;
         if(!(pcm instanceof Float32Array)) pcm=Float32Array.from(pcm);
-        const wav=pcm16Wav(pcm, audio.sampling_rate||24000);
-        self.postMessage({cmd:"audio", id:m.id, wav}, [wav]);
+        const samples=new Float32Array(pcm);
+        self.postMessage({cmd:"audio", id:m.id, rate:audio.sampling_rate||24000, samples}, [samples.buffer]);
       }catch(err){ self.postMessage({cmd:"error", id:m.id, message:String(err&&err.message||err)}); }
     });
   }
 };
 `;
 let kWorker=null, kLoaded=null, kSeq=0, kEpoch=0, kNext=null, kReady=false, kokoroPausedMid=false;
+let audioCtx=null, kNode=null, kBufDur=0, kChunkPlay=null, kPlayEpoch=0, kAnchor=0, kHL=0, kPendingBuf=null;
 const kWait=new Map();
 function kokoroNote(msg){
   const el=$("ttsKokoroNote"); if(!el)return;
@@ -1901,7 +1887,7 @@ function kokoroEnsure(){
       const m=e.data||{};
       if(m.cmd==="progress")kokoroProgress(m.p);
       else if(m.cmd==="ready"){kReady=true;kokoroNote("");res();}
-      else if(m.cmd==="audio"){const w=kWait.get(m.id);if(w){kWait.delete(m.id);w.res(m.wav);}}
+      else if(m.cmd==="audio"){const w=kWait.get(m.id);if(w){kWait.delete(m.id);w.res({samples:m.samples, rate:m.rate});}}
       else if(m.cmd==="error"){
         const w=m.id!=null&&kWait.get(m.id);
         if(w){kWait.delete(m.id);w.rej(new Error(m.message||"Kokoro failed"));}
@@ -1921,18 +1907,62 @@ function kokoroGenerate(text, voice, speed){
     kWorker.postMessage({cmd:"speak", id, text, voice, speed});
   }));
 }
-function kokoroHold(){
-  const a=$("ttsAudio"); if(!a)return;
-  a.ontimeupdate=null; a.onended=null;
-  a.loop=true; a.volume=0.01; a.dataset.kind="hold";
-  if(a.src!==SILENT_WAV)a.src=SILENT_WAV;
-  const p=a.play(); if(p&&p.catch)p.catch(()=>{});
+/* The Listen tap resumes this context. Later Heart sentences start on it,
+   which is the only way iOS will play audio that wasn't ready during the tap.
+   A looping silent <audio> does the opposite: it holds the session at nearly
+   zero volume and the real sentence is never allowed to start. */
+function audioUnlock(){
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return null;
+  if(!audioCtx||audioCtx.state==="closed")audioCtx=new AC();
+  if(audioCtx.state==="suspended"){const p=audioCtx.resume(); if(p&&p.catch)p.catch(()=>{});}
+  return audioCtx;
+}
+function kokoroStopGraph(){
+  cancelAnimationFrame(kHL); kHL=0;
+  const n=kNode; kNode=null;
+  if(n){try{n.onended=null; n.stop(0);}catch(e){}}
 }
 function kokoroStopAudio(){
+  kPendingBuf=null; kChunkPlay=null;
+  kokoroStopGraph();
+  if(audioCtx&&audioCtx.state==="running"){const p=audioCtx.suspend(); if(p&&p.catch)p.catch(()=>{});}
   const a=$("ttsAudio"); if(!a)return;
   a.onended=null; a.ontimeupdate=null;
   try{a.pause();}catch(e){}
+  a.removeAttribute("src");
+  try{a.load();}catch(e){}
   a.dataset.kind="";
+}
+function kokoroArmHighlight(){
+  cancelAnimationFrame(kHL);
+  const tick=()=>{
+    if(!kNode||!kChunkPlay||kPlayEpoch!==kEpoch||!audioCtx)return;
+    const dur=kBufDur||1;
+    const t=Math.min(1,Math.max(0,(audioCtx.currentTime-kAnchor)/dur));
+    const weights=kChunkPlay.weights, total=weights.reduce((s,w)=>s+w,0)||1;
+    let acc=0,k=0;
+    for(;k<weights.length;k++){acc+=weights[k]; if(acc/total>=t)break;}
+    ttsSetWord(kChunkPlay.start+Math.min(k,weights.length-1));
+    if(ttsSpeaking)kHL=requestAnimationFrame(tick);
+  };
+  kHL=requestAnimationFrame(tick);
+}
+function kokoroStartBuf(buf, chunk, epoch){
+  const ctx=audioUnlock(); if(!ctx)return;
+  kokoroStopGraph();
+  const src=ctx.createBufferSource();
+  src.buffer=buf; src.connect(ctx.destination);
+  kNode=src; kBufDur=buf.duration; kChunkPlay=chunk; kPlayEpoch=epoch;
+  kAnchor=ctx.currentTime;
+  src.onended=()=>{
+    if(src!==kNode||epoch!==kEpoch||!ttsSpeaking)return;
+    kNode=null;
+    if(chunk.end>=ttsWords.length)ttsChapterEnded();
+    else ttsSpeakKokoro(chunk.end);
+  };
+  try{src.start();}catch(e){kokoroFail(chunk.start, e);return;}
+  kokoroArmHighlight();
 }
 function ttsChunk(i, limit){
   if(!ttsWords.length||i>=ttsWords.length)return null;
@@ -1953,43 +1983,43 @@ function ttsChunk(i, limit){
   }
   return {start:i,end,text:spoken.join(" ").replace(/\s+/g," ").trim(),weights};
 }
-function kokoroPlay(wav, chunk, epoch){
-  const a=$("ttsAudio");
-  if(a._url)URL.revokeObjectURL(a._url);
-  const url=URL.createObjectURL(new Blob([wav],{type:"audio/wav"}));
-  a._url=url; a.loop=false; a.volume=1; a.dataset.kind="speech";
-  const weights=chunk.weights, total=weights.reduce((s,w)=>s+w,0)||1;
-  a.ontimeupdate=()=>{
-    if(epoch!==kEpoch||!a.duration)return;
-    const t=Math.min(1,a.currentTime/a.duration);
-    let acc=0,k=0;
-    for(;k<weights.length;k++){acc+=weights[k]; if(acc/total>=t)break;}
-    ttsSetWord(chunk.start+Math.min(k,weights.length-1));
-  };
-  a.onended=()=>{
+function kokoroPlay(audio, chunk, epoch){
+  const ctx=audioUnlock();
+  if(!ctx){kokoroFail(chunk.start, new Error("This browser has no audio engine"));return;}
+  if(epoch!==kEpoch||!ttsSpeaking)return;
+  const samples=audio.samples;
+  if(!samples||!samples.length){kokoroFail(chunk.start, new Error("Heart returned no audio"));return;}
+  let peak=0;
+  for(let i=0;i<samples.length;i+=64){const a=Math.abs(samples[i]); if(a>peak)peak=a;}
+  if(peak<0.0005){kokoroFail(chunk.start, new Error("Heart returned silence"));return;}
+  const rate=audio.rate||24000;
+  let buf;
+  try{
+    buf=ctx.createBuffer(1, samples.length, rate);
+    buf.getChannelData(0).set(samples);
+  }catch(e){kokoroFail(chunk.start, e);return;}
+  const start=()=>{
     if(epoch!==kEpoch||!ttsSpeaking)return;
-    if(chunk.end>=ttsWords.length)ttsChapterEnded();
-    else ttsSpeakKokoro(chunk.end);
+    if(ctx.state==="suspended"){
+      kPendingBuf={buf, chunk, epoch};
+      kokoroPausedMid=true; ttsSpeaking=false; paintTtsPlay();
+      toast("Tap play to start Heart");
+      return;
+    }
+    kokoroStartBuf(buf, chunk, epoch);
   };
-  a.src=url;
-  const p=a.play();
-  // iOS may refuse play() once the download took us outside the tap.
-  // Keep the audio queued so the next play tap starts it without rebuilding.
-  if(p&&p.catch)p.catch(()=>{
-    if(epoch!==kEpoch)return;
-    kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();
-    toast("Tap play to start Heart");
-  });
+  if(ctx.state==="suspended"){const p=ctx.resume(); if(p&&p.then)p.then(start, start); else start();}
+  else start();
 }
 function kokoroFail(from, err){
   console.error("kokoro", err);
-  kokoroFailed=true; kNext=null; kokoroStopAudio(); kokoroNote("");
+  kokoroFailed=true; kNext=null; kPendingBuf=null; kokoroPausedMid=false;
+  kokoroStopAudio(); kokoroNote("");
   const sys=ttsVoiceList[0];
   S.ttsVoice=sys?sys.name:"";
   store.set("settings",S); ttsLoadVoices();
-  toast("Heart needs a connection the first time (~90 MB). Using this phone's voice until then.");
-  if(TTS_OK)ttsSpeakFrom(from);
-  else{ttsSpeaking=false;paintTtsPlay();}
+  ttsIdx=from; ttsSpeaking=false; paintTtsPlay();
+  toast(TTS_OK?"Heart couldn't start. Tap play to use this phone's voice.":"Heart couldn't start in this browser.");
 }
 function ttsSpeakKokoro(i){
   const pending=kNext&&kNext.start===i?kNext.promise:null;
@@ -2000,7 +2030,7 @@ function ttsSpeakKokoro(i){
   if(!chunk){ttsChapterEnded();return;}
   if(!chunk.text){ttsSpeakKokoro(chunk.end);return;}
   ttsSetWord(chunk.start);
-  kokoroHold();
+  audioUnlock();
   if(!kReady)kokoroNote("Downloading Heart… first time only, about 90 MB");
   const voice=kokoroVoiceName();
   const speed=Math.min(1.6,Math.max(0.7,S.ttsRate||1));
@@ -2029,6 +2059,9 @@ const SILENT_WAV=(()=>{ // 1 s of 8 kHz 8-bit silence
   return URL.createObjectURL(new Blob([b],{type:"audio/wav"}));
 })();
 function keepAliveStart(){
+  // A playing <audio>, even a silent one, takes the iPhone audio session and
+  // the device voice comes out silent. Android still wants it for the lock screen.
+  if(IS_IOS)return;
   const a=$("keepAlive");
   try{if(!a.src)a.src=SILENT_WAV;a.volume=0.01;const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}
 }
@@ -2039,8 +2072,7 @@ function ttsWatchVisibility(){
   // current word so the user hears it continue instead of having to fiddle.
   if(document.visibilityState!=="visible"||!ttsActive||!ttsSpeaking)return;
   if(ttsUsesKokoro()){
-    const a=$("ttsAudio");
-    if(a&&a.dataset.kind==="speech"&&a.paused)a.play().catch(()=>{});
+    if(audioCtx&&audioCtx.state==="suspended"&&kNode)audioCtx.resume().catch(()=>{});
     return;
   }
   if(!TTS_OK)return;
@@ -2168,17 +2200,39 @@ function ttsSetWord(i){
     if(p!==page)goTo(p,true);
   }
 }
-function ttsSpeakFrom(i){
+function ttsEngineSpeak(u, cont){
+  const kick=()=>{
+    if(ttsUtter!==u||!ttsSpeaking)return;
+    try{
+      if(speechSynthesis.paused)speechSynthesis.resume();
+      speechSynthesis.speak(u);
+      if(speechSynthesis.paused)speechSynthesis.resume();
+    }catch(e){}
+  };
+  // A sentence that just finished must be followed immediately, with no
+  // cancel(), or iOS drops the rest of the chapter.
+  if(cont){kick();return;}
+  // cancel() and speak() in the same turn makes Chrome accept the utterance
+  // and then never play it. The first utterance of a tap must still be spoken
+  // immediately, or iOS throws the gesture away.
+  const live=!!(speechSynthesis.speaking||speechSynthesis.pending);
+  if(live){try{speechSynthesis.cancel();}catch(e){} setTimeout(kick, 50);}
+  else kick();
+  setTimeout(()=>{
+    if(ttsUtter!==u||u._started||!ttsSpeaking)return;
+    try{speechSynthesis.pause(); speechSynthesis.resume();}catch(e){}
+  }, 400);
+}
+function ttsSpeakFrom(i, cont){
   if(ttsUsesKokoro()){
-    if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
+    if(TTS_OK&&(speechSynthesis.speaking||speechSynthesis.pending)){try{speechSynthesis.cancel();}catch(e){}}
     ttsStopTimer();
     ttsSpeakKokoro(i);return;
   }
   if(kEpoch){kEpoch++;kNext=null;kokoroStopAudio();}
+  else keepAliveStop();
   if(!TTS_OK)return;
   ttsStopTimer();
-  speechSynthesis.cancel();
-  if(speechSynthesis.paused){try{speechSynthesis.resume();}catch(e){}} // un-stick Chrome's paused state
   if(!ttsWords.length||i>=ttsWords.length){ttsChapterEnded();return;}
   ttsChunkBase=i;
   // one utterance = whole sentences up to ~160 chars (hard cap 320), so prosody
@@ -2205,6 +2259,7 @@ function ttsSpeakFrom(i){
   u.rate=S.ttsRate;
   const v=ttsCurrentVoice();if(v){u.voice=v;u.lang=v.lang;}
   ttsBoundarySeen=false;
+  u.onstart=()=>{u._started=true;};
   u.onboundary=e=>{
     if(ttsUtter!==u)return;
     if(e.name&&e.name!=="word")return;
@@ -2212,7 +2267,7 @@ function ttsSpeakFrom(i){
     let k=0;while(k+1<starts.length&&starts[k+1]<=e.charIndex)k++;
     ttsSetWord(ttsChunkBase+k);
   };
-  u.onend=()=>{ttsStopTimer();if(ttsSpeaking&&ttsUtter===u)ttsSpeakFrom(end);};
+  u.onend=()=>{ttsStopTimer();if(ttsSpeaking&&ttsUtter===u)ttsSpeakFrom(end,true);};
   u.onerror=e=>{
     if(e.error==="interrupted"||e.error==="canceled")return; // our own cancel()
     if(ttsUtter!==u)return;
@@ -2225,7 +2280,7 @@ function ttsSpeakFrom(i){
   };
   ttsUtter=u;
   ttsSetWord(i);
-  speechSynthesis.speak(u);
+  ttsEngineSpeak(u, cont);
   ttsStartFallback(end);
 }
 function ttsChapterEnded(){
@@ -2233,7 +2288,7 @@ function ttsChapterEnded(){
   const j=siblingChapter(1);
   if(j!==null){
     ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
-    if(ttsUsesKokoro())kokoroHold();
+    if(ttsUsesKokoro())audioUnlock();
     else ttsHoldUntilReady();
     nav(chapterHash(CHAPTERS[j]));
   }else{
@@ -2285,8 +2340,7 @@ function ttsUnlock(){
 }
 function ttsOpen(autoplay,fromStart){
   if(!TTS_OK&&!KOKORO_OK){toast("Reading aloud isn't supported in this browser.");return;}
-  if(ttsUsesKokoro())kokoroHold();
-  else ttsUnlock();
+  audioUnlock();
   const fresh=ttsWordsFor!==cur;
   ttsActive=true;
   $("btnListen").classList.add("on");
@@ -2323,20 +2377,19 @@ function ttsOpen(autoplay,fromStart){
       if(ttsWords.length)ttsSetWord(Math.min(ttsIdx,ttsWords.length-1));
       if(autoplay)ttsPlay();
     };
-    // chapter auto-advance must speak in the same turn as onend when possible
-    if(fromStart)start();
-    else requestAnimationFrame(start);
+    // Speak in this tap. requestAnimationFrame is a new turn, and iOS drops it.
+    start();
   }else if(autoplay)ttsPlay();
 }
 function ttsClose(){
   ttsActive=false;ttsSpeaking=false;
-  kEpoch++;kNext=null;kokoroPausedMid=false;
+  kEpoch++;kNext=null;kPendingBuf=null;kokoroPausedMid=false;
   ttsStopTimer();
   ttsSleepClear();
   keepAliveStop();
   kokoroStopAudio();kokoroNote("");
   $("voiceHelp").classList.add("hidden");
-  if(TTS_OK)speechSynthesis.cancel();
+  if(TTS_OK&&(speechSynthesis.speaking||speechSynthesis.pending)){try{speechSynthesis.cancel();}catch(e){}}
   ttsClearCur();
   for(let k=ttsSentCur[0];k<ttsSentCur[1];k++)if(ttsWords[k])ttsWords[k].classList.remove("tts-sent");
   ttsSentCur=[-1,-1];
@@ -2354,20 +2407,21 @@ function ttsClose(){
 /* pause = cancel + remember the word; resume = speak again from that word.
    The engine's own pause()/resume() is broken on Android and can wedge Chrome. */
 function ttsPlay(){
-  if(!ttsActive){
-    if(ttsUsesKokoro())kokoroHold();
-    else ttsUnlock();
-    ttsOpen(true);return;
-  }
-  // Resume the sentence already in the audio element. Calling kokoroHold
-  // first would replace that audio with silence.
+  audioUnlock();
+  if(!ttsActive){ttsOpen(true);return;}
   if(ttsUsesKokoro()&&kokoroPausedMid){
     kokoroPausedMid=false;ttsSpeaking=true;
-    const p=$("ttsAudio").play(); if(p&&p.catch)p.catch(()=>{});
+    const pending=kPendingBuf; kPendingBuf=null;
+    const go=()=>{
+      if(pending)kokoroStartBuf(pending.buf, pending.chunk, pending.epoch);
+      else kokoroArmHighlight();
+    };
+    if(audioCtx&&audioCtx.state!=="running"){
+      const p=audioCtx.resume();
+      if(p&&p.then)p.then(go).catch(go); else go();
+    }else go();
     paintTtsPlay();return;
   }
-  if(ttsUsesKokoro())kokoroHold();
-  else ttsUnlock();
   if(ttsWordsFor!==cur)ttsBuildWords();
   if(!ttsWords.length){toast("Nothing to read in this chapter.");return;}
   ttsSpeaking=true;
@@ -2377,11 +2431,11 @@ function ttsPlay(){
 }
 function ttsPause(){
   if(ttsUsesKokoro()){
-    const a=$("ttsAudio");
-    if(a.dataset.kind==="speech"&&!a.ended){
-      a.pause();kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
+    if(kNode&&audioCtx&&audioCtx.state==="running"){
+      audioCtx.suspend();
+      kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
     }
-    kEpoch++;kNext=null;kokoroStopAudio();kokoroNote("");
+    kEpoch++;kNext=null;kPendingBuf=null;kokoroStopGraph();kokoroNote("");
     ttsSpeaking=false;paintTtsPlay();return;
   }
   ttsSpeaking=false;
@@ -3300,7 +3354,7 @@ $("btnNextCh").addEventListener("click",()=>openSibling(1,false));
 $("slider").addEventListener("input",e=>goTo(e.target.value-1,false));
 
 /* Listen (text-to-speech) controls */
-$("btnListen").addEventListener("click",()=>{ttsUnlock();ttsActive?ttsClose():ttsOpen(true);});
+$("btnListen").addEventListener("click",()=>{audioUnlock();ttsActive?ttsClose():ttsOpen(true);});
 $("ttsClose").addEventListener("click",ttsClose);
 $("ttsPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
 $("ttsSaveSent").addEventListener("click",ttsKeepSentence);
@@ -3347,10 +3401,15 @@ $("ttsVoice").addEventListener("change",e=>{
     kokoroNote(kReady?"Heart is ready.":"Heart downloads once (~90 MB) the first time you press play, then stays on this phone.");
   else if(TTS_OK){ // quick preview of the newly chosen device voice
     kokoroNote("");
+    kokoroStopAudio();
     const u=new SpeechSynthesisUtterance("This voice will read your books.");
     const v=ttsCurrentVoice();if(v)u.voice=v;
     u.rate=S.ttsRate;
-    speechSynthesis.cancel();speechSynthesis.speak(u);
+    try{
+      if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+      if(speechSynthesis.paused)speechSynthesis.resume();
+    }catch(err){}
   }
 });
 /* sleep timer: ⏾ cycles Off → 5 → 15 → 30 → 60 min, then pauses the voice */
