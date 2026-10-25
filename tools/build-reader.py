@@ -506,8 +506,8 @@ def build():
         "start_url": "./",
         "scope": "./",
         "display": "standalone",
-        "background_color": "#fafaf7",
-        "theme_color": "#fafaf7",
+        "background_color": "#fbfaf7",
+        "theme_color": "#fbfaf7",
         "icons": [
             {"src": icon, "sizes": "512x512", "type": "image/svg+xml", "purpose": "any"},
             {"src": icon, "sizes": "192x192", "type": "image/svg+xml", "purpose": "maskable"},

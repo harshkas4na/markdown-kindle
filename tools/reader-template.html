@@ -10,36 +10,58 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iI2IzNzYyZiIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjU2IDE1MiBDMjEwIDEyMiAxNTAgMTIyIDEyMCAxNDAgTDEyMCAzNzIgQzE1MCAzNTQgMjEwIDM1NCAyNTYgMzg0Ii8+PHBhdGggZD0iTTI1NiAxNTIgQzMwMiAxMjIgMzYyIDEyMiAzOTIgMTQwIEwzOTIgMzcyIEMzNjIgMzU0IDMwMiAzNTQgMjU2IDM4NCIvPjxsaW5lIHgxPSIyNTYiIHkxPSIxNTIiIHgyPSIyNTYiIHkyPSIzODQiLz48L2c+PC9zdmc+">
 <title>Library</title>
 <style>
-/* ---------- themes ---------- */
+/* ---------- design tokens / themes ----------
+   Kindle's model: paper, not screen. One accent (warm amber) carries CTA,
+   progress and active states; covers are the only other colour. All six
+   reading themes are OS-independent so the page never fights the phone. */
 :root{
-  --bg:#fafaf7; --fg:#1c1c1a; --muted:#8a8a84; --accent:#b3762f;
-  --bar-bg:rgba(250,250,247,.96); --bar-fg:#1c1c1a; --line:rgba(0,0,0,.09);
+  --bg:#fbfaf7; --fg:#1b1b19; --muted:#77766f; --accent:#b3762f;
+  --accent-ink:#fff8ee;
+  --bar-bg:rgba(251,250,247,.92); --bar-fg:#1b1b19; --line:rgba(0,0,0,.09);
   --card:#ffffff; --card-line:rgba(0,0,0,.07); --shadow:rgba(0,0,0,.10);
   --code-bg:rgba(0,0,0,.055);
+  --paper:#fffdf8; --paper-line:rgba(0,0,0,.055);
+  --radius:16px; --radius-sm:11px; --radius-lg:22px;
+  --ui-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  --read-font:"New York",ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --nav-h:58px; --tap:44px;
+  --ease:cubic-bezier(.22,.61,.36,1); --ease-out:cubic-bezier(.16,1,.3,1);
+  color-scheme:light;
 }
 html[data-theme="sepia"]{
-  --bg:#f3ead7; --fg:#4b3a2a; --muted:#98866f; --accent:#8a5a20;
-  --bar-bg:rgba(243,234,215,.96); --bar-fg:#4b3a2a; --line:rgba(75,58,42,.14);
-  --card:#f9f2e2; --card-line:rgba(75,58,42,.10); --shadow:rgba(75,58,42,.12);
-  --code-bg:rgba(75,58,42,.08);
+  --bg:#f4ead4; --fg:#4a3827; --muted:#8f7d66; --accent:#8a5a20;
+  --bar-bg:rgba(244,234,212,.93); --bar-fg:#4a3827; --line:rgba(74,56,39,.14);
+  --card:#faf2e0; --card-line:rgba(74,56,39,.10); --shadow:rgba(74,56,39,.13);
+  --code-bg:rgba(74,56,39,.08); --paper:#f8efdb; --paper-line:rgba(74,56,39,.08);
+  color-scheme:light;
+}
+html[data-theme="green"]{
+  --bg:#e9efe3; --fg:#29362b; --muted:#6e7d6d; --accent:#8a5a20;
+  --bar-bg:rgba(233,239,227,.93); --bar-fg:#29362b; --line:rgba(41,54,43,.13);
+  --card:#f3f7ee; --card-line:rgba(41,54,43,.09); --shadow:rgba(41,54,43,.12);
+  --code-bg:rgba(41,54,43,.07); --paper:#eff4e9; --paper-line:rgba(41,54,43,.07);
+  color-scheme:light;
 }
 html[data-theme="gray"]{
   --bg:#2b2d31; --fg:#d7d8d4; --muted:#8b8d88; --accent:#d9a65c;
-  --bar-bg:rgba(43,45,49,.96); --bar-fg:#d7d8d4; --line:rgba(255,255,255,.10);
+  --bar-bg:rgba(43,45,49,.93); --bar-fg:#d7d8d4; --line:rgba(255,255,255,.10);
   --card:#34373c; --card-line:rgba(255,255,255,.07); --shadow:rgba(0,0,0,.35);
-  --code-bg:rgba(255,255,255,.07);
+  --code-bg:rgba(255,255,255,.07); --paper:#31343a; --paper-line:rgba(255,255,255,.06);
+  color-scheme:dark;
 }
 html[data-theme="dark"]{
-  --bg:#111113; --fg:#cfcfc9; --muted:#6e6e68; --accent:#d29a4f;
-  --bar-bg:rgba(17,17,19,.96); --bar-fg:#cfcfc9; --line:rgba(255,255,255,.10);
+  --bg:#111113; --fg:#cfcfc9; --muted:#787872; --accent:#d29a4f;
+  --bar-bg:rgba(17,17,19,.93); --bar-fg:#cfcfc9; --line:rgba(255,255,255,.10);
   --card:#1a1a1d; --card-line:rgba(255,255,255,.07); --shadow:rgba(0,0,0,.5);
-  --code-bg:rgba(255,255,255,.08);
+  --code-bg:rgba(255,255,255,.08); --paper:#141416; --paper-line:rgba(255,255,255,.05);
+  color-scheme:dark;
 }
 html[data-theme="black"]{
-  --bg:#000000; --fg:#bdbdb7; --muted:#5f5f5a; --accent:#c9924a;
-  --bar-bg:rgba(0,0,0,.96); --bar-fg:#bdbdb7; --line:rgba(255,255,255,.12);
+  --bg:#000000; --fg:#c8c8c2; --muted:#66665f; --accent:#c9924a;
+  --bar-bg:rgba(0,0,0,.93); --bar-fg:#c8c8c2; --line:rgba(255,255,255,.12);
   --card:#0e0e10; --card-line:rgba(255,255,255,.08); --shadow:rgba(0,0,0,.7);
-  --code-bg:rgba(255,255,255,.09);
+  --code-bg:rgba(255,255,255,.09); --paper:#050505; --paper-line:rgba(255,255,255,.06);
+  color-scheme:dark;
 }
 /* ---------- base ---------- */
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -47,17 +69,22 @@ html,body{margin:0; padding:0; height:100%;}
 body.reader-open{overflow:hidden;}
 body{
   background:var(--bg); color:var(--fg);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-family:var(--ui-font);
   overscroll-behavior:none; touch-action:manipulation;
+  -webkit-font-smoothing:antialiased;
   transition:background .25s ease, color .25s ease;
 }
 button{font:inherit; color:inherit; background:none; border:none; cursor:pointer; padding:0;}
 .hidden{display:none !important;}
-.view{min-height:100dvh; padding:max(20px,env(safe-area-inset-top)) 18px 60px;
+.view{min-height:100dvh; padding:max(22px,env(safe-area-inset-top)) 18px calc(96px + env(safe-area-inset-bottom));
   max-width:860px; margin:0 auto;}
-.icon-btn{width:42px; height:42px; border-radius:12px; display:flex; align-items:center;
-  justify-content:center; font-size:19px; border:1px solid var(--line); flex-shrink:0;}
-.icon-btn:active{transform:scale(.94);}
+.icon-btn{width:var(--tap); height:var(--tap); border-radius:13px; display:flex; align-items:center;
+  justify-content:center; font-size:19px; border:1px solid var(--line); flex-shrink:0;
+  background:color-mix(in srgb,var(--card) 55%,transparent);
+  transition:transform .12s ease, background .15s, border-color .15s;}
+.icon-btn:active{transform:scale(.93); background:var(--code-bg);}
+svg.ic{width:21px; height:21px; display:block; fill:none; stroke:currentColor; stroke-width:1.7;
+  stroke-linecap:round; stroke-linejoin:round;}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
   outline:2px solid var(--accent); outline-offset:2px;}
 @media (prefers-reduced-motion: reduce){
@@ -66,22 +93,31 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 }
 
 /* ---------- toast (update available, import done, ...) ---------- */
-#toast{position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%);
+#toast{position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom)); transform:translateX(-50%);
   z-index:80; background:var(--fg); color:var(--bg); border-radius:14px; padding:11px 16px;
   font-size:13.5px; display:flex; align-items:center; gap:14px; box-shadow:0 10px 30px var(--shadow);
   max-width:calc(100vw - 32px); animation:toastin .25s ease;}
 #toast button{color:var(--accent); font-weight:600; font-size:13.5px; white-space:nowrap;}
 #toast .x{opacity:.6; font-weight:400;}
+body.reader-open #toast{bottom:calc(24px + env(safe-area-inset-bottom));}
 @keyframes toastin{from{opacity:0; transform:translate(-50%,10px);} to{opacity:1; transform:translate(-50%,0);}}
 
 /* ---------- bottom sheet (notes, pronunciation, confirmations) ---------- */
 #sheetScrim{position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.35);}
 #sheet{position:fixed; z-index:71; left:50%; transform:translateX(-50%);
-  bottom:calc(14px + env(safe-area-inset-bottom) + var(--kb,0px)); width:min(520px, calc(100vw - 20px));
-  max-height:min(80dvh, calc(100dvh - 28px - var(--kb,0px))); overflow-y:auto;}
-  background:var(--card); border:1px solid var(--card-line); border-radius:18px; padding:16px;
-  box-shadow:0 14px 44px var(--shadow); display:flex; flex-direction:column; gap:10px;}
-#sheet h3{margin:0; font-size:15px;}
+  bottom:calc(12px + env(safe-area-inset-bottom) + var(--kb,0px)); width:min(520px, calc(100vw - 20px));
+  max-height:min(80dvh, calc(100dvh - 28px - var(--kb,0px))); overflow-y:auto;
+  background:var(--card); border:1px solid var(--card-line); border-radius:20px; padding:18px;
+  box-shadow:0 18px 54px var(--shadow); display:flex; flex-direction:column; gap:12px;
+  -webkit-overflow-scrolling:touch;}
+#sheet h3{margin:0; font-size:16px; letter-spacing:-.01em;}
+.sheet-menu{display:flex; flex-direction:column; gap:4px; margin:2px 0;}
+.sheet-menu button{display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+  min-height:52px; padding:10px 12px; border-radius:13px; font-size:15px; background:var(--bg);}
+.sheet-menu button:active{background:var(--code-bg);}
+.sheet-menu .mi{width:26px; text-align:center; font-size:17px; color:var(--accent); flex-shrink:0;}
+.sheet-menu .ml{flex:1; min-width:0;}
+.sheet-menu small{display:block; font-size:11.5px; color:var(--muted); margin-top:2px;}
 #sheet .q{font-size:13px; color:var(--muted); line-height:1.5; border-left:3px solid var(--accent);
   padding-left:10px; max-height:90px; overflow:auto;}
 #sheet textarea,#sheet input{width:100%; font:inherit; font-size:16px; padding:10px 12px; border-radius:12px;
@@ -100,11 +136,13 @@ html[data-theme="dark"] .hc-g,html[data-theme="black"] .hc-g{background:#4f9a4f;
 html[data-theme="dark"] .hc-b,html[data-theme="black"] .hc-b{background:#3f87b8;}
 html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;}
 
-/* ---------- home (shelves) ---------- */
+/* ---------- home / library ---------- */
 .lib-top{display:flex; justify-content:space-between; align-items:center; gap:10px;}
-#home h1{font-size:26px; margin:18px 4px 4px; letter-spacing:-.02em;}
-#home .sub{color:var(--muted); font-size:14px; margin:0 4px 22px;}
-.offbar{display:inline-flex; align-items:center; gap:8px; margin:0 4px 24px; padding:9px 14px;
+#home h1{font-size:31px; line-height:1.1; margin:14px 2px 2px; letter-spacing:-.035em;}
+#home .sub{color:var(--muted); font-size:13.5px; margin:4px 2px 0;}
+.home-head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:16px;}
+.home-head .sub{font-variant-numeric:tabular-nums;}
+.offbar{display:inline-flex; align-items:center; gap:8px; margin:0 2px 18px; padding:10px 14px; min-height:44px;
   border-radius:11px; border:1px solid var(--card-line); background:var(--card); color:var(--muted);
   font:500 13px inherit; font-family:inherit; cursor:pointer; -webkit-appearance:none;
   transition:border-color .15s, color .15s;}
@@ -115,44 +153,92 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
 .offbar .spin{width:13px; height:13px; border-radius:50%; border:2px solid var(--card-line);
   border-top-color:var(--accent); display:inline-block; animation:offspin .7s linear infinite;}
 @keyframes offspin{to{transform:rotate(360deg);}}
-.continue{display:block; width:100%; text-align:left; background:var(--card);
-  border:1px solid var(--card-line); border-radius:16px; padding:16px 18px; margin-bottom:26px;
-  box-shadow:0 4px 18px var(--shadow);}
-.continue .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--accent); font-weight:600;}
-.continue .t{font-size:17px; font-weight:600; margin:6px 0 4px;}
-.continue .p{font-size:13px; color:var(--muted);}
-.section-h{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.09em;
-  color:var(--muted); margin:26px 4px 12px; display:flex; align-items:baseline; gap:10px;}
-.section-h .cnt{font-weight:500; letter-spacing:0; text-transform:none; font-size:12px; opacity:.8;}
-.shelf{display:grid; grid-template-columns:repeat(auto-fill,minmax(138px,1fr)); gap:16px 14px;}
-.shelf.row{display:flex; overflow-x:auto; gap:14px; padding:4px 4px 10px; scroll-snap-type:x proximity;
-  scrollbar-width:none; margin:0 -4px;}
+
+/* Kindle-style continue card: cover + title + a single decisive Resume pill */
+.continue{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:14px;
+  width:100%; text-align:left; background:var(--card); border:1px solid var(--card-line);
+  border-radius:var(--radius-lg); padding:13px 14px; margin:0 0 22px; box-shadow:0 6px 22px var(--shadow);
+  transition:transform .15s var(--ease), border-color .15s;}
+.continue:active{transform:scale(.985);}
+.continue .cc-cover{width:58px; flex-shrink:0; aspect-ratio:2/3; border-radius:7px; position:relative;
+  display:grid; place-items:center; overflow:hidden; color:#fff;
+  box-shadow:0 5px 14px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.08);}
+.continue .cc-cover::before{content:""; position:absolute; top:0; bottom:0; left:0; width:5px;
+  background:linear-gradient(90deg,rgba(0,0,0,.28),rgba(255,255,255,.2));}
+.continue .cc-cover::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(120% 70% at 80% 0%,rgba(255,255,255,.24),transparent 60%);}
+.continue .cc-cover span{position:relative; z-index:1; font-family:var(--read-font);
+  font-size:23px; font-weight:700; opacity:.92; text-shadow:0 1px 4px rgba(0,0,0,.3);}
+.continue .cc-main{min-width:0;}
+.continue .lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:.11em; color:var(--accent); font-weight:700;}
+.continue .t{font-size:16px; font-weight:650; line-height:1.28; margin:5px 0 3px; letter-spacing:-.015em;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+.continue .p{font-size:12.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.continue .cc-bar{height:4px; border-radius:2px; background:var(--code-bg); margin-top:9px; overflow:hidden;}
+.continue .cc-bar i{display:block; height:100%; border-radius:2px; background:var(--accent);}
+.continue .cc-go{flex-shrink:0; background:var(--accent); color:var(--accent-ink); font-size:12.5px;
+  font-weight:650; padding:9px 14px; border-radius:999px; letter-spacing:-.01em;}
+
+
+/* library filter pills — All / Reading / Unread / Finished */
+.chips{display:flex; gap:7px; overflow-x:auto; scrollbar-width:none; margin:0 -2px 18px; padding:2px;
+  scroll-snap-type:x proximity;}
+.chips::-webkit-scrollbar{display:none;}
+.chips button{flex:0 0 auto; padding:9px 14px; min-height:44px; border-radius:999px; font-size:13px;
+  font-weight:550; color:var(--muted); background:var(--card); border:1px solid var(--card-line);
+  scroll-snap-align:start; transition:background .15s,color .15s,border-color .15s;}
+.chips button.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:650;}
+
+.section-h{font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+  color:var(--muted); margin:26px 2px 12px; display:flex; align-items:baseline; gap:9px;}
+.section-h .cnt{font-weight:500; letter-spacing:0; text-transform:none; font-size:12px; opacity:.75;}
+.shelf{display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:20px 12px;}
+.shelf.row{display:flex; overflow-x:auto; gap:13px; padding:4px 2px 12px; scroll-snap-type:x proximity;
+  scrollbar-width:none; margin:0 -2px;}
 .shelf.row::-webkit-scrollbar{display:none;}
-.shelf.row .bookcard{flex:0 0 118px; scroll-snap-align:start;}
-.bookcard{text-align:left; display:flex; flex-direction:column; gap:7px;}
+.shelf.row .bookcard{flex:0 0 105px; scroll-snap-align:start;}
+.bookcard{text-align:left; display:flex; flex-direction:column; gap:7px; min-width:0;}
 .bookcard:active .cover{transform:scale(.97);}
-.cover{position:relative; aspect-ratio:2/3; border-radius:10px; padding:14px 12px 18px 16px;
-  display:flex; flex-direction:column; overflow:hidden; color:#f5f1e8;
-  box-shadow:0 5px 16px var(--shadow); transition:transform .15s ease;}
-.cover::before{content:""; position:absolute; top:0; bottom:0; left:0; width:7px;
-  background:rgba(255,255,255,.16); border-right:1px solid rgba(0,0,0,.15);}
+.cover{position:relative; aspect-ratio:2/3; border-radius:7px; padding:12px 10px 16px 14px;
+  display:flex; flex-direction:column; overflow:hidden; color:#f7f3ea; isolation:isolate;
+  box-shadow:0 5px 14px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.06);
+  transition:transform .15s var(--ease), box-shadow .15s;}
+.cover::before{content:""; position:absolute; top:0; bottom:0; left:0; width:6px; z-index:2;
+  background:linear-gradient(90deg,rgba(0,0,0,.22),rgba(255,255,255,.22) 55%,rgba(0,0,0,.10));
+  border-right:1px solid rgba(0,0,0,.16);}
+.cover::after{content:""; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
+  background:
+    radial-gradient(120% 80% at 85% 0%, rgba(255,255,255,.22), transparent 55%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.045) 0 2px, transparent 2px 5px);}
 .cover.img{padding:0;}
-.cover.img::before{display:none;}
+.cover.img::before,.cover.img::after{display:none;}
 .cover.img img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;}
 .cover.img .bt,.cover.img .ba{display:none;}
-.cover .bt{font-size:14.5px; font-weight:700; line-height:1.3; letter-spacing:-.01em;
-  display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
-  text-shadow:0 1px 2px rgba(0,0,0,.25);}
-.cover .ba{margin-top:auto; font-size:11px; opacity:.85; overflow:hidden;
+.cover .bt{position:relative; z-index:1; font-size:13.5px; font-weight:700; line-height:1.28;
+  letter-spacing:-.015em; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical;
+  overflow:hidden; text-shadow:0 1px 3px rgba(0,0,0,.3);}
+.cover .ba{position:relative; z-index:1; margin-top:auto; font-size:10px; opacity:.82; overflow:hidden;
   text-overflow:ellipsis; white-space:nowrap;}
-.cover .bar{position:absolute; left:0; right:0; bottom:0; height:4px; background:rgba(0,0,0,.25); z-index:1;}
-.cover .bar i{display:block; height:100%; background:#fff; opacity:.9;}
-.cover .badge{position:absolute; top:8px; right:8px; z-index:1; font-size:10px; font-weight:700;
-  background:rgba(0,0,0,.45); color:#fff; border-radius:6px; padding:2px 6px; letter-spacing:.04em;}
-.bookcard .cap{font-size:11.5px; color:var(--muted); padding:0 2px;}
+.cover .bar{position:absolute; left:0; right:0; bottom:0; height:4px; z-index:3;
+  background:rgba(0,0,0,.32);}
+.cover .bar i{display:block; height:100%; background:var(--accent); border-radius:0 2px 2px 0;
+  box-shadow:0 0 8px color-mix(in srgb,var(--accent) 60%,transparent);}
+.cover .badge{position:absolute; top:7px; right:7px; z-index:3; font-size:9px; font-weight:700;
+  background:rgba(0,0,0,.5); color:#fff; border-radius:6px; padding:2px 6px; letter-spacing:.06em;
+  backdrop-filter:blur(4px);}
+.bookcard .cap{font-size:11px; line-height:1.35; color:var(--muted); padding:0 1px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  font-variant-numeric:tabular-nums;}
+.bookcard .cap b{color:var(--fg); font-weight:600;}
 .bookcard .cap.done{color:var(--accent);}
-.statline{color:var(--muted); font-size:13px; margin:-14px 4px 20px; display:flex; gap:14px; flex-wrap:wrap;}
-.statline button{color:var(--accent); font-size:13px;}
+.continue:focus-visible,.bookcard:focus-visible,.chips button:focus-visible,
+.bottomnav button:focus-visible,.chap:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+.statline{color:var(--muted); font-size:13px; margin:0 2px 16px; display:flex; gap:14px; flex-wrap:wrap;
+  align-items:center;}
+.statline b{color:var(--fg); font-weight:650;}
+.statline button{color:var(--accent); font-size:13px; font-weight:550; min-height:44px; padding:0 4px; margin:-12px 0;}
+.empty{grid-column:1/-1; padding:30px 12px; text-align:center; color:var(--muted); font-size:13.5px;
+  border:1px dashed var(--card-line); border-radius:var(--radius);}
 .heat{display:grid; grid-auto-flow:column; grid-template-rows:repeat(7,12px); gap:3px; margin:12px 4px 6px;
   overflow-x:auto; padding-bottom:4px;}
 .heat i{display:block; width:12px; height:12px; border-radius:3px; background:var(--code-bg);}
@@ -160,22 +246,54 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
 .heat i.l2{background:color-mix(in srgb,var(--accent) 55%,transparent);}
 .heat i.l3{background:color-mix(in srgb,var(--accent) 80%,transparent);}
 .heat i.l4{background:var(--accent);}
-.statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:8px 4px 18px;}
-.statgrid .st{background:var(--card); border:1px solid var(--card-line); border-radius:12px; padding:12px 14px;}
-.statgrid .st b{display:block; font-size:20px; letter-spacing:-.02em;}
+.statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:8px 2px 18px;}
+.statgrid .st{background:var(--card); border:1px solid var(--card-line); border-radius:14px; padding:13px 14px;}
+.statgrid .st b{display:block; font-size:21px; letter-spacing:-.03em; font-variant-numeric:tabular-nums;}
 .statgrid .st span{font-size:12px; color:var(--muted);}
+
+/* reading-goal ring (Apple Books' Reading Now idea) */
+.goalcard{display:flex; align-items:center; gap:16px; background:var(--card); border:1px solid var(--card-line);
+  border-radius:var(--radius-lg); padding:16px 17px; margin:0 0 20px; box-shadow:0 4px 18px var(--shadow);}
+.goalring{--pct:0; width:86px; height:86px; flex-shrink:0; border-radius:50%; position:relative;
+  background:conic-gradient(var(--accent) calc(var(--pct)*1turn), var(--code-bg) 0);
+  display:grid; place-items:center; transition:background .4s ease;}
+.goalring::after{content:""; position:absolute; inset:7px; border-radius:50%; background:var(--card);}
+.goalring .gv{position:relative; z-index:1; text-align:center; line-height:1.1;}
+.goalring .gv b{display:block; font-size:20px; letter-spacing:-.03em; font-variant-numeric:tabular-nums;}
+.goalring .gv span{font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em;}
+.goalcard .gt{min-width:0; flex:1;}
+.goalcard .gt .k{font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--accent);}
+.goalcard .gt .v{font-size:17px; font-weight:650; margin:5px 0 3px; letter-spacing:-.02em;}
+.goalcard .gt .s{font-size:12.5px; color:var(--muted); line-height:1.45;}
+.goalcard .gbtn{font-size:11.5px; border:1px solid var(--card-line); border-radius:9px; padding:7px 10px;
+  color:var(--accent); flex-shrink:0; align-self:flex-start;}
+
 .hint{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--card-line);
-  border-radius:14px; padding:12px 14px; margin:0 4px 20px; font-size:13px; line-height:1.5; color:var(--muted);}
+  border-radius:14px; padding:12px 14px; margin:0 2px 18px; font-size:13px; line-height:1.5; color:var(--muted);}
 .hint b{color:var(--fg);}
-.hint button{color:var(--muted); font-size:16px; margin-left:auto; flex-shrink:0;}
+.hint button{color:var(--muted); font-size:16px; margin-left:auto; flex-shrink:0; min-width:32px; min-height:32px;}
 .dropzone{outline:3px dashed var(--accent); outline-offset:-12px;}
 .impbar{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--card-line);
-  border-radius:12px; padding:10px 14px; margin:0 4px 18px; font-size:13px; color:var(--muted);}
+  border-radius:12px; padding:10px 14px; margin:0 2px 18px; font-size:13px; color:var(--muted);}
 .impbar .spin{width:13px; height:13px; border-radius:50%; border:2px solid var(--card-line);
   border-top-color:var(--accent); display:inline-block; animation:offspin .7s linear infinite; flex-shrink:0;}
 
+/* ---------- bottom navigation (iPhone thumb zone) ---------- */
+.bottomnav{position:fixed; z-index:26; left:50%; transform:translateX(-50%);
+  bottom:calc(8px + env(safe-area-inset-bottom)); width:min(420px, calc(100vw - 24px));
+  display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+  background:var(--bar-bg); border:1px solid var(--line); border-radius:20px;
+  padding:6px; box-shadow:0 10px 34px var(--shadow);
+  backdrop-filter:blur(18px) saturate(1.35); -webkit-backdrop-filter:blur(18px) saturate(1.35);}
+.bottomnav button{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  min-height:48px; border-radius:14px; color:var(--muted); font-size:9.5px; font-weight:600;
+  letter-spacing:.01em; transition:color .15s, background .15s;}
+.bottomnav button .ic{width:21px; height:21px;}
+.bottomnav button.on{color:var(--accent); background:color-mix(in srgb,var(--accent) 12%,transparent);}
+.bottomnav button:active{background:var(--code-bg);}
+
 /* ---------- search ---------- */
-.searchbox{width:100%; padding:11px 14px; border-radius:12px; border:1px solid var(--card-line);
+.searchbox{width:100%; min-height:44px; padding:12px 14px; border-radius:12px; border:1px solid var(--card-line);
   background:var(--card); color:var(--fg); font:inherit; font-size:16px; outline:none;
   -webkit-appearance:none; transition:border-color .15s;}
 .searchbox:focus{border-color:var(--accent);}
@@ -200,10 +318,49 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
 .hlcard .q.c-b{border-left-color:#4f9fd8;} .hlcard .q.c-p{border-left-color:#d8679b;}
 .snone{color:var(--muted); font-size:14px; margin:8px 4px;}
 
+/* ---------- page chrome for Search / Notebook / Stats ---------- */
+.page-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:4px 0 14px;}
+.page-head h1{font-size:30px; line-height:1.1; margin:0; letter-spacing:-.035em;}
+.page-head .sub{margin:3px 0 0; font-size:13px; color:var(--muted);}
+.page-head .acts{display:flex; gap:8px;}
+.searchhero{position:relative; margin:0 0 18px;}
+.searchhero .searchbox{padding:14px 16px 14px 42px; border-radius:14px; font-size:16px;
+  box-shadow:0 3px 14px var(--shadow);}
+.searchhero .sic{position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted);
+  pointer-events:none;}
+.nb-tabs{display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:var(--code-bg);
+  border-radius:13px; padding:4px; margin:0 0 18px;}
+.nb-tabs button{min-height:44px; border-radius:10px; font-size:13px; color:var(--muted); font-weight:550;}
+.nb-tabs button.on{background:var(--card); color:var(--fg); font-weight:650;
+  box-shadow:0 1px 5px var(--shadow);}
+.nb-empty{text-align:center; color:var(--muted); font-size:13.5px; line-height:1.6; padding:42px 20px;
+  border:1px dashed var(--card-line); border-radius:var(--radius);}
+.nb-empty b{display:block; color:var(--fg); font-size:15px; margin-bottom:5px;}
+.bm-row{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:var(--card);
+  border:1px solid var(--card-line); border-radius:13px; padding:12px 14px; margin-bottom:8px; min-height:56px;}
+.bm-row .bi{color:var(--accent); font-size:16px; flex-shrink:0;}
+.bm-row .bt{flex:1; min-width:0;}
+.bm-row .bt b{display:-webkit-box; font-size:14px; font-weight:600; line-height:1.35;
+  overflow:hidden; -webkit-line-clamp:2; -webkit-box-orient:vertical;}
+.bm-row .bt span{display:block; font-size:11.5px; color:var(--muted); margin-top:2px;}
+.bm-row .bx{color:var(--muted); padding:8px; flex-shrink:0; min-width:44px; min-height:44px;
+  display:grid; place-items:center; margin:-6px -8px -6px 0;}
+.goalhero{display:flex; flex-direction:column; align-items:center; padding:22px 16px 18px;
+  background:var(--card); border:1px solid var(--card-line); border-radius:var(--radius-lg);
+  margin:0 0 18px; box-shadow:0 4px 20px var(--shadow);}
+.goalhero .goalring{width:142px; height:142px; margin-bottom:14px;}
+.goalhero .goalring::after{inset:10px;}
+.goalhero .goalring .gv b{font-size:33px;}
+.goalhero .goalring .gv span{font-size:10px;}
+.goalhero h2{font-size:17px; margin:0 0 4px; letter-spacing:-.02em;}
+.goalhero p{font-size:12.5px; color:var(--muted); margin:0 0 14px; text-align:center; line-height:1.5;}
+.goalhero .gbtn{background:var(--fg); color:var(--bg); border-radius:999px; padding:11px 22px;
+  font-size:13px; font-weight:650; min-height:44px;}
+
 /* ---------- home tools row (export / import) ---------- */
 .tools-row{display:flex; gap:8px; margin:34px 4px 0; flex-wrap:wrap;}
 .tools-row button{font-size:12px; color:var(--muted); border:1px solid var(--card-line);
-  border-radius:9px; padding:6px 10px; background:var(--card);}
+  border-radius:10px; padding:10px 12px; min-height:44px; background:var(--card);}
 .tools-row button:active{transform:scale(.97);}
 
 /* ---------- highlight popup ---------- */
@@ -224,45 +381,88 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
 .linkrow{display:block; width:100%; text-align:left; font-size:13.5px; color:var(--accent);
   padding:4px; margin:-10px 0 18px;}
 
-/* ---------- book TOC ---------- */
-#toc .hero{display:flex; gap:18px; margin:18px 0 6px;}
-#toc .hero .cover{width:104px; flex-shrink:0;}
-#toc .hero .bt{font-size:11px; -webkit-line-clamp:6;}
-#toc .hero .ba{font-size:8.5px;}
-#toc .hero h1{font-size:22px; margin:2px 0 4px; letter-spacing:-.02em; line-height:1.25;}
-#toc .hero .author{font-size:14px; color:var(--muted); margin:0 0 8px;}
-#toc .hero .meta{font-size:12.5px; color:var(--muted);}
-#toc .desc{font-size:14px; line-height:1.55; color:var(--muted); margin:14px 4px 18px;}
-.primary{display:block; width:100%; text-align:center; background:var(--accent); color:#fff;
-  border-radius:14px; padding:14px; font-size:15px; font-weight:600; margin-bottom:24px;
-  box-shadow:0 4px 14px var(--shadow);}
+/* ---------- book detail / TOC ---------- */
+#toc{padding-left:18px; padding-right:18px; max-width:860px;}
+.toc-hero{position:relative; margin:0 -18px 8px; padding:6px 18px 22px;
+  overflow:hidden; border-radius:0 0 26px 26px; background:var(--card);
+  box-shadow:0 12px 32px -18px var(--shadow);}
+.toc-hero-bg{position:absolute; inset:-30%; z-index:0; opacity:.5; filter:blur(46px) saturate(1.15);
+  transform:scale(1.2);}
+html[data-theme="dark"] .toc-hero-bg,html[data-theme="black"] .toc-hero-bg,
+html[data-theme="gray"] .toc-hero-bg{opacity:.35;}
+.toc-hero::after{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:linear-gradient(180deg, color-mix(in srgb,var(--bg) 18%,transparent),
+    color-mix(in srgb,var(--bg) 72%,transparent) 70%, var(--bg) 100%);}
+.toc-hero .lib-top{position:relative; z-index:2; margin-bottom:14px;}
+.toc-hero .hero-cover{position:relative; z-index:2; width:132px; margin:0 auto 18px;
+  filter:drop-shadow(0 16px 26px rgba(0,0,0,.28));}
+.toc-hero .hero-cover .cover{border-radius:9px; box-shadow:0 8px 20px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.08);}
+.toc-hero .hero-cover .cover .bt{font-size:15px;}
+.toc-hero .hero-cover .cover .ba{font-size:9.5px;}
+.toc-hero h1{position:relative; z-index:2; text-align:center; font-size:23px; line-height:1.22;
+  margin:0 auto 5px; letter-spacing:-.025em; max-width:34ch;}
+.toc-hero .author{position:relative; z-index:2; text-align:center; font-size:13.5px;
+  color:var(--muted); margin:0 0 9px;}
+.toc-hero .meta{position:relative; z-index:2; text-align:center; font-size:12px; color:var(--muted);
+  font-variant-numeric:tabular-nums;}
+.toc-body{padding:4px 0 20px;}
+.toc-progress{display:flex; align-items:center; gap:10px; margin:8px 2px 18px;}
+.toc-progress .rail{flex:1; height:5px; border-radius:3px; background:var(--code-bg); overflow:hidden;}
+.toc-progress .rail i{display:block; height:100%; border-radius:3px; background:var(--accent);}
+.toc-progress .val{font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums;
+  min-width:64px; text-align:right;}
+.upnext{font-size:11.5px; color:var(--muted); text-align:center; margin:-2px 0 18px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 8px;}
+#toc .desc{font-size:14px; line-height:1.6; color:var(--muted); margin:0 2px 18px;}
+.primary{display:flex; align-items:center; justify-content:center; gap:9px; width:100%; text-align:center;
+  background:var(--accent); color:var(--accent-ink); border-radius:15px; padding:15px 14px;
+  font-size:15px; font-weight:650; margin-bottom:10px; letter-spacing:-.01em;
+  box-shadow:0 6px 18px -6px color-mix(in srgb,var(--accent) 65%,transparent);}
 .primary:active{transform:scale(.985);}
+.primary .ic{width:18px; height:18px;}
+.secondary{display:flex; align-items:center; justify-content:center; gap:7px; width:100%;
+  border:1px solid var(--card-line); background:var(--card); border-radius:13px; padding:11px;
+  font-size:13px; color:var(--fg); margin-bottom:22px; min-height:44px;}
+.secondary:active{background:var(--code-bg);}
 .lockbox{max-width:360px; margin:min(30vh,220px) auto 0; text-align:center;}
 .lockmark{font-size:34px; margin-bottom:14px;}
 .lockbox .sub{color:var(--muted); font-size:13.5px; line-height:1.5; margin:0 0 18px;}
 .lockbox .searchbox{text-align:center; margin-bottom:14px;}
 .lockbox #lockErr{min-height:16px; color:var(--accent); margin-top:12px;}
-.chap{display:flex; align-items:center; gap:14px; width:100%; text-align:left;
-  background:var(--card); border:1px solid var(--card-line); border-radius:14px;
-  padding:13px 16px; margin-bottom:8px;}
-.chap:active{transform:scale(.985);}
-.chap .n{font-size:12px; color:var(--muted); min-width:22px; font-variant-numeric:tabular-nums;}
-.chap .t{flex:1; font-size:15px; font-weight:500; line-height:1.35;}
-.chap .pct{font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;}
-.chap .pct.done{color:var(--accent);}
+.chapter-list{background:var(--card); border:1px solid var(--card-line); border-radius:var(--radius);
+  overflow:hidden; margin:0 0 18px;}
+.chap{display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+  background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0;
+  padding:13px 15px; margin:0; min-height:58px; transition:background .12s;}
+.chapter-list .chap:last-child{border-bottom:0;}
+.chap:active{background:var(--code-bg); transform:none;}
+.chap .n{font-size:11px; color:var(--muted); min-width:23px; font-variant-numeric:tabular-nums;
+  font-weight:600; letter-spacing:.02em;}
+.chap .t{flex:1; font-size:14.5px; font-weight:500; line-height:1.35; letter-spacing:-.005em;}
+.chap .pct{font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; flex-shrink:0;}
+.chap .pct.done{color:var(--accent); font-weight:700;}
+.chap .chev{color:var(--muted); opacity:.5; font-size:16px; flex-shrink:0; line-height:1;}
+.chap-part{margin:22px 2px 9px;}
+.chapter-list .chap .n{min-width:24px;}
 
 /* ---------- reader chrome ---------- */
-#reader{position:fixed; inset:0; display:flex; flex-direction:column;}
+#reader{position:fixed; inset:0; display:flex; flex-direction:column; background:var(--paper);}
 .status{position:fixed; left:0; right:0; z-index:5; display:flex; justify-content:center;
-  gap:14px; font-size:11.5px; color:var(--muted); pointer-events:none;
-  padding:0 70px; white-space:nowrap; overflow:hidden;}
-#statusTop{top:calc(6px + env(safe-area-inset-top));}
-#statusBot{bottom:calc(8px + env(safe-area-inset-bottom));}
+  gap:14px; font-size:11px; color:var(--muted); pointer-events:none;
+  padding:0 64px; white-space:nowrap; overflow:hidden; letter-spacing:.01em;
+  font-variant-numeric:tabular-nums;}
+#statusTop{top:calc(7px + env(safe-area-inset-top)); opacity:.72;}
+#statusBot{bottom:calc(9px + env(safe-area-inset-bottom));}
 .status span{overflow:hidden; text-overflow:ellipsis;}
+#readRail{position:fixed; left:0; right:0; bottom:0; height:3px; z-index:7; pointer-events:none;
+  background:color-mix(in srgb,var(--fg) 8%,transparent);}
+#readRail i{display:block; height:100%; width:0; background:var(--accent);
+  transition:width .22s var(--ease);}
+#reader.listening #readRail{bottom:calc(var(--ttsbar-h,170px));}
 
 #pageArea{position:absolute; inset:0; margin:auto; width:100%; height:100%;
   max-width:var(--maxw,760px);
-  padding:calc(30px + env(safe-area-inset-top)) var(--pad,24px) calc(34px + env(safe-area-inset-bottom));}
+  padding:calc(34px + env(safe-area-inset-top)) var(--pad,22px) calc(46px + env(safe-area-inset-bottom));}
 #pages{position:relative; width:100%; height:100%; overflow:hidden;}
 #reader.mode-scroll #pages{overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none;}
 #reader.mode-scroll #pages::-webkit-scrollbar{display:none;}
@@ -270,9 +470,25 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
 #content{height:100%;
   column-width:var(--pw,320px); column-gap:var(--gap,60px); column-fill:auto;
   font-size:var(--fs,18px); line-height:var(--lh,1.7);}
-#content.serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;}
-#content.anim-slide{transition:transform .3s cubic-bezier(.22,.61,.36,1);}
+#content.serif{font-family:var(--read-font);}
+#content.anim-slide{transition:transform .26s var(--ease);}
 #content.anim-fade{transition:opacity .16s ease;}
+.tapzone{position:fixed; top:0; bottom:0; width:18%; z-index:2; pointer-events:none; opacity:0;
+  transition:opacity .16s ease;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 9%,transparent),transparent);}
+.tapzone.r{right:0; transform:scaleX(-1);}
+.tapzone.on{opacity:1;}
+#tapHint{position:fixed; inset:0; z-index:35; display:flex; align-items:center; justify-content:center;
+  background:color-mix(in srgb,var(--bg) 55%,transparent); backdrop-filter:blur(3px);}
+#tapHint .th{display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:8px; width:100%; max-width:430px;
+  padding:0 16px; text-align:center;}
+#tapHint .z{background:color-mix(in srgb,var(--card) 82%,transparent); border:1px solid var(--card-line);
+  border-radius:18px; padding:26px 8px; display:flex; flex-direction:column; align-items:center; gap:9px;
+  box-shadow:0 10px 30px var(--shadow);}
+#tapHint .z .big{font-size:26px; line-height:1; color:var(--accent);}
+#tapHint .z b{font-size:12.5px;}
+#tapHint .z span{font-size:10.5px; color:var(--muted); line-height:1.4;}
+#tapHint .td{grid-column:1/-1; font-size:11.5px; color:var(--muted); margin-top:6px;}
 #reader.mode-scroll #content{height:auto; column-width:auto; columns:auto;
   transform:none !important; padding-bottom:15vh;}
 
@@ -291,9 +507,11 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
 .md .task{list-style:none; margin-left:-1.2em;}
 .md .task input{margin-right:.5em; accent-color:var(--accent); pointer-events:none;}
 .md h2,.md h3{break-after:avoid; -webkit-column-break-after:avoid;}
-.md h1{font-size:1.5em; line-height:1.28; margin:0 0 .9em; letter-spacing:-.015em; text-align:left;}
-.md h2{font-size:1.22em; line-height:1.3; margin:1.5em 0 .6em; letter-spacing:-.01em;}
-.md h3{font-size:1.05em; margin:1.3em 0 .5em;}
+.md h1{font-size:1.42em; line-height:1.26; margin:0 0 .85em; letter-spacing:-.02em; text-align:left;
+  text-wrap:balance; font-weight:700;}
+.md h2{font-size:1.17em; line-height:1.32; margin:1.55em 0 .55em; letter-spacing:-.012em;
+  text-wrap:balance; font-weight:650;}
+.md h3{font-size:1.03em; margin:1.35em 0 .45em; font-weight:650;}
 .md a{color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent); overflow-wrap:anywhere;}
 .md code{background:var(--code-bg); border-radius:5px; padding:.1em .35em; font-size:.85em;
   font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; overflow-wrap:anywhere;}
@@ -312,26 +530,33 @@ html[data-theme="dark"] .hc-p,html[data-theme="black"] .hc-p{background:#b35f88;
 
 /* ---------- bars ---------- */
 .bar{position:fixed; left:0; right:0; z-index:20; background:var(--bar-bg); color:var(--bar-fg);
-  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-  display:flex; align-items:center; gap:8px;
-  transition:transform .28s ease, opacity .28s ease;}
-#topbar{top:0; padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
-  border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  backdrop-filter:blur(18px) saturate(1.25); -webkit-backdrop-filter:blur(18px) saturate(1.25);
+  display:flex; align-items:center; gap:7px;
+  transition:transform .26s var(--ease), opacity .22s ease;}
+#topbar{top:0; padding:calc(7px + env(safe-area-inset-top)) 10px 7px;
+  border-bottom:1px solid var(--line); flex-wrap:nowrap;}
 #topbar.off{transform:translateY(-110%); opacity:0; pointer-events:none;}
-#topbar .title{flex:1; font-size:14px; font-weight:600; text-align:center;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;}
-@media(max-width:560px){
-  #topbar{gap:6px;}
-  #topbar .title{order:10; flex:1 0 100%; font-size:13px; padding:2px 4px 0;}
-  .icon-btn{width:38px; height:38px; font-size:17px;}
+#topbar .title{flex:1; font-size:13px; font-weight:600; text-align:center; letter-spacing:-.005em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; padding:0 3px;}
+#btnMore{display:none;}
+@media(max-width:620px){
+  #topbar{gap:4px; padding-left:8px; padding-right:8px;}
+  #topbar .title{font-size:12.5px;}
+  #topbar #btnQk,#topbar #btnShare,#topbar #btnTheme,#topbar #btnListen,#topbar #btnAsk{display:none;}
+  #topbar #btnMore{display:flex;}
 }
-#botbar{bottom:0; padding:10px 14px calc(12px + env(safe-area-inset-bottom));
-  border-top:1px solid var(--line); flex-direction:column;}
+@media(min-width:621px){#topbar #btnMore{display:none;}}
+#botbar{bottom:0; padding:8px 14px calc(10px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line); flex-direction:column; border-radius:18px 18px 0 0;
+  box-shadow:0 -10px 30px -18px var(--shadow);}
 #botbar.off{transform:translateY(110%); opacity:0; pointer-events:none;}
-.slider-row{display:flex; align-items:center; gap:12px; width:100%; max-width:640px; margin:0 auto;}
+.slider-row{display:flex; align-items:center; gap:10px; width:100%; max-width:640px; margin:0 auto;}
 .slider-row button{font-size:13px; color:var(--muted); padding:6px; flex-shrink:0;}
-input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
-.slider-lbl{font-size:11px; color:var(--muted); text-align:center; margin-top:2px;}
+.slider-row .icon-btn{width:44px; height:44px; border:0; background:transparent; color:var(--fg);}
+.slider-row .icon-btn:active{background:var(--code-bg);}
+input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
+.slider-lbl{font-size:11px; color:var(--muted); text-align:center; margin-top:1px;
+  font-variant-numeric:tabular-nums; letter-spacing:.01em;}
 
 /* ---------- text-to-speech (Listen) ---------- */
 #ttsBar{bottom:0; flex-direction:column; padding:10px 14px calc(12px + env(safe-area-inset-bottom));
@@ -441,27 +666,41 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 /* ---------- Aa panel ---------- */
 #scrim{position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.25);}
 #aaPanel{position:fixed; z-index:30; background:var(--card); border:1px solid var(--card-line);
-  box-shadow:0 12px 40px var(--shadow); border-radius:18px; padding:18px;
+  box-shadow:0 18px 54px var(--shadow); border-radius:22px 22px 18px 18px; padding:18px 18px 20px;
   left:50%; transform:translateX(-50%);
-  bottom:calc(16px + env(safe-area-inset-bottom) + var(--kb,0px));
-  width:min(420px, calc(100vw - 24px)); max-height:min(76dvh, calc(100dvh - 32px - var(--kb,0px))); overflow-y:auto;}
-.row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;}
+  bottom:calc(12px + env(safe-area-inset-bottom) + var(--kb,0px));
+  width:min(440px, calc(100vw - 16px)); max-height:min(82dvh, calc(100dvh - 28px - var(--kb,0px)));
+  overflow-y:auto; -webkit-overflow-scrolling:touch;}
+#aaPanel::before{content:""; display:block; width:38px; height:4px; border-radius:99px;
+  background:var(--line); margin:-6px auto 14px;}
+#aaPanel .row{min-height:48px;}
+.row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:13px;}
 .row:last-child{margin-bottom:0;}
 .row .lbl{font-size:13px; color:var(--muted); min-width:74px;}
 .seg{display:flex; flex:1; background:var(--code-bg); border-radius:10px; padding:3px; gap:3px;}
-.seg button{flex:1; padding:7px 4px; border-radius:8px; font-size:13px; color:var(--muted); text-align:center;}
+.seg button{flex:1; padding:8px 4px; min-height:44px; border-radius:8px; font-size:13px; color:var(--muted); text-align:center;}
 .seg button.on{background:var(--bg); color:var(--fg); font-weight:600; box-shadow:0 1px 4px var(--shadow);}
 .stepper{display:flex; align-items:center; gap:4px; flex:1; justify-content:flex-end;}
-.stepper button{width:44px; height:36px; border:1px solid var(--line); border-radius:10px; font-size:16px;}
+.stepper button{width:46px; height:44px; border:1px solid var(--line); border-radius:11px; font-size:16px;}
 .stepper .val{min-width:52px; text-align:center; font-size:14px; font-variant-numeric:tabular-nums;}
-.theme-chips{display:flex; gap:6px; flex:1; justify-content:flex-end; flex-wrap:wrap;}
-.theme-chips button{width:40px; height:34px; border-radius:10px; border:2px solid var(--line); font-size:12px; font-weight:600;}
-.theme-chips button.on{border-color:var(--accent);}
-.chip-light{background:#fafaf7; color:#1c1c1a;}
-.chip-sepia{background:#f3ead7; color:#4b3a2a;}
+.theme-chips{display:flex; gap:9px; flex:1; justify-content:flex-end; flex-wrap:wrap;}
+@media(max-width:520px){
+  #aaPanel .theme-row{flex-wrap:wrap; row-gap:6px;}
+  #aaPanel .theme-row .lbl{flex:1 0 100%;}
+  #aaPanel .theme-row .theme-chips{flex:0 0 100%; justify-content:flex-start;}
+}
+.theme-chips button{width:44px; height:44px; border-radius:50%; border:2px solid var(--line);
+  font-size:0; font-weight:600; position:relative; box-shadow:inset 0 0 0 2px var(--card);
+  transition:transform .15s var(--ease), border-color .15s;}
+.theme-chips button.on{border-color:var(--accent); transform:scale(1.1);}
+.theme-chips button.on::after{content:""; position:absolute; inset:-5px; border-radius:50%;
+  border:2px solid var(--accent);}
+.chip-light{background:#fbfaf7; color:#1b1b19;}
+.chip-sepia{background:#f4ead4; color:#4a3827;}
+.chip-green{background:#e9efe3; color:#29362b;}
 .chip-gray{background:#2b2d31; color:#d7d8d4;}
 .chip-dark{background:#111113; color:#cfcfc9;}
-.chip-black{background:#000; color:#bdbdb7;}
+.chip-black{background:#000; color:#c8c8c2;}
 #rowCols{display:none;}
 @media (min-width:760px){#rowCols{display:flex;}}
 
@@ -493,34 +732,53 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
 <div id="home" class="view hidden"></div>
 <div id="toc" class="view hidden"></div>
 
+<nav id="bottomNav" class="bottomnav hidden" aria-label="Primary">
+  <button data-tab="lib" aria-label="Library"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 17.5h16M8 7h8M8 11h6"/></svg><span>Library</span></button>
+  <button data-tab="search" aria-label="Search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Search</span></button>
+  <button data-tab="notebook" aria-label="Notebook"><svg class="ic" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v14l-4-2.5L12 20l-4-2.5L4 20V6a2 2 0 0 1 2-2Z"/><path d="M8 8h8M8 12h5"/></svg><span>Notebook</span></button>
+  <button data-tab="stats" aria-label="Reading stats"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Stats</span></button>
+</nav>
+
 <div id="reader" class="hidden mode-page">
   <div id="statusTop" class="status"><span id="stTitle"></span></div>
   <div id="pageArea">
     <div id="pages"><div id="content" class="md serif anim-slide"></div></div>
   </div>
+  <div class="tapzone l" id="tzL"></div>
+  <div class="tapzone r" id="tzR"></div>
   <div id="hintL" class="pagehint">‹</div>
   <div id="hintR" class="pagehint">›</div>
   <div id="statusBot" class="status"><span id="stInfo"></span></div>
+  <div id="readRail" aria-hidden="true"><i id="readRailFill"></i></div>
+  <div id="tapHint" class="hidden" role="dialog" aria-label="Reading gestures">
+    <div class="th">
+      <div class="z"><span class="big">‹</span><b>Previous</b><span>Tap the left edge<br>or swipe right</span></div>
+      <div class="z"><span class="big">☰</span><b>Menu</b><span>Tap the centre page for<br>chapters &amp; settings</span></div>
+      <div class="z"><span class="big">›</span><b>Next</b><span>Tap the right edge<br>or swipe left</span></div>
+      <div class="td">Tap anywhere to start reading</div>
+    </div>
+  </div>
 
   <header id="topbar" class="bar off">
     <button class="icon-btn" id="btnToc" title="Contents (Esc)" aria-label="Contents">☰</button>
     <div class="title" id="barTitle"></div>
-    <button class="icon-btn" id="btnQk" title="Quick open — jump to any book or chapter (⌘K)" aria-label="Quick open">⌘</button>
     <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)" aria-label="Bookmark">⚐</button>
+    <button class="icon-btn" id="btnQk" title="Quick open — jump to any book or chapter (⌘K)" aria-label="Quick open">⌘</button>
     <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter" aria-label="Share chapter">⤴</button>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)" aria-label="Cycle theme">◑</button>
     <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud (L)" aria-label="Listen">🔊</button>
     <button class="icon-btn" id="btnAsk" title="Ask AI — select text then press A, or ask about the chapter" aria-label="Ask AI">✦</button>
     <button class="icon-btn" id="btnAa" title="Display settings" aria-label="Display settings">Aa</button>
+    <button class="icon-btn" id="btnMore" title="More actions" aria-label="More actions">⋯</button>
   </header>
 
   <div id="hlPop" class="hidden"></div>
 
   <footer id="botbar" class="bar off">
     <div class="slider-row">
-      <button id="btnPrevCh" title="Previous chapter">⏮ Prev</button>
-      <input type="range" id="slider" min="1" max="1" value="1">
-      <button id="btnNextCh" title="Next chapter">Next ⏭</button>
+      <button class="icon-btn" id="btnPrevCh" title="Previous chapter" aria-label="Previous chapter"><svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <input type="range" id="slider" min="1" max="1" value="1" aria-label="Page">
+      <button class="icon-btn" id="btnNextCh" title="Next chapter" aria-label="Next chapter"><svg class="ic" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
     </div>
     <div class="slider-lbl" id="sliderLbl"></div>
   </footer>
@@ -639,10 +897,11 @@ input[type=range]{flex:1; accent-color:var(--accent); height:26px;}
       <div class="seg" id="segMargin"><button data-v="s">Narrow</button><button data-v="m">Medium</button><button data-v="l">Wide</button></div></div>
     <div class="row"><span class="lbl">Align</span>
       <div class="seg" id="segAlign"><button data-v="justify">Justify</button><button data-v="left">Left</button></div></div>
-    <div class="row"><span class="lbl">Theme</span>
+    <div class="row theme-row"><span class="lbl">Theme</span>
       <div class="theme-chips" id="themeChips">
         <button class="chip-light" data-v="light" title="Light">A</button>
         <button class="chip-sepia" data-v="sepia" title="Sepia">A</button>
+        <button class="chip-green" data-v="green" title="Green">A</button>
         <button class="chip-gray" data-v="gray" title="Gray">A</button>
         <button class="chip-dark" data-v="dark" title="Dark">A</button>
         <button class="chip-black" data-v="black" title="Black (OLED)">A</button></div></div>
@@ -905,10 +1164,25 @@ $("sheetScrim").addEventListener("click",()=>closeSheet(null));
 function confirmSheet(title,ok,danger){
   return sheet({title,noInput:true,ok:ok||"OK",danger}).then(r=>!!r);
 }
+/* actionMenu(title, [{icon,label,sub,fn}]) — native-feeling bottom action sheet */
+function actionMenu(title,items){
+  closeSheet(null);
+  const el=$("sheet");
+  el.innerHTML=`<h3 id="sheetTitle">${esc(title)}</h3>
+    <div class="sheet-menu">${items.map((it,i)=>
+      `<button data-mi="${i}"><span class="mi">${it.icon||"›"}</span><span class="ml">${esc(it.label)}${it.sub?`<small>${esc(it.sub)}</small>`:""}</span></button>`).join("")}</div>
+    <div class="btns"><button data-act="cancel">Close</button></div>`;
+  el.classList.remove("hidden");$("sheetScrim").classList.remove("hidden");
+  el.querySelectorAll("[data-mi]").forEach(b=>b.addEventListener("click",()=>{
+    const it=items[+b.dataset.mi];closeSheet(null);if(it&&it.fn)it.fn();
+  }));
+  el.querySelector('[data-act="cancel"]').addEventListener("click",()=>closeSheet(null));
+}
 
 /* ================= settings application ================= */
 const MARGINS={s:{pad:16,maxw:920},m:{pad:26,maxw:760},l:{pad:40,maxw:620}};
-const THEME_COLORS={light:"#fafaf7",sepia:"#f3ead7",gray:"#2b2d31",dark:"#111113",black:"#000000"};
+const THEME_COLORS={light:"#fbfaf7",sepia:"#f4ead4",green:"#e9efe3",gray:"#2b2d31",dark:"#111113",black:"#000000"};
+const THEME_ORDER=["light","sepia","green","gray","dark","black"];
 function twoCols(){return S.cols==="2"&&S.mode==="page"&&innerWidth>=760;}
 function applySettings(){
   if(!THEME_COLORS[S.theme])S.theme="light";
@@ -967,6 +1241,13 @@ function chHash(id){
 }
 function chapterHash(c){return chHash(c.id);}
 function bookHash(b){return (share&&share.type==="book"?"#s/b/":"#b/")+encodeURIComponent(b.id);}
+let navTab="lib";
+function paintNav(){
+  const nav=$("bottomNav");if(!nav)return;
+  const hide=!!share||!reader.classList.contains("hidden")||!locked.classList.contains("hidden");
+  nav.classList.toggle("hidden",hide);
+  nav.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("on",b.dataset.tab===navTab));
+}
 function route(){
   const h=decodeURIComponent(location.hash);
   if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
@@ -976,20 +1257,22 @@ function route(){
   const chId=chapterIdFromHash(h);
   if(chId!=null){
     const i=CHAPTERS.findIndex(c=>c.id===chId);
-    if(i>=0){showView("reader");renderChapter(i);return;}
+    if(i>=0){navTab="lib";showView("reader");renderChapter(i);return;}
   }
   if(h.startsWith("#b/")||h.startsWith("#s/b/")){
     const b=BOOKS[h.startsWith("#s/")?h.slice(5):h.slice(3)];
-    if(b){showView("toc");renderToc(b);window.scrollTo(0,0);return;}
+    if(b){navTab="lib";showView("toc");renderToc(b);window.scrollTo(0,0);return;}
   }
+  if(h==="#search"&&!share){navTab="search";showView("toc");renderSearchPage();window.scrollTo(0,0);return;}
+  if(h==="#n"&&!share){navTab="notebook";showView("toc");renderNotebookPage();window.scrollTo(0,0);return;}
   if(h.startsWith("#h/")){
     const b=BOOKS[h.slice(3)];
-    if(b){showView("toc");renderHighlightsPage(b);window.scrollTo(0,0);return;}
+    if(b){navTab="notebook";showView("toc");renderHighlightsPage(b);window.scrollTo(0,0);return;}
   }
-  if(h==="#v"&&!share){showView("toc");renderVocabPage();window.scrollTo(0,0);return;}
-  if(h==="#stats"&&!share){showView("toc");renderStatsPage();window.scrollTo(0,0);return;}
+  if(h==="#v"&&!share){navTab="notebook";showView("toc");renderVocabPage();window.scrollTo(0,0);return;}
+  if(h==="#stats"&&!share){navTab="stats";showView("toc");renderStatsPage();window.scrollTo(0,0);return;}
   share=null; // a broken/unknown share link falls back to the full library
-  showView("home");renderHome();window.scrollTo(0,0);
+  navTab="lib";showView("home");renderHome();window.scrollTo(0,0);
 }
 /* copy a share link to the clipboard, with a brief ✓ on the button.
    #s/... share links (hash starting "#s/") never carry the key — those are
@@ -1113,6 +1396,7 @@ function showView(v){
   reader.classList.toggle("hidden",v!=="reader");
   document.body.classList.toggle("reader-open",v==="reader");
   if(v!=="reader")cur=-1;
+  paintNav();
 }
 
 /* ================= progress helpers ================= */
@@ -1140,8 +1424,9 @@ function coverHtml(b){
 }
 function bookCardHtml(b){
   const p=bookPct(b);
-  const cap=p>=.95?"✓ Finished":(p>0?Math.round(p*100)+"% read":b.chapters.length+" chapter"+(b.chapters.length===1?"":"s"));
-  return `<button class="bookcard" data-book="${esc(b.id)}" title="${esc(b.title)}">${coverHtml(b)}
+  const who=b.author||`${b.chapters.length} chapter${b.chapters.length===1?"":"s"}`;
+  const cap=p>=.95?`Finished · ${esc(who)}`:(p>0?`${Math.round(p*100)}% · ${esc(who)}`:esc(who));
+  return `<button class="bookcard" data-book="${esc(b.id)}" title="${esc(b.title)}" aria-label="${esc(b.title)}${b.author?" by "+esc(b.author):""}, ${p>=.95?"finished":Math.round(p*100)+"% read"}">${coverHtml(b)}
     <span class="cap ${p>=.95?"done":""}">${cap}</span></button>`;
 }
 function inProgressBooks(){
@@ -1154,21 +1439,34 @@ const IS_MOBILE=IS_IOS||/Android/i.test(navigator.userAgent);
 const STANDALONE=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 
 /* ================= home (shelves) ================= */
+function bookState(b){
+  const p=bookPct(b);
+  if(p>=.95||stats.finished[b.id])return "finished";
+  if(p>0)return "reading";
+  return "unread";
+}
 function renderHome(){
-  const nBooks=Object.keys(BOOKS).length;
+  const all=Object.values(BOOKS);
+  const nBooks=all.length;
   const streak=readingStreak(),todayW=stats.days[todayKey()]||0;
-  let h=`<div class="lib-top"><div><h1>Library</h1>
+  const counts={all:nBooks,reading:0,unread:0,finished:0};
+  all.forEach(b=>counts[bookState(b)]++);
+  let filter=ui.filter||"all";
+  if(!["all","reading","unread","finished"].includes(filter))filter="all";
+  const pass=b=>filter==="all"||bookState(b)===filter;
+  let h=`<div class="home-head"><div><h1>Library</h1>
     <p class="sub">${nBooks} books · ${CHAPTERS.length} chapters</p></div>
-    <div style="display:flex;gap:8px;">
-    <button class="icon-btn" id="homeQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>
-    ${ACCESS_HASH?'<button class="icon-btn" id="homeLink" title="Copy a link to the whole library (includes the key)">🔗</button>':''}
-    <button class="icon-btn" id="homeTheme" title="Cycle theme">◑</button></div></div>
-    <div class="statline">
-      ${streak?`<span>🔥 ${streak}-day streak</span>`:""}
-      ${todayW?`<span>${Math.max(1,Math.round(todayW/230))} min today</span>`:""}
-      <button id="homeStats">Reading stats →</button></div>
+    <div class="acts" style="display:flex;gap:8px;">
+    <button class="icon-btn" id="homeQk" title="Quick open — jump to any book or chapter (⌘K)" aria-label="Quick open">⌘</button>
+    ${ACCESS_HASH?'<button class="icon-btn" id="homeLink" title="Copy a link to the whole library (includes the key)" aria-label="Copy library link">🔗</button>':''}
+    <button class="icon-btn" id="homeTheme" title="Cycle theme" aria-label="Change theme">◑</button></div></div>
     <div class="searchwrap"><input type="search" class="searchbox" id="searchBox"
-      placeholder="Search every book…  ( / )" autocomplete="off"></div>
+      placeholder="Search every book…" autocomplete="off" aria-label="Search every book"></div>
+    <div class="statline">
+      ${streak?`<span>🔥 <b>${streak}</b>-day streak</span>`:""}
+      ${todayW?`<span><b>${Math.max(1,Math.round(todayW/230))}</b> min today</span>`:""}
+      ${!streak&&!todayW?`<span>Your reading history starts here.</span>`:""}
+      <button id="homeStats">Reading stats →</button></div>
     <div id="sresults" class="hidden"></div>
     <div id="shelves">
     <div id="offlineBar"></div>
@@ -1178,24 +1476,38 @@ function renderHome(){
       tap Share <span style="font-size:15px">⎙</span> then “Add to Home Screen”. Imported books stay on this device — open the app regularly so Safari does not evict them.</span><button id="hideInstall" title="Dismiss">✕</button></div>`;
   if(IS_MOBILE&&IMPORT_OK)
     h+=`<div class="hint"><span>📥</span><span><b>Import from this phone.</b> Tap Import a book and pick an <b>.epub</b> from Files or iCloud Drive. Conversion happens here — nothing is uploaded. Apple Books / Kindle store files are DRM-locked and will not convert.</span></div>`;
-  if(last){
+  if(last&&(filter==="all"||filter==="reading")){
     const c=chapterById(last.id);
-    if(c){const b=BOOKS[c.book];
-      h+=`<button class="continue" data-ch="${esc(c.id)}"><span class="lbl">Continue reading</span>
-        <div class="t">${esc(c.title)}</div>
-        <div class="p">${esc(b.title)} · ${Math.round(chPct(c.id)*100)}% of chapter · ${Math.round(bookPct(b)*100)}% of book</div></button>`;}
+    if(c){const b=BOOKS[c.book],bp=bookPct(b);
+      h+=`<button class="continue" data-ch="${esc(c.id)}" aria-label="Continue reading ${esc(c.title)}">
+        <div class="cc-cover" style="${coverStyle(b.title)}"><span>${esc((b.title.match(/[A-Za-z0-9]/)||["B"])[0].toUpperCase())}</span></div>
+        <div class="cc-main"><span class="lbl">Continue reading</span>
+          <div class="t">${esc(c.title)}</div>
+          <div class="p">${esc(b.title)} · ${Math.round(bp*100)}% of book</div>
+          <div class="cc-bar"><i style="width:${Math.round(bp*100)}%"></i></div></div>
+        <span class="cc-go">Resume</span></button>`;}
   }
+  h+=`<div class="chips" role="tablist" aria-label="Filter library">`;
+  [["all","All"],["reading","Reading"],["unread","Unread"],["finished","Finished"]].forEach(([k,label])=>{
+    h+=`<button data-filter="${k}" class="${filter===k?"on":""}" role="tab" aria-selected="${filter===k}">${label} <span style="opacity:.7">${counts[k]}</span></button>`;
+  });
+  h+=`</div>`;
   const ip=inProgressBooks();
-  if(ip.length>=2){
+  if((filter==="all"||filter==="reading")&&ip.length>=2){
     h+=`<div class="section-h">Currently reading <span class="cnt">${ip.length}</span></div><div class="shelf row">`;
     ip.slice(0,12).forEach(b=>{h+=bookCardHtml(b);});
     h+=`</div>`;
   }
+  let shown=0;
   LIB.forEach(s=>{
-    h+=`<div class="section-h">${esc(s.title)} <span class="cnt">${s.books.length}</span></div><div class="shelf">`;
-    s.books.forEach(b=>{h+=bookCardHtml(b);});
+    const books=s.books.filter(pass);
+    if(!books.length)return;
+    shown+=books.length;
+    h+=`<div class="section-h">${esc(s.title)} <span class="cnt">${books.length}</span></div><div class="shelf">`;
+    books.forEach(b=>{h+=bookCardHtml(b);});
     h+=`</div>`;
   });
+  if(!shown)h+=`<div class="shelf"><div class="empty">Nothing in this filter yet.</div></div>`;
   h+=`<div class="tools-row">
     <button id="btnImportBook" title="Add an .epub / .md / .txt from this device — it is converted here, in the browser, and stored on this device only">📥 Import a book</button>
     ${vocab.length?`<button id="btnVocab" title="Words you looked up while reading">🔤 Vocabulary (${vocab.length})</button>`:""}
@@ -1203,17 +1515,20 @@ function renderHome(){
     <button id="btnRestore" title="Restore a previously downloaded backup">⬆ Restore backup</button>
     <button id="btnHelp" title="Keyboard shortcuts & tips">? Help</button>
   </div>
-  <p class="sub" style="margin-top:14px;font-size:11.5px">Build ${BUILD_ID}${IMPORT_OK?"":" · in-browser import needs a newer browser (Safari 16.4+, Chrome 103+)"}</p></div>`;
+  <p class="sub" style="margin-top:14px;font-size:11px">Build ${BUILD_ID}${IMPORT_OK?"":" · in-browser import needs a newer browser (Safari 16.4+, Chrome 103+)"}</p></div>`;
   home.innerHTML=h;
   home.querySelectorAll("[data-book]").forEach(el=>el.addEventListener("click",
     ()=>nav(bookHash(BOOKS[el.dataset.book]))));
   home.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+  home.querySelectorAll("[data-filter]").forEach(el=>el.addEventListener("click",()=>{
+    ui.filter=el.dataset.filter;store.set("ui",ui);renderHome();
+  }));
   $("homeTheme").addEventListener("click",()=>{cycleTheme();});
   $("homeQk").addEventListener("click",qkOpen);
   $("homeStats").addEventListener("click",()=>nav("#stats"));
   if($("homeLink"))$("homeLink").addEventListener("click",()=>copyShare("",$("homeLink")));
-  if($("btnVocab"))$("btnVocab").addEventListener("click",()=>nav("#v"));
+  if($("btnVocab"))$("btnVocab").addEventListener("click",()=>nav("#n"));
   if($("hideInstall"))$("hideInstall").addEventListener("click",()=>{ui.hideInstall=true;store.set("ui",ui);renderHome();});
   $("btnExport").addEventListener("click",exportData);
   $("btnRestore").addEventListener("click",()=>$("restoreFile").click());
@@ -1253,10 +1568,7 @@ function plainOf(c){
   if(c._plain==null){c._plain=stripMd(c.md);c._plainLc=c._plain.toLowerCase();}
   return c._plain;
 }
-function renderSearch(q){
-  const box=$("sresults"),shelves=$("shelves");
-  q=q.trim();
-  if(q.length<2){box.classList.add("hidden");shelves.classList.remove("hidden");box.innerHTML="";return;}
+function searchChapters(q){
   const toks=[...new Set(q.toLowerCase().split(/\s+/).filter(Boolean))];
   const results=[];
   for(const c of CHAPTERS){
@@ -1284,19 +1596,134 @@ function renderSearch(q){
   }
   results.sort((a,b)=>b.score-a.score);
   const rx=new RegExp(toks.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|"),"gi");
-  const hi=s=>esc(s).replace(rx,m=>`<mark>${m}</mark>`);
-  let h=`<p class="snone">${results.length?results.length+" matching chapter"+(results.length>1?"s":""):"No matches for “"+esc(q)+"”"}</p>`;
-  results.slice(0,60).forEach(r=>{
+  return {toks,rx,results};
+}
+function searchResultsHtml(q,res){
+  const hi=s=>esc(s).replace(res.rx,m=>`<mark>${m}</mark>`);
+  let h=`<p class="snone">${res.results.length?res.results.length+" matching chapter"+(res.results.length>1?"s":""):"No matches for “"+esc(q)+"”"}</p>`;
+  res.results.slice(0,60).forEach(r=>{
     const b=BOOKS[r.c.book];
     h+=`<button class="sres" data-ch="${esc(r.c.id)}">
       <div class="b">${esc(b.title)}</div>
       <div class="t">${hi(r.c.title)}</div>
       ${r.snip?`<div class="s">${hi(r.snip)}</div>`:""}</button>`;
   });
-  box.innerHTML=h;
-  box.classList.remove("hidden");shelves.classList.add("hidden");
+  return h;
+}
+function wireSearchResults(box){
   box.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav("#c/"+encodeURIComponent(el.dataset.ch))));
+}
+function renderSearch(q){
+  const box=$("sresults"),shelves=$("shelves");
+  q=q.trim();
+  if(q.length<2){box.classList.add("hidden");shelves.classList.remove("hidden");box.innerHTML="";return;}
+  box.innerHTML=searchResultsHtml(q,searchChapters(q));
+  box.classList.remove("hidden");shelves.classList.add("hidden");
+  wireSearchResults(box);
+}
+function renderSearchPage(){
+  toc.innerHTML=`<div class="page-head"><div><h1>Search</h1>
+      <p class="sub">Every book, every chapter</p></div>
+      <div class="acts"><button class="icon-btn" id="spQk" title="Quick open" aria-label="Quick open">⌘</button></div></div>
+    <div class="searchhero">
+      <span class="sic"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
+      <input type="search" class="searchbox" id="pageSearchBox" placeholder="Search words, phrases, chapters…" autocomplete="off" aria-label="Search">
+    </div>
+    <div id="pageSearchResults"><p class="snone">Type at least two characters. Results show the matching passage and its book.</p></div>`;
+  const box=$("pageSearchResults"),inp=$("pageSearchBox");
+  let t;
+  inp.addEventListener("input",()=>{
+    clearTimeout(t);
+    t=setTimeout(()=>{
+      const q=inp.value.trim();
+      if(q.length<2){box.innerHTML=`<p class="snone">Type at least two characters. Results show the matching passage and its book.</p>`;return;}
+      box.innerHTML=searchResultsHtml(q,searchChapters(q));
+      wireSearchResults(box);
+    },110);
+  });
+  $("spQk").addEventListener("click",qkOpen);
+  setTimeout(()=>inp.focus(),80);
+}
+
+/* ================= notebook (all highlights / bookmarks / words) ================= */
+let notebookTab="highlights";
+function renderNotebookPage(){
+  const hlCount=Object.values(highlights).reduce((a,x)=>a+x.length,0);
+  const bmCount=bookmarks.length, wCount=vocab.length;
+  const tab=notebookTab;
+  let h=`<div class="page-head"><div><h1>Notebook</h1>
+      <p class="sub">${hlCount} highlight${hlCount===1?"":"s"} · ${bmCount} bookmark${bmCount===1?"":"s"} · ${wCount} word${wCount===1?"":"s"}</p></div>
+      <div class="acts">${vocab.length?'<button class="icon-btn" id="nbReview" title="Review vocabulary" aria-label="Review vocabulary">🎴</button>':""}</div></div>
+    <div class="nb-tabs" role="tablist">
+      <button data-nbt="highlights" class="${tab==="highlights"?"on":""}" role="tab">Highlights</button>
+      <button data-nbt="bookmarks" class="${tab==="bookmarks"?"on":""}" role="tab">Bookmarks</button>
+      <button data-nbt="words" class="${tab==="words"?"on":""}" role="tab">Words</button>
+    </div>`;
+  if(tab==="highlights"){
+    if(!hlCount)h+=`<div class="nb-empty"><b>No highlights yet</b>Select text while reading, then tap Highlight. Every highlight lands here.</div>`;
+    LIB.forEach(s=>s.books.forEach(b=>{
+      let body="";
+      b.chapters.forEach(i=>{
+        const c=CHAPTERS[i],hls=highlights[c.id]||[];
+        if(!hls.length)return;
+        hls.forEach((hl,j)=>{
+          body+=`<button class="hlcard" data-nbch="${esc(c.id)}" data-nbj="${j}">
+            <div class="q${hl.c?" c-"+hl.c:""}">${esc(hl.text)}</div>
+            ${hl.note?`<div class="note">✎ ${esc(hl.note)}</div>`:""}
+            <div class="meta"><span>${esc(c.title)}${hl.t?" · "+new Date(hl.t).toLocaleDateString():""}</span><span class="del" data-nbdel="1">Delete</span></div></button>`;
+        });
+      });
+      if(body)h+=`<div class="section-h">${esc(b.title)} <span class="cnt">${b.author||""}</span></div>${body}`;
+    }));
+  }else if(tab==="bookmarks"){
+    if(!bmCount)h+=`<div class="nb-empty"><b>No bookmarks yet</b>Tap the flag while reading to mark a page. Bookmarks survive across devices in your backup.</div>`;
+    LIB.forEach(s=>s.books.forEach(b=>{
+      const marks=bookmarks.filter(m=>{const c=chapterById(m.ch);return c&&c.book===b.id;});
+      if(!marks.length)return;
+      h+=`<div class="section-h">${esc(b.title)} <span class="cnt">${marks.length}</span></div>`;
+      marks.forEach(m=>{
+        const c=chapterById(m.ch),idx=bookmarks.indexOf(m);
+        h+=`<button class="bm-row" data-nbbkm="${idx}"><span class="bi">⚑</span>
+          <span class="bt"><b>${esc(c.title)}</b><span>${Math.round(m.pct*100)}% through the chapter</span></span>
+          <span class="bx" data-nbbkmdel="1">✕</span></button>`;
+      });
+    }));
+  }else{
+    if(!wCount)h+=`<div class="nb-empty"><b>No words yet</b>Select a word while reading and press D (or tap Meaning) to save its definition here.</div>`;
+    vocab.forEach((v,i)=>{
+      const c=chapterById(v.ch);
+      h+=`<div class="hlcard"><div class="q" style="font-size:15px;font-weight:600">${esc(v.w)}${v.via?` <span style="font-size:11px;color:var(--muted);font-weight:400">· ${esc(v.via)}</span>`:""}</div>
+        <div class="note">${esc(v.def.length>400?v.def.slice(0,400)+"…":v.def)}</div>
+        <div class="meta"><span>${c?esc(c.title):""}</span><span class="del" data-nbwdel="${i}">Delete</span></div></div>`;
+    });
+  }
+  toc.innerHTML=h;
+  toc.querySelectorAll("[data-nbt]").forEach(el=>el.addEventListener("click",()=>{
+    notebookTab=el.dataset.nbt;renderNotebookPage();
+  }));
+  if($("nbReview"))$("nbReview").addEventListener("click",()=>nav("#v"));
+  toc.querySelectorAll("[data-nbch]").forEach(el=>el.addEventListener("click",async e=>{
+    const ch=el.dataset.nbch,j=+el.dataset.nbj;
+    if(e.target.closest("[data-nbdel]")){
+      if(!await confirmSheet("Delete this highlight?","Delete"))return;
+      highlights[ch].splice(j,1);if(!highlights[ch].length)delete highlights[ch];
+      store.set("highlights",highlights);renderNotebookPage();return;
+    }
+    pendingHl={ch,text:(highlights[ch][j]||{}).text};nav("#c/"+encodeURIComponent(ch));
+  }));
+  toc.querySelectorAll("[data-nbbkm]").forEach(el=>el.addEventListener("click",async e=>{
+    const idx=+el.dataset.nbbkm,m=bookmarks[idx];
+    if(!m)return;
+    if(e.target.closest("[data-nbbkmdel]")){
+      bookmarks=bookmarks.filter(x=>x!==m);store.set("bookmarks",bookmarks);renderNotebookPage();return;
+    }
+    pendingPct=m.pct;nav("#c/"+encodeURIComponent(m.ch));
+  }));
+  toc.querySelectorAll("[data-nbwdel]").forEach(el=>el.addEventListener("click",e=>{
+    e.stopPropagation();
+    vocab.splice(+el.dataset.nbwdel,1);store.set("vocab",vocab);renderNotebookPage();
+  }));
 }
 
 /* ================= backup / restore ================= */
@@ -1365,21 +1792,31 @@ function renderToc(b){
   const wordsLeft=b.chapters.reduce((a,i)=>a+CHAPTERS[i].words*(1-chPct(CHAPTERS[i].id)),0);
   const leftMin=Math.ceil(wordsLeft/230);
   const left=p>0&&p<.95?` · ${leftMin>=60?Math.round(leftMin/60*10)/10+" h":leftMin+" min"} left`:"";
-  let h=`<div class="lib-top">${share
+  let h=`<div class="toc-hero">
+    <div class="toc-hero-bg" style="${coverStyle(b.title)}"></div>
+    <div class="lib-top">${share
       ?`<span class="sub" style="color:var(--muted);font-size:12px">Shared from a library</span>`
-      :`<button class="icon-btn" id="tocBack" title="Library">‹</button>`}
+      :`<button class="icon-btn" id="tocBack" title="Library" aria-label="Back to library">‹</button>`}
     <div style="display:flex;gap:8px">
-      ${share?"":'<button class="icon-btn" id="tocQk" title="Quick open — jump to any book or chapter (⌘K)">⌘</button>'}
-      ${share||b.local?"":'<button class="icon-btn" id="tocShare" title="Copy a link that shares just this book">⤴</button>'}
-      ${share?"":'<button class="icon-btn" id="tocMore" title="More — reset progress, mark finished…">⋯</button>'}
-      <button class="icon-btn" id="tocTheme" title="Cycle theme">◑</button></div></div>
-  <div class="hero">${coverHtml(b)}<div>
+      ${share?"":'<button class="icon-btn" id="tocQk" title="Quick open — jump to any book or chapter (⌘K)" aria-label="Quick open">⌘</button>'}
+      ${share||b.local?"":'<button class="icon-btn" id="tocShare" title="Copy a link that shares just this book" aria-label="Share book">⤴</button>'}
+      ${share?"":'<button class="icon-btn" id="tocMore" title="More — reset progress, mark finished…" aria-label="More actions">⋯</button>'}
+      <button class="icon-btn" id="tocTheme" title="Cycle theme" aria-label="Change theme">◑</button></div></div>
+    <div class="hero-cover">${coverHtml(b)}</div>
     <h1>${esc(b.title)}</h1>
     ${b.author?`<p class="author">${esc(b.author)}</p>`:""}
     <p class="meta">${esc(b.section)} · ${b.chapters.length} chapter${b.chapters.length===1?"":"s"} · ~${time}
-      ${stats.finished[b.id]?` · ✓ finished ${stats.finished[b.id]}`:(p>0?` · ${Math.round(p*100)}% read${left}`:"")}</p></div></div>`;
+      ${stats.finished[b.id]?` · ✓ finished ${stats.finished[b.id]}`:(p>0?` · ${Math.round(p*100)}% read${left}`:"")}</p>
+  </div>
+  <div class="toc-body">
+  <div class="toc-progress"><div class="rail"><i style="width:${Math.round(p*100)}%"></i></div>
+    <span class="val">${p>=.95?"Finished":(p>0?Math.round(p*100)+"% read":"Not started")}</span></div>
+  <button class="primary" data-ch="${esc(resume.id)}">
+    <svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M8 7h8M8 11h6"/></svg>
+    <span>${p>=.95?"Read again":(p>0?"Continue reading":"Start reading")}</span></button>
+  <p class="upnext">${p>=.95?"Start over · ":"Up next · "}${esc(resume.title)}</p>
+  ${p>0&&p<.95&&b.chapters.length>1?`<button class="secondary" data-ch="${esc(CHAPTERS[b.chapters[0]].id)}">Read from the beginning</button>`:""}`;
   if(b.description)h+=`<p class="desc">${esc(b.description)}</p>`;
-  h+=`<button class="primary" data-ch="${esc(resume.id)}">${p>0?"Continue reading":"Start reading"} — ${esc(resume.title)}</button>`;
   const nHl=share?0:bookHighlightCount(b); // highlights page is not part of the shared view
   if(nHl)h+=`<button class="linkrow" id="tocHl">✎ ${nHl} highlight${nHl>1?"s":""} & notes in this book →</button>`;
   if(b.local&&!share)
@@ -1388,27 +1825,35 @@ function renderToc(b){
       <button id="locDelete" title="Remove this imported book from this device">🗑 Remove from device</button></div>`;
   const marks=bookmarks.filter(m=>{const c=chapterById(m.ch);return c&&c.book===b.id;});
   if(marks.length){
-    h+=`<div class="section-h">Bookmarks</div>`;
+    h+=`<div class="section-h">Bookmarks</div><div class="chapter-list">`;
     marks.forEach((m,i)=>{
       const c=chapterById(m.ch);
-      h+=`<button class="chap" data-bkm="${i}"><span class="n">⚑</span>
+      h+=`<button class="chap" data-bkm="${i}"><span class="n" style="color:var(--accent)">⚑</span>
         <span class="t">${esc(c.title)} — ${Math.round(m.pct*100)}%</span>
-        <span class="pct" data-delbkm="${i}">✕</span></button>`;
+        <span class="pct" data-delbkm="${i}" style="padding:8px">✕</span></button>`;
     });
+    h+=`</div>`;
   }
   if(b.chapters.length>=10)
-    h+=`<div class="searchwrap" style="margin-top:18px"><input type="search" class="searchbox" id="tocFilter"
-      placeholder="Filter ${b.chapters.length} chapters…" autocomplete="off"></div>`;
-  let part=null;
+    h+=`<div class="searchwrap" style="margin:18px 0 6px"><input type="search" class="searchbox" id="tocFilter"
+      placeholder="Filter ${b.chapters.length} chapters…" autocomplete="off" aria-label="Filter chapters"></div>`;
+  let part=null,openList=false;
   b.chapters.forEach(i=>{
     const c=CHAPTERS[i];
-    if(c.part!==part){part=c.part;
-      if(part)h+=`<div class="section-h chap-part">${esc(part)}</div>`;}
+    if(c.part!==part){
+      if(openList){h+=`</div>`;openList=false;}
+      part=c.part;
+      if(part)h+=`<div class="section-h chap-part">${esc(part)}</div>`;
+    }
+    if(!openList){h+=`<div class="chapter-list">`;openList=true;}
     const cp=chPct(c.id);
     h+=`<button class="chap" data-ch="${esc(c.id)}"><span class="n">${String(c.num).padStart(2,"0")}</span>
       <span class="t">${esc(c.title)}</span>
-      <span class="pct ${cp>=.95?"done":""}">${pctLabel(cp)}</span></button>`;
+      <span class="pct ${cp>=.95?"done":""}">${pctLabel(cp)}</span>
+      <span class="chev">›</span></button>`;
   });
+  if(openList)h+=`</div>`;
+  h+=`</div>`;
   toc.innerHTML=h;
   toc.querySelectorAll("[data-ch]").forEach(el=>el.addEventListener("click",
     ()=>nav(chHash(el.dataset.ch))));
@@ -1426,10 +1871,15 @@ function renderToc(b){
     const q=tf.value.trim().toLowerCase();
     toc.querySelectorAll(".chap[data-ch]").forEach(el=>{
       el.style.display=!q||el.querySelector(".t").textContent.toLowerCase().includes(q)?"":"none";});
+    toc.querySelectorAll(".chapter-list").forEach(list=>{
+      if(!list.querySelector(".chap[data-ch]"))return;
+      list.style.display=[...list.querySelectorAll(".chap[data-ch]")].some(el=>el.style.display!=="none")?"":"none";
+    });
     toc.querySelectorAll(".chap-part").forEach(el=>{
       let n=el.nextElementSibling,any=false;
       while(n&&!n.classList.contains("chap-part")){
-        if(n.classList.contains("chap")&&n.style.display!=="none")any=true;
+        if(n.classList.contains("chapter-list")&&n.style.display!=="none"&&
+          [...n.querySelectorAll(".chap[data-ch]")].some(x=>x.style.display!=="none"))any=true;
         n=n.nextElementSibling;}
       el.style.display=any?"":"none";});
   });
@@ -1483,10 +1933,20 @@ function renderStatsPage(){
     heat+=`<i class="l${lvl}" title="${k}: ${w?Math.round(w/230)+" min":"—"}"></i>`;
   }
   const recent=keys.slice(-14).reverse().filter(k=>days[k]>0);
-  let h=`<div class="lib-top"><button class="icon-btn" id="stBack" title="Back">‹</button>
-    <button class="icon-btn" id="stTheme" title="Cycle theme">◑</button></div>
-    <h1 style="font-size:22px;margin:18px 4px 4px">Reading stats</h1>
-    <p class="sub" style="color:var(--muted);font-size:13px;margin:0 4px 14px">Words you turn past are counted as reading; minutes assume ~230 words a minute. Time on the page is the clock while a chapter is open (idle gaps over 2 minutes are ignored).</p>
+  const todayMin=Math.max(0,Math.round(
+    (stats.secs&&stats.secs[todayKey()]?stats.secs[todayKey()]/60:0)||(days[todayKey()]||0)/230));
+  const goal=Math.max(1,Math.round(stats.goalMin||10));
+  const gp=Math.min(1,todayMin/goal);
+  const togo=Math.max(0,goal-todayMin);
+  let h=`<div class="page-head"><div><h1>Reading</h1>
+      <p class="sub">Your daily practice</p></div>
+      <div class="acts"><button class="icon-btn" id="stTheme" title="Cycle theme" aria-label="Change theme">◑</button></div></div>
+    <div class="goalhero">
+      <div class="goalring" style="--pct:${gp.toFixed(3)}"><div class="gv"><b>${todayMin}</b><span>min today</span></div></div>
+      <h2>${gp>=1?"Goal reached":togo+" min to your goal"}</h2>
+      <p>${gp>=1?"You hit today's reading goal. Anything else is a bonus.":`A ${goal}-minute daily goal builds the habit — one chapter is usually enough.`}</p>
+      <button class="gbtn" id="stGoal">${gp>=1?"Change goal":"Adjust goal"}</button>
+    </div>
     <div class="statgrid">
       <div class="st"><b>${streak}</b><span>day streak</span></div>
       <div class="st"><b>${best}</b><span>best streak</span></div>
@@ -1499,18 +1959,28 @@ function renderStatsPage(){
     <div class="section-h">Last 26 weeks</div>
     <div class="heat">${heat}</div>`;
   if(recent.length){
-    h+=`<div class="section-h">Recent days</div>`;
+    h+=`<div class="section-h">Recent days</div><div class="chapter-list">`;
     recent.forEach(k=>{h+=`<div class="chap" style="cursor:default"><span class="n">${k.slice(5)}</span><span class="t">${Math.round(days[k]/230)} min · ${days[k].toLocaleString()} words</span></div>`;});
+    h+=`</div>`;
   }
   const fin=Object.entries(stats.finished).sort((a,b)=>b[1].localeCompare(a[1]));
   if(fin.length){
-    h+=`<div class="section-h">Finished</div>`;
-    fin.forEach(([id,d])=>{const b=BOOKS[id];if(b)h+=`<button class="chap" data-book="${esc(id)}"><span class="n">✓</span><span class="t">${esc(b.title)}</span><span class="pct">${d}</span></button>`;});
+    h+=`<div class="section-h">Finished</div><div class="chapter-list">`;
+    fin.forEach(([id,d])=>{const b=BOOKS[id];if(b)h+=`<button class="chap" data-book="${esc(id)}"><span class="n">✓</span><span class="t">${esc(b.title)}</span><span class="pct">${d}</span><span class="chev">›</span></button>`;});
+    h+=`</div>`;
   }
   toc.innerHTML=h;
   toc.querySelectorAll("[data-book]").forEach(el=>el.addEventListener("click",()=>nav(bookHash(BOOKS[el.dataset.book]))));
-  $("stBack").addEventListener("click",()=>nav(""));
   $("stTheme").addEventListener("click",()=>{cycleTheme();});
+  $("stGoal").addEventListener("click",async()=>{
+    const r=await sheet({title:"Daily reading goal",value:String(goal),multiline:false,
+      placeholder:"Minutes per day",hint:"Between 1 and 240 minutes. Today's ring fills as you read.",
+      ok:"Save goal"});
+    if(!r||r.value==null)return;
+    const n=Math.max(1,Math.min(240,parseInt(r.value,10)||0));
+    stats.goalMin=n;store.set("stats",stats);renderStatsPage();
+    toast(`Daily goal set to ${n} min`);
+  });
 }
 
 /* ================= vocabulary book ================= */
@@ -1685,6 +2155,7 @@ function renderChapter(i,fromEnd){
     paginate();
     goToPct(pct,false);
     restoreAnim();
+    maybeShowTapHint();
     if(pendingHl&&pendingHl.ch===c.id){
       const m=[...content.querySelectorAll("mark.hl")].find(x=>x.textContent&&pendingHl.text&&pendingHl.text.startsWith(x.textContent.slice(0,40)));
       pendingHl=null;
@@ -1834,6 +2305,21 @@ import { KokoroTTS } from ${JSON.stringify(KOKORO_URL)};
 const MODEL=${JSON.stringify(KOKORO_MODEL)};
 let tts=null, chain=Promise.resolve();
 function enqueue(fn){ chain=chain.then(fn).catch(()=>{}); }
+function pcm16Wav(samples, rate){
+  const n=samples.length, buf=new ArrayBuffer(44+n*2), v=new DataView(buf);
+  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  w(0,"RIFF"); v.setUint32(4,36+n*2,true); w(8,"WAVE"); w(12,"fmt ");
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,rate,true); v.setUint32(28,rate*2,true);
+  v.setUint16(32,2,true); v.setUint16(34,16,true);
+  w(36,"data"); v.setUint32(40,n*2,true);
+  let o=44;
+  for(let i=0;i<n;i++){
+    const x=Math.max(-1,Math.min(1,samples[i]||0));
+    v.setInt16(o, x<0?x*0x8000:x*0x7fff, true); o+=2;
+  }
+  return buf;
+}
 self.onmessage=(e)=>{
   const m=e.data||{};
   if(m.cmd==="load"){
@@ -1856,15 +2342,14 @@ self.onmessage=(e)=>{
         let pcm=audio.audio;
         if(pcm&&pcm.data) pcm=pcm.data;
         if(!(pcm instanceof Float32Array)) pcm=Float32Array.from(pcm);
-        const samples=new Float32Array(pcm);
-        self.postMessage({cmd:"audio", id:m.id, rate:audio.sampling_rate||24000, samples}, [samples.buffer]);
+        const wav=pcm16Wav(pcm, audio.sampling_rate||24000);
+        self.postMessage({cmd:"audio", id:m.id, wav}, [wav]);
       }catch(err){ self.postMessage({cmd:"error", id:m.id, message:String(err&&err.message||err)}); }
     });
   }
 };
 `;
 let kWorker=null, kLoaded=null, kSeq=0, kEpoch=0, kNext=null, kReady=false, kokoroPausedMid=false;
-let audioCtx=null, kNode=null, kBufDur=0, kChunkPlay=null, kPlayEpoch=0, kAnchor=0, kHL=0, kPendingBuf=null;
 const kWait=new Map();
 function kokoroNote(msg){
   const el=$("ttsKokoroNote"); if(!el)return;
@@ -1887,7 +2372,7 @@ function kokoroEnsure(){
       const m=e.data||{};
       if(m.cmd==="progress")kokoroProgress(m.p);
       else if(m.cmd==="ready"){kReady=true;kokoroNote("");res();}
-      else if(m.cmd==="audio"){const w=kWait.get(m.id);if(w){kWait.delete(m.id);w.res({samples:m.samples, rate:m.rate});}}
+      else if(m.cmd==="audio"){const w=kWait.get(m.id);if(w){kWait.delete(m.id);w.res(m.wav);}}
       else if(m.cmd==="error"){
         const w=m.id!=null&&kWait.get(m.id);
         if(w){kWait.delete(m.id);w.rej(new Error(m.message||"Kokoro failed"));}
@@ -1907,62 +2392,18 @@ function kokoroGenerate(text, voice, speed){
     kWorker.postMessage({cmd:"speak", id, text, voice, speed});
   }));
 }
-/* The Listen tap resumes this context. Later Heart sentences start on it,
-   which is the only way iOS will play audio that wasn't ready during the tap.
-   A looping silent <audio> does the opposite: it holds the session at nearly
-   zero volume and the real sentence is never allowed to start. */
-function audioUnlock(){
-  const AC=window.AudioContext||window.webkitAudioContext;
-  if(!AC)return null;
-  if(!audioCtx||audioCtx.state==="closed")audioCtx=new AC();
-  if(audioCtx.state==="suspended"){const p=audioCtx.resume(); if(p&&p.catch)p.catch(()=>{});}
-  return audioCtx;
-}
-function kokoroStopGraph(){
-  cancelAnimationFrame(kHL); kHL=0;
-  const n=kNode; kNode=null;
-  if(n){try{n.onended=null; n.stop(0);}catch(e){}}
+function kokoroHold(){
+  const a=$("ttsAudio"); if(!a)return;
+  a.ontimeupdate=null; a.onended=null;
+  a.loop=true; a.volume=0.01; a.dataset.kind="hold";
+  if(a.src!==SILENT_WAV)a.src=SILENT_WAV;
+  const p=a.play(); if(p&&p.catch)p.catch(()=>{});
 }
 function kokoroStopAudio(){
-  kPendingBuf=null; kChunkPlay=null;
-  kokoroStopGraph();
-  if(audioCtx&&audioCtx.state==="running"){const p=audioCtx.suspend(); if(p&&p.catch)p.catch(()=>{});}
   const a=$("ttsAudio"); if(!a)return;
   a.onended=null; a.ontimeupdate=null;
   try{a.pause();}catch(e){}
-  a.removeAttribute("src");
-  try{a.load();}catch(e){}
   a.dataset.kind="";
-}
-function kokoroArmHighlight(){
-  cancelAnimationFrame(kHL);
-  const tick=()=>{
-    if(!kNode||!kChunkPlay||kPlayEpoch!==kEpoch||!audioCtx)return;
-    const dur=kBufDur||1;
-    const t=Math.min(1,Math.max(0,(audioCtx.currentTime-kAnchor)/dur));
-    const weights=kChunkPlay.weights, total=weights.reduce((s,w)=>s+w,0)||1;
-    let acc=0,k=0;
-    for(;k<weights.length;k++){acc+=weights[k]; if(acc/total>=t)break;}
-    ttsSetWord(kChunkPlay.start+Math.min(k,weights.length-1));
-    if(ttsSpeaking)kHL=requestAnimationFrame(tick);
-  };
-  kHL=requestAnimationFrame(tick);
-}
-function kokoroStartBuf(buf, chunk, epoch){
-  const ctx=audioUnlock(); if(!ctx)return;
-  kokoroStopGraph();
-  const src=ctx.createBufferSource();
-  src.buffer=buf; src.connect(ctx.destination);
-  kNode=src; kBufDur=buf.duration; kChunkPlay=chunk; kPlayEpoch=epoch;
-  kAnchor=ctx.currentTime;
-  src.onended=()=>{
-    if(src!==kNode||epoch!==kEpoch||!ttsSpeaking)return;
-    kNode=null;
-    if(chunk.end>=ttsWords.length)ttsChapterEnded();
-    else ttsSpeakKokoro(chunk.end);
-  };
-  try{src.start();}catch(e){kokoroFail(chunk.start, e);return;}
-  kokoroArmHighlight();
 }
 function ttsChunk(i, limit){
   if(!ttsWords.length||i>=ttsWords.length)return null;
@@ -1983,43 +2424,43 @@ function ttsChunk(i, limit){
   }
   return {start:i,end,text:spoken.join(" ").replace(/\s+/g," ").trim(),weights};
 }
-function kokoroPlay(audio, chunk, epoch){
-  const ctx=audioUnlock();
-  if(!ctx){kokoroFail(chunk.start, new Error("This browser has no audio engine"));return;}
-  if(epoch!==kEpoch||!ttsSpeaking)return;
-  const samples=audio.samples;
-  if(!samples||!samples.length){kokoroFail(chunk.start, new Error("Heart returned no audio"));return;}
-  let peak=0;
-  for(let i=0;i<samples.length;i+=64){const a=Math.abs(samples[i]); if(a>peak)peak=a;}
-  if(peak<0.0005){kokoroFail(chunk.start, new Error("Heart returned silence"));return;}
-  const rate=audio.rate||24000;
-  let buf;
-  try{
-    buf=ctx.createBuffer(1, samples.length, rate);
-    buf.getChannelData(0).set(samples);
-  }catch(e){kokoroFail(chunk.start, e);return;}
-  const start=()=>{
-    if(epoch!==kEpoch||!ttsSpeaking)return;
-    if(ctx.state==="suspended"){
-      kPendingBuf={buf, chunk, epoch};
-      kokoroPausedMid=true; ttsSpeaking=false; paintTtsPlay();
-      toast("Tap play to start Heart");
-      return;
-    }
-    kokoroStartBuf(buf, chunk, epoch);
+function kokoroPlay(wav, chunk, epoch){
+  const a=$("ttsAudio");
+  if(a._url)URL.revokeObjectURL(a._url);
+  const url=URL.createObjectURL(new Blob([wav],{type:"audio/wav"}));
+  a._url=url; a.loop=false; a.volume=1; a.dataset.kind="speech";
+  const weights=chunk.weights, total=weights.reduce((s,w)=>s+w,0)||1;
+  a.ontimeupdate=()=>{
+    if(epoch!==kEpoch||!a.duration)return;
+    const t=Math.min(1,a.currentTime/a.duration);
+    let acc=0,k=0;
+    for(;k<weights.length;k++){acc+=weights[k]; if(acc/total>=t)break;}
+    ttsSetWord(chunk.start+Math.min(k,weights.length-1));
   };
-  if(ctx.state==="suspended"){const p=ctx.resume(); if(p&&p.then)p.then(start, start); else start();}
-  else start();
+  a.onended=()=>{
+    if(epoch!==kEpoch||!ttsSpeaking)return;
+    if(chunk.end>=ttsWords.length)ttsChapterEnded();
+    else ttsSpeakKokoro(chunk.end);
+  };
+  a.src=url;
+  const p=a.play();
+  // iOS may refuse play() once the download took us outside the tap.
+  // Keep the audio queued so the next play tap starts it without rebuilding.
+  if(p&&p.catch)p.catch(()=>{
+    if(epoch!==kEpoch)return;
+    kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();
+    toast("Tap play to start Heart");
+  });
 }
 function kokoroFail(from, err){
   console.error("kokoro", err);
-  kokoroFailed=true; kNext=null; kPendingBuf=null; kokoroPausedMid=false;
-  kokoroStopAudio(); kokoroNote("");
+  kokoroFailed=true; kNext=null; kokoroStopAudio(); kokoroNote("");
   const sys=ttsVoiceList[0];
   S.ttsVoice=sys?sys.name:"";
   store.set("settings",S); ttsLoadVoices();
-  ttsIdx=from; ttsSpeaking=false; paintTtsPlay();
-  toast(TTS_OK?"Heart couldn't start. Tap play to use this phone's voice.":"Heart couldn't start in this browser.");
+  toast("Heart needs a connection the first time (~90 MB). Using this phone's voice until then.");
+  if(TTS_OK)ttsSpeakFrom(from);
+  else{ttsSpeaking=false;paintTtsPlay();}
 }
 function ttsSpeakKokoro(i){
   const pending=kNext&&kNext.start===i?kNext.promise:null;
@@ -2030,7 +2471,7 @@ function ttsSpeakKokoro(i){
   if(!chunk){ttsChapterEnded();return;}
   if(!chunk.text){ttsSpeakKokoro(chunk.end);return;}
   ttsSetWord(chunk.start);
-  audioUnlock();
+  kokoroHold();
   if(!kReady)kokoroNote("Downloading Heart… first time only, about 90 MB");
   const voice=kokoroVoiceName();
   const speed=Math.min(1.6,Math.max(0.7,S.ttsRate||1));
@@ -2059,9 +2500,6 @@ const SILENT_WAV=(()=>{ // 1 s of 8 kHz 8-bit silence
   return URL.createObjectURL(new Blob([b],{type:"audio/wav"}));
 })();
 function keepAliveStart(){
-  // A playing <audio>, even a silent one, takes the iPhone audio session and
-  // the device voice comes out silent. Android still wants it for the lock screen.
-  if(IS_IOS)return;
   const a=$("keepAlive");
   try{if(!a.src)a.src=SILENT_WAV;a.volume=0.01;const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}
 }
@@ -2072,7 +2510,8 @@ function ttsWatchVisibility(){
   // current word so the user hears it continue instead of having to fiddle.
   if(document.visibilityState!=="visible"||!ttsActive||!ttsSpeaking)return;
   if(ttsUsesKokoro()){
-    if(audioCtx&&audioCtx.state==="suspended"&&kNode)audioCtx.resume().catch(()=>{});
+    const a=$("ttsAudio");
+    if(a&&a.dataset.kind==="speech"&&a.paused)a.play().catch(()=>{});
     return;
   }
   if(!TTS_OK)return;
@@ -2200,39 +2639,17 @@ function ttsSetWord(i){
     if(p!==page)goTo(p,true);
   }
 }
-function ttsEngineSpeak(u, cont){
-  const kick=()=>{
-    if(ttsUtter!==u||!ttsSpeaking)return;
-    try{
-      if(speechSynthesis.paused)speechSynthesis.resume();
-      speechSynthesis.speak(u);
-      if(speechSynthesis.paused)speechSynthesis.resume();
-    }catch(e){}
-  };
-  // A sentence that just finished must be followed immediately, with no
-  // cancel(), or iOS drops the rest of the chapter.
-  if(cont){kick();return;}
-  // cancel() and speak() in the same turn makes Chrome accept the utterance
-  // and then never play it. The first utterance of a tap must still be spoken
-  // immediately, or iOS throws the gesture away.
-  const live=!!(speechSynthesis.speaking||speechSynthesis.pending);
-  if(live){try{speechSynthesis.cancel();}catch(e){} setTimeout(kick, 50);}
-  else kick();
-  setTimeout(()=>{
-    if(ttsUtter!==u||u._started||!ttsSpeaking)return;
-    try{speechSynthesis.pause(); speechSynthesis.resume();}catch(e){}
-  }, 400);
-}
-function ttsSpeakFrom(i, cont){
+function ttsSpeakFrom(i){
   if(ttsUsesKokoro()){
-    if(TTS_OK&&(speechSynthesis.speaking||speechSynthesis.pending)){try{speechSynthesis.cancel();}catch(e){}}
+    if(TTS_OK){try{speechSynthesis.cancel();}catch(e){}}
     ttsStopTimer();
     ttsSpeakKokoro(i);return;
   }
   if(kEpoch){kEpoch++;kNext=null;kokoroStopAudio();}
-  else keepAliveStop();
   if(!TTS_OK)return;
   ttsStopTimer();
+  speechSynthesis.cancel();
+  if(speechSynthesis.paused){try{speechSynthesis.resume();}catch(e){}} // un-stick Chrome's paused state
   if(!ttsWords.length||i>=ttsWords.length){ttsChapterEnded();return;}
   ttsChunkBase=i;
   // one utterance = whole sentences up to ~160 chars (hard cap 320), so prosody
@@ -2259,7 +2676,6 @@ function ttsSpeakFrom(i, cont){
   u.rate=S.ttsRate;
   const v=ttsCurrentVoice();if(v){u.voice=v;u.lang=v.lang;}
   ttsBoundarySeen=false;
-  u.onstart=()=>{u._started=true;};
   u.onboundary=e=>{
     if(ttsUtter!==u)return;
     if(e.name&&e.name!=="word")return;
@@ -2267,7 +2683,7 @@ function ttsSpeakFrom(i, cont){
     let k=0;while(k+1<starts.length&&starts[k+1]<=e.charIndex)k++;
     ttsSetWord(ttsChunkBase+k);
   };
-  u.onend=()=>{ttsStopTimer();if(ttsSpeaking&&ttsUtter===u)ttsSpeakFrom(end,true);};
+  u.onend=()=>{ttsStopTimer();if(ttsSpeaking&&ttsUtter===u)ttsSpeakFrom(end);};
   u.onerror=e=>{
     if(e.error==="interrupted"||e.error==="canceled")return; // our own cancel()
     if(ttsUtter!==u)return;
@@ -2280,7 +2696,7 @@ function ttsSpeakFrom(i, cont){
   };
   ttsUtter=u;
   ttsSetWord(i);
-  ttsEngineSpeak(u, cont);
+  speechSynthesis.speak(u);
   ttsStartFallback(end);
 }
 function ttsChapterEnded(){
@@ -2288,7 +2704,7 @@ function ttsChapterEnded(){
   const j=siblingChapter(1);
   if(j!==null){
     ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
-    if(ttsUsesKokoro())audioUnlock();
+    if(ttsUsesKokoro())kokoroHold();
     else ttsHoldUntilReady();
     nav(chapterHash(CHAPTERS[j]));
   }else{
@@ -2340,7 +2756,8 @@ function ttsUnlock(){
 }
 function ttsOpen(autoplay,fromStart){
   if(!TTS_OK&&!KOKORO_OK){toast("Reading aloud isn't supported in this browser.");return;}
-  audioUnlock();
+  if(ttsUsesKokoro())kokoroHold();
+  else ttsUnlock();
   const fresh=ttsWordsFor!==cur;
   ttsActive=true;
   $("btnListen").classList.add("on");
@@ -2377,19 +2794,20 @@ function ttsOpen(autoplay,fromStart){
       if(ttsWords.length)ttsSetWord(Math.min(ttsIdx,ttsWords.length-1));
       if(autoplay)ttsPlay();
     };
-    // Speak in this tap. requestAnimationFrame is a new turn, and iOS drops it.
-    start();
+    // chapter auto-advance must speak in the same turn as onend when possible
+    if(fromStart)start();
+    else requestAnimationFrame(start);
   }else if(autoplay)ttsPlay();
 }
 function ttsClose(){
   ttsActive=false;ttsSpeaking=false;
-  kEpoch++;kNext=null;kPendingBuf=null;kokoroPausedMid=false;
+  kEpoch++;kNext=null;kokoroPausedMid=false;
   ttsStopTimer();
   ttsSleepClear();
   keepAliveStop();
   kokoroStopAudio();kokoroNote("");
   $("voiceHelp").classList.add("hidden");
-  if(TTS_OK&&(speechSynthesis.speaking||speechSynthesis.pending)){try{speechSynthesis.cancel();}catch(e){}}
+  if(TTS_OK)speechSynthesis.cancel();
   ttsClearCur();
   for(let k=ttsSentCur[0];k<ttsSentCur[1];k++)if(ttsWords[k])ttsWords[k].classList.remove("tts-sent");
   ttsSentCur=[-1,-1];
@@ -2407,21 +2825,20 @@ function ttsClose(){
 /* pause = cancel + remember the word; resume = speak again from that word.
    The engine's own pause()/resume() is broken on Android and can wedge Chrome. */
 function ttsPlay(){
-  audioUnlock();
-  if(!ttsActive){ttsOpen(true);return;}
+  if(!ttsActive){
+    if(ttsUsesKokoro())kokoroHold();
+    else ttsUnlock();
+    ttsOpen(true);return;
+  }
+  // Resume the sentence already in the audio element. Calling kokoroHold
+  // first would replace that audio with silence.
   if(ttsUsesKokoro()&&kokoroPausedMid){
     kokoroPausedMid=false;ttsSpeaking=true;
-    const pending=kPendingBuf; kPendingBuf=null;
-    const go=()=>{
-      if(pending)kokoroStartBuf(pending.buf, pending.chunk, pending.epoch);
-      else kokoroArmHighlight();
-    };
-    if(audioCtx&&audioCtx.state!=="running"){
-      const p=audioCtx.resume();
-      if(p&&p.then)p.then(go).catch(go); else go();
-    }else go();
+    const p=$("ttsAudio").play(); if(p&&p.catch)p.catch(()=>{});
     paintTtsPlay();return;
   }
+  if(ttsUsesKokoro())kokoroHold();
+  else ttsUnlock();
   if(ttsWordsFor!==cur)ttsBuildWords();
   if(!ttsWords.length){toast("Nothing to read in this chapter.");return;}
   ttsSpeaking=true;
@@ -2431,11 +2848,11 @@ function ttsPlay(){
 }
 function ttsPause(){
   if(ttsUsesKokoro()){
-    if(kNode&&audioCtx&&audioCtx.state==="running"){
-      audioCtx.suspend();
-      kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
+    const a=$("ttsAudio");
+    if(a.dataset.kind==="speech"&&!a.ended){
+      a.pause();kokoroPausedMid=true;ttsSpeaking=false;paintTtsPlay();return;
     }
-    kEpoch++;kNext=null;kPendingBuf=null;kokoroStopGraph();kokoroNote("");
+    kEpoch++;kNext=null;kokoroStopAudio();kokoroNote("");
     ttsSpeaking=false;paintTtsPlay();return;
   }
   ttsSpeaking=false;
@@ -3287,11 +3704,27 @@ function updateStatus(){
   if(S.mode==="scroll"){
     $("stInfo").textContent=`${Math.round(pct*100)}% · ${minsLeft} min left`;
   }else{
-    $("stInfo").textContent=`Page ${page+1} of ${pageCount} · ${Math.round(pct*100)}% · ${minsLeft} min left`;
+    $("stInfo").textContent=`Page ${page+1} of ${pageCount} · ${minsLeft} min left`;
     $("slider").value=page+1;
   }
-  $("sliderLbl").textContent=`${b.title} — chapter ${c.num} of ${b.chapters.length}`;
+  const rail=$("readRailFill");
+  if(rail)rail.style.width=Math.max(0,Math.min(100,pct*100))+"%";
+  $("sliderLbl").textContent=`${b.title} · chapter ${c.num} of ${b.chapters.length}`;
   paintBookmark();
+}
+function flashEdge(side){
+  const z=side==="l"?$("tzL"):$("tzR");if(!z)return;
+  z.classList.add("on");clearTimeout(z._t);z._t=setTimeout(()=>z.classList.remove("on"),210);
+}
+let tapHintT=null;
+function maybeShowTapHint(){
+  if(!IS_MOBILE||ui.tapHint||share)return;
+  const el=$("tapHint");if(!el)return;
+  ui.tapHint=true;store.set("ui",ui);
+  el.classList.remove("hidden");
+  const close=()=>{el.classList.add("hidden");clearTimeout(tapHintT);};
+  el.addEventListener("click",close,{once:true});
+  tapHintT=setTimeout(close,6500);
 }
 function openSibling(offset,fromEnd){
   const j=siblingChapter(offset);
@@ -3299,6 +3732,7 @@ function openSibling(offset,fromEnd){
   else if(fromEnd===undefined)backToToc();  // past the last chapter -> book TOC
 }
 function next(){
+  flashEdge("r");
   if(S.mode==="scroll"){
     const atEnd=pages.scrollTop+pages.clientHeight>=pages.scrollHeight-2;
     if(!atEnd){pages.scrollBy({top:pages.clientHeight*.9,behavior:"smooth"});return;}
@@ -3309,6 +3743,7 @@ function next(){
   else if(cur>=0&&!(share&&share.type==="chapter"))toast("End of book","Contents",backToToc);
 }
 function prev(){
+  flashEdge("l");
   if(S.mode==="scroll"){
     if(pages.scrollTop>2){pages.scrollBy({top:-pages.clientHeight*.9,behavior:"smooth"});return;}
   }else if(page>0){goTo(page-1);return;}
@@ -3330,8 +3765,7 @@ function toggleBars(){barsOn?hideBars():showBars();}
 function showPanel(){$("aaPanel").classList.remove("hidden");$("scrim").classList.remove("hidden");}
 function hidePanel(){$("aaPanel").classList.add("hidden");$("scrim").classList.add("hidden");}
 function cycleTheme(){
-  const order=["light","sepia","gray","dark","black"];
-  S.theme=order[(order.indexOf(S.theme)+1)%order.length];
+  S.theme=THEME_ORDER[(THEME_ORDER.indexOf(S.theme)+1)%THEME_ORDER.length];
   applySettings();
 }
 function reflowKeepingPct(fn){
@@ -3349,12 +3783,34 @@ $("btnShare").addEventListener("click",()=>{
 $("btnAa").addEventListener("click",showPanel);
 $("btnTheme").addEventListener("click",cycleTheme);
 $("scrim").addEventListener("click",()=>{hidePanel();aiClose();});
+$("bottomNav").addEventListener("click",e=>{
+  const b=e.target.closest("[data-tab]");if(!b)return;
+  const t=b.dataset.tab;
+  if(t==="lib")nav("");
+  else if(t==="search")nav("#search");
+  else if(t==="notebook")nav("#n");
+  else if(t==="stats")nav("#stats");
+});
+function openReaderMenu(){
+  const items=[
+    {icon:"⌘",label:"Quick open",sub:"Jump to any book or chapter",fn:qkOpen},
+    {icon:"⚑",label:bookmarkHere()?"Remove bookmark":"Bookmark this page",fn:toggleBookmark},
+    {icon:"🔊",label:"Listen",sub:"Read this chapter aloud",fn:()=>$("btnListen").click()},
+    {icon:"✦",label:"Ask AI",sub:"About this chapter or a selection",fn:()=>$("btnAsk").click()},
+    {icon:"⤴",label:"Share this chapter",fn:()=>$("btnShare").click()},
+    {icon:"◑",label:"Change theme",fn:cycleTheme},
+    {icon:"Aa",label:"Display settings",sub:"Type, spacing, margins, page turn",fn:showPanel}
+  ];
+  if(!IS_MOBILE)items.push({icon:"?",label:"Keyboard shortcuts",fn:toggleHelp});
+  actionMenu("Reader",items);
+}
+$("btnMore").addEventListener("click",openReaderMenu);
 $("btnPrevCh").addEventListener("click",()=>openSibling(-1,false));
 $("btnNextCh").addEventListener("click",()=>openSibling(1,false));
 $("slider").addEventListener("input",e=>goTo(e.target.value-1,false));
 
 /* Listen (text-to-speech) controls */
-$("btnListen").addEventListener("click",()=>{audioUnlock();ttsActive?ttsClose():ttsOpen(true);});
+$("btnListen").addEventListener("click",()=>{ttsUnlock();ttsActive?ttsClose():ttsOpen(true);});
 $("ttsClose").addEventListener("click",ttsClose);
 $("ttsPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
 $("ttsSaveSent").addEventListener("click",ttsKeepSentence);
@@ -3401,15 +3857,10 @@ $("ttsVoice").addEventListener("change",e=>{
     kokoroNote(kReady?"Heart is ready.":"Heart downloads once (~90 MB) the first time you press play, then stays on this phone.");
   else if(TTS_OK){ // quick preview of the newly chosen device voice
     kokoroNote("");
-    kokoroStopAudio();
     const u=new SpeechSynthesisUtterance("This voice will read your books.");
     const v=ttsCurrentVoice();if(v)u.voice=v;
     u.rate=S.ttsRate;
-    try{
-      if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-      if(speechSynthesis.paused)speechSynthesis.resume();
-    }catch(err){}
+    speechSynthesis.cancel();speechSynthesis.speak(u);
   }
 });
 /* sleep timer: ⏾ cycles Off → 5 → 15 → 30 → 60 min, then pauses the voice */

@@ -314,6 +314,41 @@ Top-to-bottom map:
   "⬆ Restore backup" imports it — use this before clearing site data or when
   switching devices.
 
+## Mobile UI system
+
+The phone layout follows two references: **Kindle's paper-first reading surface**
+(one warm accent, covers as the only colour, progress everywhere, chrome that
+disappears) and **Apple Books' thumb-zone navigation** (bottom tabs, cover
+detail, reading goals). The important pieces:
+
+- **Library** — 3-up cover grid on iPhone (more on iPad/desktop) with an amber
+  reading bar on every cover; a large *Continue reading* card with a Resume
+  pill; All / Reading / Unread / Finished filter pills; horizontal
+  "Currently reading" shelf.
+- **Bottom tabs** — Library · Search · Notebook · Stats. Fixed above the home
+  indicator, 48px targets, hidden in the reader and on share links so a shared
+  book stays clean.
+- **Book page** — a full-bleed blurred cover hero, title/author/section,
+  book-progress rail, one primary *Continue reading* action, and a grouped
+  chapter list with per-chapter progress and part headings.
+- **Reader** — chrome-free page by default. Tap the edges (or swipe) to turn,
+  centre-tap for the bars. The top bar keeps only Contents, Bookmark, Aa and a
+  `⋯` menu on phones; Listen / Ask AI / Share / theme live in that menu. A thin
+  amber rail and "page · min left" whisper stay at the bottom, and a one-time
+  gesture tip appears on the first read.
+- **Aa panel** — a true bottom sheet with a grabber, 44px controls and Kindle's
+  six reading themes (Light, Sepia, Green, Gray, Dark, Black) as round swatches.
+- **Search** — a dedicated full-screen search tab, plus the quick search box on
+  the Library screen.
+- **Notebook** — every highlight, bookmark and looked-up word in one place,
+  grouped by book, with delete and jump-back.
+- **Stats** — Apple Books-style daily goal ring ("N min today", adjustable
+  1–240 min), streak, heatmap, finished books.
+- **Foundations** — safe-area insets everywhere, 44pt minimum touch targets,
+  16px inputs (no iOS zoom), `prefers-reduced-motion` respected, labelled
+  controls, and system light/dark for chrome while the page theme stays
+  independent.
+
 ## Offline mode (PWA)
 
 The whole library is embedded inside `index.html`, so once the page has loaded it

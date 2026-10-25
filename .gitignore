@@ -16,3 +16,7 @@ index.local.html
 
 # Bytecode cache from the tools/ scripts.
 __pycache__/
+
+# Local scratch / macOS metadata
+.tmp/
+.DS_Store
