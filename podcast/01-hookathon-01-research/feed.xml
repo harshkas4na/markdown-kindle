@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Research: What To Build (2026)</title>
+    <link>https://harshkas4na.github.io/markdown-kindle/</link>
+    <atom:link href="https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/feed.xml" rel="self" type="application/rss+xml"/>
+    <language>en</language>
+    <description>What Uniswap is struggling with in 2026 that no hook has solved — unsolved problems, new whitepapers explained simply, DeFi trends, and a ranked shortlist of project ideas.</description>
+    <itunes:author>Hookathon research pack</itunes:author>
+    <itunes:summary>What Uniswap is struggling with in 2026 that no hook has solved — unsolved problems, new whitepapers explained simply, DeFi trends, and a ranked shortlist of project ideas.</itunes:summary>
+    <itunes:type>serial</itunes:type>
+    <itunes:image href="https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/cover.png"/>
+    <image><url>https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/cover.png</url><title>Research: What To Build (2026)</title><link>https://harshkas4na.github.io/markdown-kindle/</link></image>
+    <itunes:category text="Education"/>
+    <itunes:explicit>false</itunes:explicit>
+    <item>
+      <title>Research Pack: What To Build Next (July 2026)</title>
+      <itunes:title>Research Pack: What To Build Next (July 2026)</itunes:title>
+      <itunes:episode>1</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <description>Chapter 1 of Research: What To Build (2026).</description>
+      <enclosure url="https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/01-research-pack-what-to-build-next-july-2026.mp3" length="1140864" type="audio/mpeg"/>
+      <guid isPermaLink="false">01-hookathon-01-research-1-0485a2ec2eafc514</guid>
+      <pubDate>Sun, 25 Oct 2026 14:22:30 GMT</pubDate>
+      <itunes:duration>00:03:10</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>What Uniswap Is Actually Struggling With (Mid-2026)</title>
+      <itunes:title>What Uniswap Is Actually Struggling With (Mid-2026)</itunes:title>
+      <itunes:episode>2</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <description>Chapter 2 of Research: What To Build (2026).</description>
+      <enclosure url="https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/02-what-uniswap-is-actually-struggling-with-mid-2026.mp3" length="7119606" type="audio/mpeg"/>
+      <guid isPermaLink="false">01-hookathon-01-research-2-dceacccb68f8ba7b</guid>
+      <pubDate>Sun, 25 Oct 2026 14:31:25 GMT</pubDate>
+      <itunes:duration>00:19:46</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>New Whitepapers &amp; Big Ideas, Explained Simply</title>
+      <itunes:title>New Whitepapers &amp; Big Ideas, Explained Simply</itunes:title>
+      <itunes:episode>3</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <description>Chapter 3 of Research: What To Build (2026).</description>
+      <enclosure url="https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/03-new-whitepapers-big-ideas-explained-simply.mp3" length="5831664" type="audio/mpeg"/>
+      <guid isPermaLink="false">01-hookathon-01-research-3-d17c4752be680179</guid>
+      <pubDate>Sun, 25 Oct 2026 14:39:55 GMT</pubDate>
+      <itunes:duration>00:16:12</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>What DeFi Actually Cares About in 2026 (Trends, Simply)</title>
+      <itunes:title>What DeFi Actually Cares About in 2026 (Trends, Simply)</itunes:title>
+      <itunes:episode>4</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <description>Chapter 4 of Research: What To Build (2026).</description>
+      <enclosure url="https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/04-what-defi-actually-cares-about-in-2026-trends-simply.mp3" length="3890554" type="audio/mpeg"/>
+      <guid isPermaLink="false">01-hookathon-01-research-4-2912d283e82635c4</guid>
+      <pubDate>Sun, 25 Oct 2026 14:44:52 GMT</pubDate>
+      <itunes:duration>00:10:48</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>The Shortlist: 8 Hook Ideas Worth Considering (Ranked)</title>
+      <itunes:title>The Shortlist: 8 Hook Ideas Worth Considering (Ranked)</itunes:title>
+      <itunes:episode>5</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <description>Chapter 5 of Research: What To Build (2026).</description>
+      <enclosure url="https://harshkas4na.github.io/markdown-kindle/podcast/01-hookathon-01-research/05-the-shortlist-8-hook-ideas-worth-considering-ranked.mp3" length="5006121" type="audio/mpeg"/>
+      <guid isPermaLink="false">01-hookathon-01-research-5-8d2083680942a42b</guid>
+      <pubDate>Sun, 25 Oct 2026 14:51:17 GMT</pubDate>
+      <itunes:duration>00:13:54</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+  </channel>
+</rss>

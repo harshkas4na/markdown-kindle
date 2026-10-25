@@ -1,0 +1,10 @@
+{
+  "name": "library-podcast",
+  "private": true,
+  "type": "module",
+  "description": "Builds public podcast feeds (Kokoro voice) for books that opt in with \"podcast\": true in book.json",
+  "dependencies": {
+    "kokoro-js": "1.2.1",
+    "playwright-core": "1.48.2"
+  }
+}

@@ -238,9 +238,16 @@ Top-to-bottom map:
 ## Reader UI cheat-sheet
 
 - **Home** → tap a cover → **book TOC** → tap a chapter → **reader**.
-- In the reader: tap center = toolbars, tap/swipe edges = turn page,
-  `←/→`/space = pages, `T` = theme, `+/-` = font size, `B`/⚑ = bookmark this page,
-  `Esc`/☰ = back to TOC.
+- In the reader: tap center = toolbars, tap/swipe edges = turn page (the page
+  follows the finger), `←/→`/space = pages, `T` = theme, `+/-` = font size,
+  `B`/⚑ = bookmark this page, `Esc`/‹ = back to wherever you came from.
+- Changing chapter: swipe past the last/first page (page mode), swipe sideways
+  or pull up past the end (scroll mode), the **Up next** card under every
+  chapter's last line, or tap the title in the top bar for the chapter list.
+  Chapter-to-chapter moves replace the history entry, so ‹ always leaves the
+  reader in one step. Library ↔ book ↔ reader slide like an iOS navigation
+  stack (View Transitions); on book/search/notebook/stats pages, swipe in from
+  the left edge to go back.
 - "Continue reading" card on Home jumps to the last-read chapter across all books;
   each book's TOC additionally remembers its own last-read chapter.
 - **Search** (box on Home, or press `/`): full-text search across every chapter,
@@ -344,8 +351,11 @@ detail, reading goals). The important pieces:
   book-progress rail, one primary *Continue reading* action, and a grouped
   chapter list with per-chapter progress and part headings.
 - **Reader** — chrome-free page by default. Tap the edges (or swipe) to turn,
-  centre-tap for the bars. The top bar keeps only Contents, Bookmark, Aa and a
-  `⋯` menu on phones; Listen / Ask AI / Share / theme live in that menu. A thin
+  centre-tap for the bars. The top bar keeps only Back, the chapter title (tap
+  for the chapter list), Listen, Aa and a `⋯` menu on phones; Library,
+  Bookmark, Ask AI, Share and theme live in that menu. The Listen bar is a mini
+  player (⏮ ▶ ⏭ + position) — swipe it up or tap ⌃ for speed, voice and the
+  rest. A thin
   amber rail and "page · min left" whisper stay at the bottom, and a one-time
   gesture tip appears on the first read.
 - **Aa panel** — a true bottom sheet with a grabber, 44px controls and Kindle's
@@ -388,6 +398,32 @@ next visit.
 
 All three files (`index.html`, `sw.js`, `manifest.webmanifest`) must be deployed
 together at the same path (GitHub Pages serves the repo root, so this is automatic).
+
+## Podcast feeds (public)
+
+A book can also be published as a podcast — every chapter an episode, read by
+the same Kokoro voice as Listen, followable in Apple Podcasts (lock screen,
+CarPlay, downloads) or any podcast app.
+
+```bash
+# once: npm deps for the generator (and ffmpeg: brew install ffmpeg)
+cd tools/podcast && npm install && cd ../..
+
+# opt a book in: "podcast": true in its book.json (optional "podcastVoice": "af_bella")
+node tools/podcast/podcast.mjs                 # every opted-in book (only changed chapters are re-made)
+node tools/podcast/podcast.mjs 01-hookathon/01-research   # just one
+python3 tools/build-reader.py                  # adds the 🎙 Podcast button to the book page
+git add podcast library && git commit && git push
+```
+
+The feed lands at `podcast/<section>-<book>/feed.xml` on GitHub Pages
+(`https://<user>.github.io/<repo>/podcast/…/feed.xml`; set `PODCAST_BASE` to
+override). Episodes are 48 kbps mono MP3 (~0.35 MB a minute), committed to the
+repo. Words come from the built reader itself (headless Chrome runs Listen's
+`ttsPlanFor`), so an episode says exactly what Listen says.
+
+**Feeds are public.** Only opt in books you have the right to publish as audio —
+your own notes. Never the bought/EPUB books in `02-books/` or `07-epub/`.
 
 ## Note on book content & copyright
 

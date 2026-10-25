@@ -20,3 +20,7 @@ __pycache__/
 # Local scratch / macOS metadata
 .tmp/
 .DS_Store
+
+# Podcast generator deps (tools/podcast/podcast.mjs)
+/tools/podcast/node_modules/
+/podcast/*/.tmp.wav

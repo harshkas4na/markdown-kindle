@@ -1,0 +1,57 @@
+{
+ "book": "01-hookathon/01-research",
+ "voice": "af_heart",
+ "coverFor": "Research: What To Build (2026)0",
+ "episodes": [
+  {
+   "n": 1,
+   "title": "Research Pack: What To Build Next (July 2026)",
+   "file": "01-research-pack-what-to-build-next-july-2026.mp3",
+   "hash": "0485a2ec2eafc514",
+   "seconds": 190.025,
+   "bytes": 1140864,
+   "guid": "01-hookathon-01-research-1-0485a2ec2eafc514",
+   "published": 1792938150138
+  },
+  {
+   "n": 2,
+   "title": "What Uniswap Is Actually Struggling With (Mid-2026)",
+   "file": "02-what-uniswap-is-actually-struggling-with-mid-2026.mp3",
+   "hash": "dceacccb68f8ba7b",
+   "seconds": 1186.475,
+   "bytes": 7119606,
+   "guid": "01-hookathon-01-research-2-dceacccb68f8ba7b",
+   "published": 1792938685545
+  },
+  {
+   "n": 3,
+   "title": "New Whitepapers & Big Ideas, Explained Simply",
+   "file": "03-new-whitepapers-big-ideas-explained-simply.mp3",
+   "hash": "d17c4752be680179",
+   "seconds": 971.825,
+   "bytes": 5831664,
+   "guid": "01-hookathon-01-research-3-d17c4752be680179",
+   "published": 1792939195072
+  },
+  {
+   "n": 4,
+   "title": "What DeFi Actually Cares About in 2026 (Trends, Simply)",
+   "file": "04-what-defi-actually-cares-about-in-2026-trends-simply.mp3",
+   "hash": "2912d283e82635c4",
+   "seconds": 648.3,
+   "bytes": 3890554,
+   "guid": "01-hookathon-01-research-4-2912d283e82635c4",
+   "published": 1792939492055
+  },
+  {
+   "n": 5,
+   "title": "The Shortlist: 8 Hook Ideas Worth Considering (Ranked)",
+   "file": "05-the-shortlist-8-hook-ideas-worth-considering-ranked.mp3",
+   "hash": "8d2083680942a42b",
+   "seconds": 834.225,
+   "bytes": 5006121,
+   "guid": "01-hookathon-01-research-5-8d2083680942a42b",
+   "published": 1792939877608
+  }
+ ]
+}

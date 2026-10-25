@@ -103,6 +103,31 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 body.reader-open #toast{bottom:calc(24px + env(safe-area-inset-bottom));}
 @keyframes toastin{from{opacity:0; transform:translate(-50%,10px);} to{opacity:1; transform:translate(-50%,0);}}
 
+/* ---------- push / pop between library, book and reader ---------- */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.36s; animation-timing-function:cubic-bezier(.32,.72,0,1);}
+html[data-vt=push]::view-transition-new(root){animation-name:vtInR;}
+html[data-vt=push]::view-transition-old(root){animation-name:vtOutL;}
+html[data-vt=pop]::view-transition-new(root){animation-name:vtInL;}
+html[data-vt=pop]::view-transition-old(root){animation-name:vtOutR; z-index:2;}
+@keyframes vtInR{from{transform:translateX(100%);}}
+@keyframes vtOutL{to{transform:translateX(-28%); opacity:.7;}}
+@keyframes vtInL{from{transform:translateX(-28%); opacity:.7;}}
+@keyframes vtOutR{to{transform:translateX(100%);}}
+#bottomNav{view-transition-name:tabbar;}
+::view-transition-group(tabbar){animation:none;}
+/* edge swipe back (book / search / notebook / stats pages) */
+#toc.edge-drag{box-shadow:-18px 0 40px -20px rgba(0,0,0,.35);}
+#tocNav{position:fixed; top:0; left:0; right:0; z-index:22; display:flex; align-items:center; gap:8px;
+  padding:calc(6px + env(safe-area-inset-top)) 10px 6px; background:color-mix(in srgb,var(--bg) 82%,transparent);
+  -webkit-backdrop-filter:saturate(1.6) blur(18px); backdrop-filter:saturate(1.6) blur(18px);
+  border-bottom:1px solid var(--line); transform:translateY(-100%); transition:transform .22s var(--ease); pointer-events:none;}
+#tocNav.on{transform:none; pointer-events:auto;}
+#tocNav b{flex:1; min-width:0; font-size:15px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:44px;}
+.toc-actions{display:flex; gap:10px; margin:10px 0 4px;}
+.toc-actions button{flex:1; display:flex; align-items:center; justify-content:center; gap:7px; padding:12px;
+  border-radius:14px; border:1px solid var(--line); font-size:14.5px; color:var(--fg); background:var(--card);}
+.toc-actions button:active{background:var(--code-bg);}
+
 /* ---------- bottom sheet (notes, pronunciation, confirmations) ---------- */
 #sheetScrim{position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.35);}
 #sheet{position:fixed; z-index:71; left:50%; transform:translateX(-50%);
@@ -465,7 +490,29 @@ html[data-theme="gray"] .toc-hero-bg{opacity:.35;}
   max-width:var(--maxw,760px);
   padding:calc(34px + env(safe-area-inset-top)) var(--pad,22px) calc(46px + env(safe-area-inset-bottom));}
 #pages{position:relative; width:100%; height:100%; overflow:hidden;}
-#reader.mode-scroll #pages{overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none;}
+#reader.mode-scroll #pages{overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; touch-action:pan-y;}
+#reader:not(.mode-scroll) #pages{touch-action:pan-y pinch-zoom;}
+/* end-of-chapter card */
+.ch-end{break-inside:avoid; margin:3.2em 0 1.5em; padding:22px 18px 18px; border-radius:20px;
+  background:var(--card); border:1px solid var(--card-line); text-align:center;
+  font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif; text-indent:0; hyphens:none;}
+.ch-end .ce-k{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;}
+.ch-end .ce-next{display:grid; grid-template-columns:1fr auto; gap:2px 12px; align-items:center; width:100%;
+  text-align:left; padding:14px 16px; border-radius:14px; background:var(--accent); color:#fff;}
+.ch-end .ce-up{grid-column:1; font-size:11.5px; opacity:.85;}
+.ch-end .ce-t{grid-column:1; font-size:16px; font-weight:650; line-height:1.3;}
+.ch-end .ce-go{grid-column:2; grid-row:1/3; font-size:22px;}
+.ch-end .ce-hint{font-size:12px; color:var(--muted); margin-top:10px;}
+.ch-end .ce-done{font-size:16px; margin-bottom:14px;}
+.ch-end .ce-row{display:flex; gap:10px;}
+.ch-end .ce-row button{flex:1; padding:12px; border-radius:13px; border:1px solid var(--line); font-size:14px; color:var(--fg);}
+#pullNext{position:fixed; left:50%; bottom:calc(26px + env(safe-area-inset-bottom)); z-index:25;
+  transform:translate(-50%,0); padding:10px 16px; border-radius:99px; background:var(--card);
+  border:1px solid var(--card-line); box-shadow:0 8px 24px var(--shadow); font-size:13px; color:var(--muted);
+  max-width:80vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity:0; pointer-events:none;
+  transition:opacity .15s;}
+#pullNext.on{opacity:1;}
+#pullNext.go{color:var(--accent); border-color:var(--accent);}
 #reader.mode-scroll #pages::-webkit-scrollbar{display:none;}
 
 #content{height:100%;
@@ -479,7 +526,7 @@ html[data-theme="gray"] .toc-hero-bg{opacity:.35;}
   background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 9%,transparent),transparent);}
 .tapzone.r{right:0; transform:scaleX(-1);}
 .tapzone.on{opacity:1;}
-#tapHint{position:fixed; inset:0; z-index:35; display:flex; align-items:center; justify-content:center;
+#tapHint{position:fixed; inset:0; z-index:35; pointer-events:none; display:flex; align-items:center; justify-content:center;
   background:color-mix(in srgb,var(--bg) 55%,transparent); backdrop-filter:blur(3px);}
 #tapHint .th{display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:8px; width:100%; max-width:430px;
   padding:0 16px; text-align:center;}
@@ -538,12 +585,15 @@ html[data-theme="gray"] .toc-hero-bg{opacity:.35;}
   border-bottom:1px solid var(--line); flex-wrap:nowrap;}
 #topbar.off{transform:translateY(-110%); opacity:0; pointer-events:none;}
 #topbar .title{flex:1; font-size:13px; font-weight:600; text-align:center; letter-spacing:-.005em;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; padding:0 3px;}
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; padding:0 3px; color:var(--fg);
+  height:40px; border-radius:10px;}
+#topbar .title::after{content:" ⌄"; color:var(--muted); font-weight:400;}
+#topbar .title:active{background:var(--code-bg);}
 #btnMore{display:none;}
 @media(max-width:620px){
   #topbar{gap:4px; padding-left:8px; padding-right:8px;}
   #topbar .title{font-size:12.5px;}
-  #topbar #btnQk,#topbar #btnShare,#topbar #btnTheme,#topbar #btnListen,#topbar #btnAsk{display:none;}
+  #topbar #btnQk,#topbar #btnShare,#topbar #btnTheme,#topbar #btnBkm,#topbar #btnAsk{display:none;}
   #topbar #btnMore{display:flex;}
 }
 @media(min-width:621px){#topbar #btnMore{display:none;}}
@@ -573,6 +623,18 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
 #ttsBar .mini.on{color:var(--accent); border-color:var(--accent);}
 #ttsBar optgroup{font-style:normal; font-weight:600; color:var(--muted);}
 #ttsBar .kokoro-only.hidden{display:none;}
+/* mini player: one row until expanded (tap ⌃ / the grabber, or swipe up) */
+#ttsBar{padding-top:4px;}
+#ttsGrab{display:block; width:44px; height:14px; margin:0 auto 2px; padding:0; position:relative;}
+#ttsGrab::before{content:""; position:absolute; left:6px; right:6px; top:5px; height:4px; border-radius:99px; background:var(--line);}
+#ttsBar:not(.expanded) #ttsMore{display:none;}
+#ttsMore{width:100%; max-width:640px; margin:0 auto;}
+#ttsMore .slider-row{max-width:none;}
+#ttsBar.expanded #ttsMoreBtn{transform:rotate(180deg);}
+#ttsBar .tts-main{gap:2px;}
+#ttsBar .tts-main #ttsPlay{width:50px; height:50px; border-radius:50%; background:var(--accent); color:#fff; font-size:18px;}
+#ttsBar .tts-main #ttsSeek{margin:0 6px;}
+@media(max-width:380px){#ttsBar .tts-main #ttsBack,#ttsBar .tts-main #ttsFwd{width:38px;}}
 #carMode{position:fixed; inset:0; z-index:70; background:var(--bg); color:var(--fg); display:flex; flex-direction:column;
   padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom)); gap:14px;}
 #carMode.hidden{display:none;}
@@ -774,19 +836,20 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
   </div>
 
   <header id="topbar" class="bar off">
-    <button class="icon-btn" id="btnToc" title="Contents (Esc)" aria-label="Contents">☰</button>
-    <div class="title" id="barTitle"></div>
+    <button class="icon-btn" id="btnToc" title="Back (Esc)" aria-label="Back"><svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+    <button class="title" id="barTitle" title="Chapters" aria-label="Chapters"></button>
     <button class="icon-btn" id="btnBkm" title="Bookmark this page (B)" aria-label="Bookmark">⚐</button>
     <button class="icon-btn" id="btnQk" title="Quick open — jump to any book or chapter (⌘K)" aria-label="Quick open">⌘</button>
     <button class="icon-btn" id="btnShare" title="Copy a link that shares just this chapter" aria-label="Share chapter">⤴</button>
     <button class="icon-btn" id="btnTheme" title="Cycle theme (T)" aria-label="Cycle theme">◑</button>
-    <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud (L)" aria-label="Listen">🔊</button>
+    <button class="icon-btn" id="btnListen" title="Listen — read this chapter aloud (L)" aria-label="Listen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14h3v6H5a1 1 0 0 1-1-1zM20 14h-3v6h2a1 1 0 0 0 1-1z"/></svg></button>
     <button class="icon-btn" id="btnAsk" title="Ask AI — select text then press A, or ask about the chapter" aria-label="Ask AI">✦</button>
     <button class="icon-btn" id="btnAa" title="Display settings" aria-label="Display settings">Aa</button>
     <button class="icon-btn" id="btnMore" title="More actions" aria-label="More actions">⋯</button>
   </header>
 
   <div id="hlPop" class="hidden"></div>
+  <div id="pullNext" aria-hidden="true"></div>
 
   <footer id="botbar" class="bar off">
     <div class="slider-row">
@@ -798,11 +861,16 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
   </footer>
 
   <footer id="ttsBar" class="bar hidden">
-    <div class="slider-row">
+    <button id="ttsGrab" aria-label="More listening controls" title="More controls"></button>
+    <div class="slider-row tts-main">
+      <button class="icon-btn" id="ttsBack" title="Previous sentence" aria-label="Previous sentence"><svg class="ic" viewBox="0 0 24 24"><path d="M6 5v14M19 6 9 12l10 6z"/></svg></button>
       <button class="icon-btn" id="ttsPlay" title="Play / pause reading">▶</button>
+      <button class="icon-btn" id="ttsFwd" title="Next sentence" aria-label="Next sentence"><svg class="ic" viewBox="0 0 24 24"><path d="M18 5v14M5 6l10 6-10 6z"/></svg></button>
       <input type="range" id="ttsSeek" min="0" max="0" value="0" title="Reading position — drag to jump">
+      <button class="icon-btn" id="ttsMoreBtn" title="More controls" aria-label="More controls">⌃</button>
       <button class="icon-btn" id="ttsClose" title="Stop listening">✕</button>
     </div>
+    <div id="ttsMore">
     <div class="slider-row" style="margin-top:10px">
       <span style="font-size:13px;color:var(--muted);min-width:56px">Speed</span>
       <input type="range" id="ttsRateSlider" min="0.5" max="2.5" step="0.1" value="1" title="Voice speed">
@@ -826,6 +894,7 @@ input[type=range]{flex:1; accent-color:var(--accent); height:32px; margin:0;}
       <button class="mini" id="ttsRecapBtn" title="A short spoken recap of what you heard last (also plays by itself when you come back after 6+ hours)">⟲ Recap</button>
       <button class="mini" id="ttsCar" title="Car mode: big buttons, screen stays on, spoken commands">🚗 Car mode</button>
       <button id="ttsVoiceHelp" style="font-size:12px;color:var(--accent)">About voices</button>
+    </div>
     </div>
     <div id="ttsKokoroNote" class="hidden" style="font-size:12px;color:var(--muted);text-align:center;margin-top:6px"></div>
   </footer>
@@ -1272,6 +1341,44 @@ function chapterIdFromHash(h){
   return null;
 }
 function nav(h){ if(location.hash===h){route();} else {location.hash=h;} }
+/* chapter → chapter inside the reader replaces the history entry, so Back
+   leaves the reader instead of stepping through every chapter read */
+function navReplace(h){
+  if(location.hash===h){route();return;}
+  navStackReplace=true;
+  history.replaceState(history.state,"",location.pathname+location.search+h);
+  onHashChange();
+}
+/* the in-app back stack (hashes), so ‹ goes where you came from, like iOS */
+const navStack=[];let navStackReplace=false;
+function navNote(h){
+  if(navStackReplace){navStackReplace=false;if(navStack.length)navStack[navStack.length-1]=h;else navStack.push(h);return;}
+  if(navStack.length>1&&navStack[navStack.length-2]===h)navStack.pop();
+  else if(navStack[navStack.length-1]!==h)navStack.push(h);
+}
+function goBack(fallback){
+  if(navStack.length>1)history.back();
+  else nav(fallback);
+}
+/* depth for the slide direction: tabs 0, a book 1, the reader 2 */
+function routeDepth(h){
+  if(chapterIdFromHash(h)!=null)return 2;
+  if(/^#(s\/)?b\/|^#h\//.test(h))return 1;
+  return 0;
+}
+const VT_OK=!!document.startViewTransition&&!prefersReduce;
+let vtDepth=-1, vtSkip=false;
+/* push / pop slide between library, book and reader (View Transitions) */
+function withTransition(h,fn){
+  const d=routeDepth(h),dir=vtDepth<0||d===vtDepth?null:d>vtDepth?"push":"pop";
+  vtDepth=d;
+  if(!VT_OK||!dir||vtSkip||ttsActive||document.visibilityState!=="visible"){vtSkip=false;fn();return;}
+  const root=document.documentElement;root.dataset.vt=dir;
+  try{
+    const t=document.startViewTransition(fn);
+    t.finished.finally(()=>{if(root.dataset.vt===dir)delete root.dataset.vt;});
+  }catch(e){delete root.dataset.vt;fn();}
+}
 function chHash(id){
   return share?(share.type==="book"?"#s/bc/":"#s/c/")+encodeURIComponent(id)
               :"#c/"+encodeURIComponent(id);
@@ -1287,6 +1394,10 @@ function paintNav(){
 }
 function route(){
   const h=decodeURIComponent(location.hash);
+  navNote(h);
+  withTransition(h,()=>routeNow(h));
+}
+function routeNow(h){
   if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
   if(ttsActive){ if(ttsAutoNav||ttsResumeAfterRender)ttsAutoNav=false; else ttsClose(); }
   hideBars();hidePanel();hideHlPop();
@@ -1512,7 +1623,7 @@ function renderHome(){
     h+=`<div class="hint"><span>📲</span><span><b>Add to Home Screen</b> for a full-screen reader that opens offline:
       tap Share <span style="font-size:15px">⎙</span> then “Add to Home Screen”. Imported books stay on this device — open the app regularly so Safari does not evict them.</span><button id="hideInstall" title="Dismiss">✕</button></div>`;
   if(IS_MOBILE&&IMPORT_OK)
-    h+=`<div class="hint"><span>📥</span><span><b>Import from this phone.</b> Tap Import a book and pick an <b>.epub</b> from Files or iCloud Drive. Conversion happens here — nothing is uploaded. Apple Books / Kindle store files are DRM-locked and will not convert.</span></div>`;
+    if(!ui.hideImportTip)h+=`<div class="hint"><span>📥</span><span><b>Import from this phone.</b> Tap Import a book and pick an <b>.epub</b> from Files or iCloud Drive. Conversion happens here — nothing is uploaded. Apple Books / Kindle store files are DRM-locked and will not convert.</span><button id="hideImportTip" title="Dismiss">✕</button></div>`;
   if(last&&(filter==="all"||filter==="reading")){
     const c=chapterById(last.id);
     if(c){const b=BOOKS[c.book],bp=bookPct(b);
@@ -1567,6 +1678,7 @@ function renderHome(){
   if($("homeLink"))$("homeLink").addEventListener("click",()=>copyShare("",$("homeLink")));
   if($("btnVocab"))$("btnVocab").addEventListener("click",()=>nav("#n"));
   if($("hideInstall"))$("hideInstall").addEventListener("click",()=>{ui.hideInstall=true;store.set("ui",ui);renderHome();});
+  if($("hideImportTip"))$("hideImportTip").addEventListener("click",()=>{ui.hideImportTip=true;store.set("ui",ui);renderHome();});
   $("btnExport").addEventListener("click",exportData);
   $("btnRestore").addEventListener("click",()=>$("restoreFile").click());
   $("btnImportBook").addEventListener("click",()=>{
@@ -1829,7 +1941,8 @@ function renderToc(b){
   const wordsLeft=b.chapters.reduce((a,i)=>a+CHAPTERS[i].words*(1-chPct(CHAPTERS[i].id)),0);
   const leftMin=Math.ceil(wordsLeft/230);
   const left=p>0&&p<.95?` · ${leftMin>=60?Math.round(leftMin/60*10)/10+" h":leftMin+" min"} left`:"";
-  let h=`<div class="toc-hero">
+  let h=`<div id="tocNav">${share?"":`<button class="icon-btn" id="tocNavBack" aria-label="Back">‹</button>`}<b>${esc(b.title)}</b></div>
+  <div class="toc-hero">
     <div class="toc-hero-bg" style="${coverStyle(b.title)}"></div>
     <div class="lib-top">${share
       ?`<span class="sub" style="color:var(--muted);font-size:12px">Shared from a library</span>`
@@ -1851,6 +1964,10 @@ function renderToc(b){
   <button class="primary" data-ch="${esc(resume.id)}">
     <svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M8 7h8M8 11h6"/></svg>
     <span>${p>=.95?"Read again":(p>0?"Continue reading":"Start reading")}</span></button>
+  <div class="toc-actions">
+    <button id="tocListen" data-listen="${esc(resume.id)}" title="Open ${esc(resume.title)} and start reading it aloud">🎧 Listen</button>
+    ${b.podcast&&!share?`<button id="tocPodcast" title="This book as a podcast — follow it in Apple Podcasts or any podcast app">🎙 Podcast</button>`:""}
+  </div>
   <p class="upnext">${p>=.95?"Start over · ":"Up next · "}${esc(resume.title)}</p>
   ${p>0&&p<.95&&b.chapters.length>1?`<button class="secondary" data-ch="${esc(CHAPTERS[b.chapters[0]].id)}">Read from the beginning</button>`:""}`;
   if(b.description)h+=`<p class="desc">${esc(b.description)}</p>`;
@@ -1923,7 +2040,14 @@ function renderToc(b){
   const hlBtn=$("tocHl");
   if(hlBtn)hlBtn.addEventListener("click",()=>nav("#h/"+encodeURIComponent(b.id)));
   const back=$("tocBack");
-  if(back)back.addEventListener("click",()=>nav(""));
+  if(back)back.addEventListener("click",()=>goBack(""));
+  if($("tocNavBack"))$("tocNavBack").addEventListener("click",()=>goBack(""));
+  if($("tocListen"))$("tocListen").addEventListener("click",e=>{
+    // unlock audio inside this tap (iOS), then open the chapter and start
+    if(ttsUsesKokoro())kokoroHold();else ttsUnlock();
+    pendingListen=true;nav(chHash(e.currentTarget.dataset.listen));
+  });
+  if($("tocPodcast"))$("tocPodcast").addEventListener("click",()=>podcastMenu(b));
   if($("tocQk"))$("tocQk").addEventListener("click",qkOpen);
   if($("tocShare"))$("tocShare").addEventListener("click",()=>copyShare("#s/b/"+encodeURIComponent(b.id),$("tocShare")));
   if($("tocMore"))$("tocMore").addEventListener("click",async()=>{
@@ -2138,6 +2262,33 @@ function siblingChapter(offset){
   const pos=b.chapters.indexOf(cur)+offset;
   return (pos>=0&&pos<b.chapters.length)?b.chapters[pos]:null;
 }
+let pendingListen=false;
+/* idea 7: the public podcast feed tools/podcast/podcast.mjs made for this book */
+function podcastMenu(b){
+  const feed=new URL(b.podcast,location.href.split("#")[0].split("?")[0]).href;
+  actionMenu("Podcast",[
+    {icon:"🎙",label:"Open in Apple Podcasts",sub:"Follow it there — episodes download and play with the screen locked, in CarPlay too",
+      fn:()=>{location.href="podcast://"+feed.replace(/^https?:\/\//,"");}},
+    {icon:"⧉",label:"Copy the feed link",sub:"For Overcast, Pocket Casts, Castro… (Add by URL)",
+      fn:()=>{(navigator.clipboard?navigator.clipboard.writeText(feed):Promise.reject()).then(()=>toast("Feed link copied"),()=>sheet({title:"Feed link",value:feed,ok:"Done"}));}},
+  ]);
+}
+/* the card under the last line of a chapter: what's next and how to get there */
+function chapterEndCard(i){
+  const c=CHAPTERS[i],b=bookOf(c);
+  if(share&&share.type==="chapter")return "";
+  const pos=b.chapters.indexOf(i),nx=pos>=0&&pos<b.chapters.length-1?CHAPTERS[b.chapters[pos+1]]:null;
+  if(nx){
+    const mins=Math.max(1,Math.round(nx.words/230));
+    return `<div class="ch-end"><div class="ce-k">End of chapter ${c.num}</div>
+      <button class="ce-next" data-ce="next"><span class="ce-up">Up next · ${mins} min</span>
+        <span class="ce-t">${esc(nx.title)}</span><span class="ce-go">→</span></button>
+      <div class="ce-hint">${S.mode==="scroll"?"or swipe left · pull up":"or swipe left"}</div></div>`;
+  }
+  return `<div class="ch-end"><div class="ce-k">The end</div>
+    <div class="ce-done">You've finished <i>${esc(b.title)}</i>.</div>
+    <div class="ce-row"><button data-ce="book">Book overview</button><button data-ce="home">Library</button></div></div>`;
+}
 function renderChapter(i,fromEnd){
   if(i<0||i>=CHAPTERS.length)return;
   // park the AI conversation of the chapter being left, restore this one's
@@ -2150,7 +2301,7 @@ function renderChapter(i,fromEnd){
     if(!$("aiPanel").classList.contains("hidden")){paintAiHead();aiRender();}
   }
   if(!htmlCache[c.id])htmlCache[c.id]=mdToHtml(c.md);
-  content.style.transition="none";content.innerHTML=htmlCache[c.id];
+  content.style.transition="none";content.innerHTML=htmlCache[c.id]+chapterEndCard(i);
   ttsWordsFor=-1; // word spans (if any) were just destroyed with the old DOM
   content.querySelectorAll("a[data-int]").forEach(a=>a.addEventListener("click",e=>{
     e.preventDefault();
@@ -2192,6 +2343,11 @@ function renderChapter(i,fromEnd){
     paginate();
     goToPct(pct,false);
     restoreAnim();
+    if(slideIn&&pages.animate&&!prefersReduce)
+      pages.animate([{transform:`translateX(${slideIn*48}px)`,opacity:0},{transform:"none",opacity:1}],
+        {duration:260,easing:"cubic-bezier(.2,.8,.2,1)"});
+    slideIn=0;
+    if(pendingListen){pendingListen=false;ttsOpen(true);}
     maybeShowTapHint();
     if(pendingHl&&pendingHl.ch===c.id){
       const m=[...content.querySelectorAll("mark.hl")].find(x=>x.textContent&&pendingHl.text&&pendingHl.text.startsWith(x.textContent.slice(0,40)));
@@ -2944,7 +3100,7 @@ function ttsTokenize(root, wrap){
   while(n=walker.nextNode()){
     if(!n.nodeValue.trim())continue;
     const pe=n.parentElement;
-    if(pe&&pe.closest("pre,figcaption,.imgcap,sup.fn"))continue; // don't read code / captions / footnote marks
+    if(pe&&pe.closest("pre,figcaption,.imgcap,sup.fn,.ch-end"))continue; // don't read code / captions / footnote marks / the end card
     if(S.ttsSkipHead&&pe&&pe.closest("h1,h2,h3,h4,h5,h6,table"))continue;
     nodes.push(n);
   }
@@ -3136,7 +3292,7 @@ function ttsChapterEnded(){
     ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
     if(ttsUsesKokoro())kokoroHold();
     else ttsHoldUntilReady();
-    nav(chapterHash(CHAPTERS[j]));
+    navReplace(chapterHash(CHAPTERS[j]));
   }else{
     ttsSpeaking=false;paintTtsPlay();
     toast("End of book");
@@ -3195,6 +3351,7 @@ function ttsOpen(autoplay,fromStart){
   $("ttsBar").classList.remove("hidden");
   $("botbar").classList.add("hidden");
   content.classList.add("tts-mode");
+  $("ttsBar").classList.toggle("expanded",!!ui.ttsExpanded);
   // reserve room for the persistent TTS bar so it never covers the page
   // bottom, then repaginate/rescroll to the same reading position
   reader.style.setProperty("--ttsbar-h",$("ttsBar").offsetHeight+"px");
@@ -3499,7 +3656,7 @@ async function ttsCommand(){
     const j=siblingChapter(1);if(j===null){toast("This is the last chapter");return;}
     ttsAutoNav=true;ttsResumeAfterRender=true;ttsIdx=0;
     if(ttsUsesKokoro())kokoroHold();
-    nav(chapterHash(CHAPTERS[j]));return;
+    navReplace(chapterHash(CHAPTERS[j]));return;
   }
   if(short&&/^(back|go back|repeat|again|previous|rewind)/.test(t)){ttsSentence(-1);ttsPlay();return;}
   if(short&&/^(next|skip|forward)/.test(t)){ttsSentence(1);ttsPlay();return;}
@@ -4327,13 +4484,30 @@ function maybeShowTapHint(){
   ui.tapHint=true;store.set("ui",ui);
   el.classList.remove("hidden");
   const close=()=>{el.classList.add("hidden");clearTimeout(tapHintT);};
-  el.addEventListener("click",close,{once:true});
+  // the tip lets touches through (pointer-events:none), so the first tap or
+  // swipe both dismisses it and does what it was meant to
+  document.addEventListener("pointerdown",close,{once:true,capture:true});
   tapHintT=setTimeout(close,6500);
 }
 function openSibling(offset,fromEnd){
-  const j=siblingChapter(offset);
-  if(j!==null)nav(chapterHash(CHAPTERS[j]));
-  else if(fromEnd===undefined)backToToc();  // past the last chapter -> book TOC
+  if(!chapterGo(offset)&&fromEnd===undefined)backToToc();  // past the last chapter -> book TOC
+}
+/* move to the next (1) / previous (-1) chapter: the page slides out the way
+   the finger went, the new chapter slides in. Returns false at the book's edge. */
+let slideIn=0, chGoing=false;
+function chapterGo(dir,fromX){
+  const j=siblingChapter(dir);
+  if(j===null)return false;
+  if(dir>0&&(isShortChapter()||curPct()>=.95))markChapterFinished();
+  if(chGoing)return true;
+  chGoing=true;
+  const go=()=>{chGoing=false;slideIn=dir;if(dir<0)pendingFromEnd=true;navReplace(chapterHash(CHAPTERS[j]));};
+  if(prefersReduce||!pages.animate){go();return true;}
+  const w=pages.clientWidth;
+  const a=pages.animate([{transform:`translateX(${fromX||0}px)`,opacity:1},
+    {transform:`translateX(${-dir*w*.55}px)`,opacity:0}],{duration:170,easing:"cubic-bezier(.4,0,1,1)",fill:"forwards"});
+  a.onfinish=()=>{go();requestAnimationFrame(()=>a.cancel());};
+  return true;
 }
 function next(){
   flashEdge("r");
@@ -4341,24 +4515,73 @@ function next(){
     const atEnd=pages.scrollTop+pages.clientHeight>=pages.scrollHeight-2;
     if(!atEnd){pages.scrollBy({top:pages.clientHeight*.9,behavior:"smooth"});return;}
   }else if(page<pageCount-1){goTo(page+1);return;}
-  if(isShortChapter()||curPct()>=.95)markChapterFinished();
-  const j=siblingChapter(1);
-  if(j!==null)nav(chapterHash(CHAPTERS[j]));
-  else if(cur>=0&&!(share&&share.type==="chapter"))toast("End of book","Contents",backToToc);
+  if(!chapterGo(1)){
+    if(isShortChapter()||curPct()>=.95)markChapterFinished();
+    if(cur>=0&&!(share&&share.type==="chapter"))toast("End of book","Contents",backToToc);
+  }
 }
 function prev(){
   flashEdge("l");
   if(S.mode==="scroll"){
     if(pages.scrollTop>2){pages.scrollBy({top:-pages.clientHeight*.9,behavior:"smooth"});return;}
   }else if(page>0){goTo(page-1);return;}
-  const j=siblingChapter(-1);
-  if(j!==null){pendingFromEnd=true;nav(chapterHash(CHAPTERS[j]));}
+  chapterGo(-1);
 }
 let pendingFromEnd=false;
 function backToToc(){
   if(share&&share.type==="chapter")return; // a shared chapter has no TOC to go back to
   const c=CHAPTERS[cur];
-  nav(c?bookHash(bookOf(c)):"");
+  goBack(c?bookHash(bookOf(c)):"");
+}
+/* book page: the small nav bar slides in once the big header scrolls away */
+window.addEventListener("scroll",()=>{
+  const n=document.getElementById("tocNav");
+  if(n&&!toc.classList.contains("hidden"))n.classList.toggle("on",window.scrollY>260);
+},{passive:true});
+/* swipe in from the left edge to go back — book, search, notebook, stats pages */
+let eb=null;
+document.addEventListener("touchstart",e=>{
+  if(toc.classList.contains("hidden")||e.touches.length!==1||!sheetClosed())return;
+  const t=e.touches[0];
+  if(t.clientX>28)return;
+  eb={x:t.clientX,y:t.clientY,t:Date.now(),dir:null,dx:0};
+},{passive:true});
+document.addEventListener("touchmove",e=>{
+  if(!eb)return;
+  const t=e.touches[0];eb.dx=t.clientX-eb.x;const dy=t.clientY-eb.y;
+  if(!eb.dir){if(Math.abs(eb.dx)<8&&Math.abs(dy)<8)return;eb.dir=eb.dx>Math.abs(dy)?"h":"v";}
+  if(eb.dir!=="h"){eb=null;return;}
+  toc.classList.add("edge-drag");
+  toc.style.transition="none";toc.style.transform=`translateX(${Math.max(0,eb.dx)}px)`;
+},{passive:true});
+document.addEventListener("touchend",()=>{
+  if(!eb)return;
+  const g=eb;eb=null;
+  if(g.dir!=="h"){return;}
+  const go=g.dx>innerWidth*.3||(g.dx>50&&g.dx/Math.max(1,Date.now()-g.t)>.5);
+  toc.style.transition="transform .24s cubic-bezier(.2,.8,.2,1)";
+  toc.style.transform=go?`translateX(${innerWidth}px)`:"";
+  setTimeout(()=>{
+    toc.style.transition="";toc.style.transform="";toc.classList.remove("edge-drag");
+    if(go){vtSkip=true;const h=location.hash;goBack(/^#h\//.test(h)?bookHash(BOOKS[decodeURIComponent(h).slice(3)]||{id:""}):"");}
+  },go?240:250);
+},{passive:true});
+function sheetClosed(){return $("sheet").classList.contains("hidden");}
+/* tap the title: this book's chapters, current one marked */
+function openChapterList(){
+  const c=CHAPTERS[cur];if(!c||(share&&share.type==="chapter"))return;
+  const b=bookOf(c);
+  actionMenu(b.title,[
+    {icon:"‹",label:"Book overview",sub:"Cover, progress, highlights",fn:()=>nav(bookHash(b))},
+    ...b.chapters.map(i=>{
+      const ch=CHAPTERS[i],pct=chPct(ch.id),mins=Math.max(1,Math.round(ch.words/230));
+      return {icon:i===cur?"▶":pct>=.95?"✓":String(ch.num),label:ch.title,
+        sub:(i===cur?"Reading now · ":"")+`${mins} min`+(pct>0&&pct<.95?` · ${Math.round(pct*100)}%`:""),
+        fn:()=>{if(i!==cur)navReplace(chapterHash(ch));}};
+    })
+  ]);
+  const curBtn=$("sheet").querySelector(`[data-mi="${b.chapters.indexOf(cur)+1}"]`);
+  if(curBtn)curBtn.scrollIntoView({block:"center"});
 }
 
 /* ================= chrome (bars / panel / theme) ================= */
@@ -4380,6 +4603,7 @@ function reflowKeepingPct(fn){
 
 /* ================= events ================= */
 $("btnToc").addEventListener("click",backToToc);
+$("barTitle").addEventListener("click",openChapterList);
 $("btnShare").addEventListener("click",()=>{
   const c=CHAPTERS[cur];if(!c)return;
   copyShare("#s/c/"+encodeURIComponent(c.id),$("btnShare"));
@@ -4397,6 +4621,8 @@ $("bottomNav").addEventListener("click",e=>{
 });
 function openReaderMenu(){
   const items=[
+    {icon:"⌂",label:"Library",sub:"All your books",fn:()=>nav("")},
+    {icon:"☰",label:"Chapters",sub:"Jump within this book",fn:openChapterList},
     {icon:"⌘",label:"Quick open",sub:"Jump to any book or chapter",fn:qkOpen},
     {icon:"⚑",label:bookmarkHere()?"Remove bookmark":"Bookmark this page",fn:toggleBookmark},
     {icon:"🔊",label:"Listen",sub:"Read this chapter aloud",fn:()=>$("btnListen").click()},
@@ -4416,6 +4642,28 @@ $("slider").addEventListener("input",e=>goTo(e.target.value-1,false));
 /* Listen (text-to-speech) controls */
 $("btnListen").addEventListener("click",()=>{ttsUnlock();ttsActive?ttsClose():ttsOpen(true);});
 $("ttsClose").addEventListener("click",ttsClose);
+$("ttsBack").addEventListener("click",()=>ttsSentence(-1));
+$("ttsFwd").addEventListener("click",()=>ttsSentence(1));
+function ttsExpand(on){
+  const bar=$("ttsBar");
+  if(on===bar.classList.contains("expanded"))return;
+  bar.classList.toggle("expanded",on);
+  ui.ttsExpanded=on;store.set("ui",ui);
+  // the page keeps clear of the bar: re-measure and keep the reading spot
+  reader.style.setProperty("--ttsbar-h",bar.offsetHeight+"px");
+  if(reader.classList.contains("listening"))reflowKeepingPct(()=>{});
+}
+$("ttsMoreBtn").addEventListener("click",()=>ttsExpand(!$("ttsBar").classList.contains("expanded")));
+$("ttsGrab").addEventListener("click",()=>ttsExpand(!$("ttsBar").classList.contains("expanded")));
+let tbT=null;
+$("ttsBar").addEventListener("touchstart",e=>{
+  tbT=e.target.closest("select")?null:{x:e.touches[0].clientX,y:e.touches[0].clientY};},{passive:true});
+$("ttsBar").addEventListener("touchend",e=>{
+  if(!tbT)return;
+  const t=e.changedTouches[0],dx=t.clientX-tbT.x,dy=t.clientY-tbT.y;tbT=null;
+  if(Math.abs(dy)<40||Math.abs(dy)<Math.abs(dx)*1.5)return; // a sideways drag is the seek bar's
+  ttsExpand(dy<0);
+},{passive:true});
 $("ttsPlay").addEventListener("click",()=>{ttsSpeaking?ttsPause():ttsPlay();});
 $("ttsSaveSent").addEventListener("click",ttsKeepSentence);
 $("ttsSave").addEventListener("click",ttsSaveChapter);
@@ -4615,6 +4863,13 @@ function guardClick(e){
   return true;
 }
 $("pageArea").addEventListener("click",e=>{
+  const ce=e.target.closest("[data-ce]");
+  if(ce){
+    const a=ce.dataset.ce;
+    if(a==="next"){if(!chapterGo(1))backToToc();}
+    else{markChapterFinished();if(a==="book")nav(bookHash(bookOf(CHAPTERS[cur])));else nav("");}
+    return;
+  }
   if(ttsActive){
     const w=e.target.closest(".tts-w");
     if(w){
@@ -4668,17 +4923,95 @@ function paintBookmark(){
 }
 $("btnBkm").addEventListener("click",toggleBookmark);
 
-/* swipe */
-let tx=0,ty=0,tt=0;
+/* swipe — the page follows the finger. Page mode: drag to turn (and past the
+   first/last page into the neighbouring chapter). Scroll mode: a sideways
+   swipe changes chapter, and pulling up past the end opens the next one. */
+let sw=null;
+function swSolo(){return !!(share&&share.type==="chapter");}
+function swDrag(dx){
+  const w=pages.clientWidth;
+  if(S.mode==="scroll"){
+    const edge=(dx<0&&siblingChapter(1)===null)||(dx>0&&siblingChapter(-1)===null);
+    const x=edge?dx*.25:dx;
+    pages.style.transition="none";
+    pages.style.transform=`translateX(${x}px)`;pages.style.opacity=String(1-Math.min(.5,Math.abs(x)/w*.6));
+    return;
+  }
+  const atL=page===0&&siblingChapter(-1)===null,atR=page===pageCount-1&&siblingChapter(1)===null;
+  const x=(dx>0&&atL)||(dx<0&&atR)?dx*.25:dx;
+  content.style.transition="none";
+  content.style.transform=`translateX(${-page*step()+x}px)`;
+}
+function swReset(animate){
+  pages.style.transition=animate?"transform .22s cubic-bezier(.2,.8,.2,1), opacity .22s":"none";
+  pages.style.transform="";pages.style.opacity="";
+  if(S.mode!=="scroll"){content.style.transition="";goTo(page,animate);}
+}
+function pullShow(px){
+  const el=$("pullNext");
+  if(px<=0){el.classList.remove("on","go");return;}
+  const j=siblingChapter(1);
+  if(j===null){el.classList.remove("on","go");return;}
+  el.classList.add("on");el.classList.toggle("go",px>80);
+  el.textContent=(px>80?"Release for ":"↑ Pull for ")+CHAPTERS[j].title;
+  el.style.transform=`translate(-50%,${-Math.min(px,110)*.5}px)`;
+}
 $("pageArea").addEventListener("touchstart",e=>{
-  tx=e.touches[0].clientX;ty=e.touches[0].clientY;tt=Date.now();},{passive:true});
-$("pageArea").addEventListener("touchend",e=>{
-  const sel=window.getSelection();
-  if(sel&&sel.toString())return; // don't turn the page while selecting text
-  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
-  if(Date.now()-tt<600&&Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.4){
-    if(S.mode!=="scroll"){dx<0?next():prev();}
-  }},{passive:true});
+  if(e.touches.length!==1||ttsSeekDragging){sw=null;return;}
+  // a wide code block or table scrolls sideways itself — leave that swipe to it
+  for(let el=e.target;el&&el!==pages;el=el.parentElement)
+    if(el.scrollWidth>el.clientWidth+2&&/auto|scroll/.test(getComputedStyle(el).overflowX)){sw=null;return;}
+  const t=e.touches[0];
+  sw={x:t.clientX,y:t.clientY,t:Date.now(),dir:null,dx:0,dy:0,
+      atEnd:S.mode==="scroll"&&pages.scrollTop+pages.clientHeight>=pages.scrollHeight-2};
+},{passive:true});
+$("pageArea").addEventListener("touchmove",e=>{
+  if(!sw)return;
+  if(e.touches.length!==1){swReset(true);pullShow(0);sw=null;return;}
+  const t=e.touches[0];sw.dx=t.clientX-sw.x;sw.dy=t.clientY-sw.y;
+  if(!sw.dir){
+    if(Math.abs(sw.dx)<10&&Math.abs(sw.dy)<10)return;
+    sw.dir=Math.abs(sw.dx)>Math.abs(sw.dy)*1.2?"h":"v";
+    const sel=window.getSelection();
+    if(sel&&sel.toString()){sw=null;return;} // selecting text, not turning pages
+  }
+  if(sw.dir==="h"&&!swSolo())swDrag(sw.dx);
+  else if(sw.dir==="v"&&sw.atEnd&&S.mode==="scroll"&&!swSolo()){
+    if(pages.scrollTop+pages.clientHeight<pages.scrollHeight-2){sw.atEnd=false;pullShow(0);return;}
+    pullShow(-sw.dy);
+  }
+},{passive:true});
+function swEnd(){
+  if(!sw)return;
+  const g=sw;sw=null;
+  if(g.dir==="v"){
+    const pulled=g.atEnd&&-g.dy>80;pullShow(0);
+    if(pulled)chapterGo(1);
+    return;
+  }
+  if(g.dir!=="h"||swSolo())return;
+  const w=pages.clientWidth,ms=Math.max(1,Date.now()-g.t);
+  const commit=Math.abs(g.dx)>w*.22||(Math.abs(g.dx)>40&&Math.abs(g.dx)/ms>.45);
+  if(!commit){swReset(true);return;}
+  const dir=g.dx<0?1:-1;
+  if(S.mode==="scroll"){
+    const x=parseFloat((pages.style.transform.match(/-?[\d.]+/)||[0])[0]);
+    pages.style.transition="none";pages.style.transform="";pages.style.opacity="";
+    if(!chapterGo(dir,x)){swReset(true);if(dir>0)toast("End of book","Contents",backToToc);}
+    return;
+  }
+  // page mode: a turn inside the chapter animates from where the finger let go
+  content.style.transition="";
+  if(dir>0&&page<pageCount-1){goTo(page+1);return;}
+  if(dir<0&&page>0){goTo(page-1);return;}
+  const x=g.dx;
+  goTo(page,false);
+  if(!chapterGo(dir,x)){
+    if(dir>0){if(isShortChapter()||curPct()>=.95)markChapterFinished();toast("End of book","Contents",backToToc);}
+  }
+}
+$("pageArea").addEventListener("touchend",swEnd,{passive:true});
+$("pageArea").addEventListener("touchcancel",()=>{if(sw){sw=null;swReset(true);pullShow(0);}},{passive:true});
 
 /* keyboard */
 document.addEventListener("keydown",e=>{
@@ -5646,7 +5979,8 @@ async function intakeSharedFiles(){
 }
 
 /* ================= boot ================= */
-window.addEventListener("hashchange",async()=>{
+window.addEventListener("hashchange",()=>onHashChange());
+async function onHashChange(){
   const h=decodeURIComponent(location.hash);
   parseShare(h); // must run before tryEnter() — it reads `share`
   if(!await tryEnter()){showLocked();return;}
@@ -5657,10 +5991,11 @@ window.addEventListener("hashchange",async()=>{
     const i=CHAPTERS.findIndex(c=>c.id===id);
     if(i>=0){if(cur>=0&&!reader.classList.contains("hidden"))saveProgress();
       if(ttsActive){if(ttsAutoNav||ttsResumeAfterRender)ttsAutoNav=false;else ttsClose();}
+      navNote(h);vtDepth=2;
       hideBars();hidePanel();hideHlPop();showView("reader");renderChapter(i,true);return;}
   }
   route();
-});
+}
 $("lockBtn").addEventListener("click",attemptUnlock);
 $("lockInput").addEventListener("keydown",e=>{if(e.key==="Enter")attemptUnlock();});
 boot();

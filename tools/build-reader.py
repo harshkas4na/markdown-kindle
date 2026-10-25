@@ -12,7 +12,9 @@ No configuration needed. The script discovers content from the folder structure
         <book>/             second-level folder = one book
           book.json         optional: {"title", "author", "description",
                                        "cover": "cover.jpg" (relative) or a data: URL,
-                                       "lang": "en"}
+                                       "lang": "en",
+                                       "podcast": true  → public audio feed, see
+                                                          tools/podcast/podcast.mjs}
           01-intro.md       .md files, sorted by filename = chapters
           <part>/           deeper folders = named parts; their .md files are
                             chapters grouped under a part heading in the TOC
@@ -482,6 +484,10 @@ def build():
                 book["cover"] = cover
             if meta.get("lang"):
                 book["lang"] = meta["lang"]
+            # a public podcast feed made by tools/podcast/podcast.mjs ("podcast": true)
+            feed = f"podcast/{book_id.replace('/', '-')}/feed.xml"
+            if os.path.exists(os.path.join(ROOT, feed)):
+                book["podcast"] = feed
             section["books"].append(book)
 
         if section["books"]:
