@@ -5,6 +5,8 @@
 
 The tutor has the same problem. A sealed turn has several hops, each with its own delay, and a pointer that takes fifteen seconds to move is a broken demo. The target is **under about eight seconds from releasing the key to the pointer starting to move**, and the lab's first job is to measure where the time really goes.
 
+![Where the 3 seconds go](img/gpt-three-seconds.jpg "Measured on 30 October: hear on the laptop 0.5 s, then 0GM-1.0 and laya in parallel, then point. Storage is off the clock")
+
 ## The hops, and what each probably costs
 
 These are expectations, not measurements. The lab replaces them. One real data point exists: 0G's own desk robot, **Project Floaty**, runs "Ask Floaty" on 0GM-1.0 in Private mode in about **2 seconds**, and when no enclave is free it waits rather than falling back. That is both a latency hint and 0G using our exact safe-stop pattern.

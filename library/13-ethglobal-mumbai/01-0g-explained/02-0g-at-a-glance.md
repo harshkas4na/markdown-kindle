@@ -9,6 +9,8 @@ That building is 0G. The reception counter is the **router**, the sealed rooms a
 
 ![0G in one picture](img/fig-stack.svg "Figure 1 again. Compute behind one router key; Storage, Chain and Agentic ID through SDKs and RPC")
 
+![0G, the trust layer for AI](img/gpt-0g-stack.jpg "The same four layers as a picture: Compute, Storage, Chain, Agentic ID, and one API key in front of Compute")
+
 ## Who builds it
 
 **0G Labs**, founded in 2023, with Michael Heinrich as CEO. The code lives under the **0G Foundation** GitHub organisation (older npm packages still carry the earlier `0glabs` name). Its own one-line description: the trust layer for AI. An older framing, still in the whitepaper, calls it a decentralised AI operating system.

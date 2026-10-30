@@ -81,6 +81,8 @@ Every model in 0G's catalog carries one of three badges, and the difference betw
 
 ![Public, Verified and Private](img/fig-trust-modes.svg "Figure 3. The badge tells you what is proven. The tutor uses only Private")
 
+![Three trust modes, one router](img/gpt-trust-modes.jpg "Public: the provider reads your prompt. Verified: proof of who answered. Private: runs inside a sealed enclave")
+
 - **Public**: an ordinary cloud model. The provider reads your prompt. Nothing is proven beyond the bill.
 - **Verified** (0G calls the mechanism TeeTLS): the route is attested. You get proof of *which provider* answered, signed. But the model runs on the provider's normal infrastructure, so the provider can still read your prompt. Our research notes put it in one line: TeeTLS attests the routing path, not the execution.
 - **Private** (TeeML): the model itself runs inside an attested enclave. Nobody reads the prompt. This is the kitchen with glass walls.

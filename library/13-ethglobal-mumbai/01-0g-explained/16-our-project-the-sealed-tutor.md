@@ -49,6 +49,8 @@ The rule that organises everything is 0G's own sentence: **0G is the brain, not 
 
 ![One turn of the loop](img/fig-decision-loop.svg "Figure 7. Hear, see, think, check, point, log. The safe-stop branch leaves from the check")
 
+![One turn of the tutor](img/gpt-tutor-loop.jpg "Follow the numbers 1 to 6: hear and see on the laptop, think and check sealed on 0G, point, then log to 0G Storage")
+
 1. **Hear.** The clip is transcribed on the laptop (or by 0G Whisper, if switched on).
 2. **See.** The outline is compiled (in parallel with step 1, chapter 18 explains why).
 3. **Think.** 0GM-1.0 gets the question and the outline and returns an explanation plus a target.

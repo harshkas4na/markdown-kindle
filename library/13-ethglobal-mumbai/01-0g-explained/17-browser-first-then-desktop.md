@@ -9,6 +9,8 @@ The track says "desktop companion". Our plan is to crack the browser perfectly f
 
 ![Two ways to turn a screen into text](img/fig-browser-desktop.svg "Figure 8. The browser path and the desktop path both produce the same outline")
 
+![Two roads to the same outline](img/gpt-two-roads.jpg "Browser reads the page structure; desktop reads the accessibility tree plus on-device text recognition; both give the same outline")
+
 ## The browser path (build first)
 
 A Chrome extension (Manifest V3) has three parts, and screen-tutor already taught us how each behaves:
