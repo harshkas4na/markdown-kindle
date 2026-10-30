@@ -16,7 +16,7 @@ There are two ways to reach a model, and verification behaves differently on eac
 
 ## Three facts the docs bury
 
-1. **Signatures expire after about 20 minutes.** The provider's broker caches each `{text, signature}` pair for 20 minutes by default, then forgets it. A "check it later" design must fetch the signature within that window and **store it** (in our case, in the episode log). Re-fetching live on Saturday morning a signature from Friday night will fail.
+1. **Signatures expire after about 20 minutes.** The provider's broker caches each `{text, signature}` pair for 20 minutes by default, then forgets it. A "check it later" design must fetch the signature within that window and **store it** (in our case, in the episode log). Re-fetching live on Saturday morning a signature from Friday night will fail. The lab timed it on 30 October: the same signature came back at 17 and at 19 minutes, and at 21 minutes the provider answered "chat id not found or expired".
 2. **What is signed is two hashes.** For chat and speech, the enclave signs `sha256(request body):sha256(response bytes)`. Because the router strips some fields before forwarding and adds its trace on the way back, hashing the bytes *your* client saw may not reproduce the provider's hashes. The lab tested it on 30 October, and it does not match, for laya or for 0GM-1.0. So the signature proves that this sealed provider answered this chat id, not these exact words. The proof sheet should say exactly that, and no more.
 3. **The SDK's `processResponse` checks only the signature.** It recovers the signer and compares addresses. It does not check that the signed text matches your content.
 

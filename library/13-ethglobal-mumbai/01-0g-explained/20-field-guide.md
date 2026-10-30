@@ -23,11 +23,12 @@ Each line says what goes wrong and what to do. The source is in brackets.
 - **The testnet router has two models.** Whisper, laya and GLM-5.3 are mainnet-only. Fund a mainnet key. (measured 30 October)
 - **Never ship 0G keys in code.** The user brings their own key. (0G docs)
 - **laya reads only 512 tokens** of English state; longer is cut off. (model page)
+- **On a phone hotspot the turn holds (2.2-2.5 s), but a fresh connection costs 3.6 s and laya stalled twice in 40 calls (12 s, 30 s).** Warm the connection at session start, keep it alive, and time out each call: laya 4 s (retry once, then ask), 0GM 8 s (hold). (measured)
 - **Testnet and mainnet are separate worlds**: separate endpoints, keys and balances. A mainnet key does not work on testnet. (0G router docs, via the brief)
 
 ## Verification
 
-- **Signatures expire after about 20 minutes** at the provider. Fetch and store them right after each decision. (0G serving broker config)
+- **Signatures expire after 20 minutes** at the provider: served at 19.1 minutes, `404 chat_id_not_found` at 20.9. Fetch and store them right after each decision. (broker config; measured)
 - `processResponse` checks the signature, not that the signed text matches your content. (SDK source)
 - **Through the router, the signed hashes never match your own bytes** (the router rewrites both ways). The signature proves which sealed provider answered which chat id, not the exact words. (measured)
 - **The manual signature check works**: `getService(provider)` on the Inference contract for `url` and signer, then `{url}/v1/proxy/signature/{chatID}?model=...`, about 130 ms. (measured)

@@ -46,3 +46,6 @@ Each is a hypothesis for the lab, not a plan.
 
 > [!TRY] The lab's benchmark, exactly
 > Ten questions on three pages. For each: key-release to Whisper text; outline compile time and token count; 0GM-1.0 time with thinking on and off; laya time; total to first pointer move. Report the median and the slowest of ten. Repeat once from a phone hotspot, because the venue's network will be worse than home's.
+
+> [!NOTE] What the lab measured, 30 October
+> On home Wi-Fi, key release to pointer took about 3 seconds: half a second to hear on the laptop, then 0GM-1.0 and laya together in 2.1 to 2.6 seconds. On an iPhone hotspot, the same turn took 2.2 to 2.5 seconds, so mobile data is not the problem. Two things were. A brand-new connection to the router took 3.6 seconds before the first byte, so the tutor opens its connection when the session starts and keeps it open. And laya stalled twice in forty calls on the hotspot, once for 12 seconds and once for 30. So every call gets a timeout: if laya does not answer in 4 seconds, try once more, then ask instead of pointing; if 0GM-1.0 does not answer in 8, hold still and say so. The numbers say build it.
