@@ -23,17 +23,19 @@ That is **0G Storage**. Every file is known by a **Merkle root**: a 32-byte fing
 ## The facts that matter
 
 - **Use the Turbo network.** The testnet indexer is `indexer-storage-testnet-turbo.0g.ai` and mainnet's is `indexer-storage-turbo.0g.ai`. The "Standard" indexers returned 503 or nothing on 30 October.
-- **The SDK**: `@0gfoundation/0g-storage-ts-sdk` (version 1.2.13, published 24 October). Upload from Node: build the file object, compute its Merkle tree (the root is known *before* uploading), then `indexer.upload(...)`. Every call returns a `[value, error]` pair and never throws.
-- **Encryption is built in**: pass `aes256` (a 32-byte key) or `ecies` (to a recipient's public key) as an upload option, and the SDK encrypts on your machine before anything leaves it. A wrong key on download does not throw; it hands you ciphertext. Call `peekHeader(root)` first. Lose the key and there is no recovery.
+- **The SDK**: `@0gfoundation/0g-storage-ts-sdk` (version 1.2.13, published 24 October). Upload from Node: build the file object, compute its Merkle tree (the root is known *before* uploading), then `indexer.upload(...)`. Every call returns a `[value, error]` pair and never throws. It installs only next to **ethers 6.13.1 exactly**; with any other version, npm refuses.
+- **Encryption is built in**: pass `aes256` (a 32-byte key) or `ecies` (to a recipient's public key) as an upload option, and the SDK encrypts on your machine before anything leaves it. Lose the key and there is no recovery.
+- **The encrypted file has its own fingerprint.** When the SDK encrypts inside the upload, the root it stores is the root of the scrambled bytes, not of your original. To know the real root before uploading, encrypt first with `newSymmetricEncryptedFile`, compute the root of that, and upload it with no encryption option. Measured in the lab: the two roots matched.
+- **A wrong key fails silently.** Measured: download with the wrong key and you get back garbage exactly as long as the original, with no error. The SDK's encryption (AES-256 in counter mode) carries no check of its own. So keep a SHA-256 of the original next to the root and compare it after decrypting.
 - **The browser is awkward**: the browser build needs Node polyfills, and downloads must be reassembled from segments. Doing Storage from a small local Node helper is simpler.
-- **It costs almost nothing.** The fee is a one-time payment per 256-byte sector: about 0.000126 0G per MiB, measured on chain. An episode log of a few kilobytes is effectively free beyond gas.
-- **It can be slow to become readable.** 0run waited more than 22 minutes for a 658 KB upload to be readable, and one upload call never returned. That is one team's measurement, not re-tested, but it is the reason the next rule exists.
+- **It costs almost nothing.** The fee is a one-time payment per 256-byte sector: about 0.000126 0G per MiB, measured on chain. In the lab, a 50 KB encrypted log cost 0.0012 0G in total, nearly all of it gas, so one faucet claim of 0.5 0G covers about four hundred uploads.
+- **It was fast when we measured it.** On 30 October, on the test network from home Wi-Fi, that 50 KB log was finalized in 15 seconds and read back and decrypted in 20. But 0run once waited more than 22 minutes for a 658 KB upload to be readable, and one upload call never returned. One fast run does not cancel one slow run, which is the reason the next rule exists.
 
 > [!GOTCHA] Never put Storage on the decision path
 > The tutor writes its episode log line by line to a local buffer, and a background job uploads it in batches with a timeout (120 seconds for upload, 30 for download, as 0run used). The decision loop never waits for Storage. The fingerprint is computed locally, so the proof exists the moment the file does, even before the upload finishes.
 
 > [!PROJECT] What we store
-> 1. **The episode log**: one line per decision (request ids, the decision, laya's probability, the target id, a hash of the outline, the provider's signature). Encrypted with a key that lives only on the laptop, uploaded at the end of each session, its root recorded by our small contract. This is a Physical AI must-show.
+> 1. **The episode log**: one line per decision (request ids, the decision, laya's probability, the target id, a hash of the outline, the provider's signature). Encrypted with a key that lives only on the laptop, uploaded at the end of each session, its root and the SHA-256 of the original recorded by our small contract. This is a Physical AI must-show.
 > 2. **The learner's memory** (stretch): a small encrypted file ("got stuck on the Contract tab twice last week") uploaded as a new version each session, with a pointer to the latest root kept locally. The key-value layer would be more natural, but reading it needs our own node, so the log layer it is.
 > 3. **Never the screen.** Screenshots and outlines are not stored anywhere. Only their hashes go into the log.
 

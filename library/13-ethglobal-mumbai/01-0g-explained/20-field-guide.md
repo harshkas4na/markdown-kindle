@@ -36,11 +36,13 @@ Each line says what goes wrong and what to do. The source is in brackets.
 ## Storage
 
 - **Use the Turbo indexers**; the Standard ones returned 503 or nothing on 30 October. **KV reads need your own KV node**; the documented one timed out. (measured)
-- **Uploads are slow and can hang.** 0run saw 22+ minutes before a file was readable, and an upload call that never returned. **Never put Storage on the decision path.** Upload in the background, cache locally, compute the Merkle root yourself. (0run)
+- **Uploads can be slow and can hang.** 0run saw 22+ minutes before a file was readable, and an upload call that never returned. Our one lab run was fast: 50 KB finalized in 15 s and read back in 20 s, for 0.0012 0G. **Never put Storage on the decision path.** Upload in the background, cache locally, compute the Merkle root yourself. (0run; measured)
+- **The SDK installs only with `ethers@6.13.1` exactly.** Any other version fails with ERESOLVE. (measured)
+- **With the `encryption` option, the stored root is the ciphertext's.** To know it before uploading, wrap the file with `newSymmetricEncryptedFile` yourself, root that, and upload it with no `encryption` option. (measured: roots matched)
 - **Put a timeout on every SDK call**: 120 s upload, 30 s download. `waitForLogEntry` retries forever otherwise. (0run, dMemo)
 - **The TypeScript SDK returns `[value, error]` pairs**; it does not throw. Check the error every time. (Hands Unchained)
 - **`upload()` returns an object**; unwrap `.rootHash`. Download refuses to overwrite an existing file. (Rerun)
-- **A wrong decryption key does not throw**: it silently returns ciphertext. Call `indexer.peekHeader(rootHash)` first. Lose the AES key and there is no server-side recovery. (brief)
+- **A wrong decryption key does not throw**: it silently returns garbage the same length as the original. Keep a SHA-256 of the original and check it after decrypting; `indexer.peekHeader(rootHash)` only tells you the file is encrypted. Lose the AES key and there is no server-side recovery. (measured)
 - **The SDK's `with_proof` flag was a no-op** for dMemo, and AES-CTR has no authentication tag. Recompute the blob's Merkle root from the raw ciphertext and compare before decrypting. (dMemo)
 - **Downloads use `fs`** and do not work in a browser. Do Storage from a Node process, not the extension page. (brief)
 - **The Storage SDK's old axios breaks inside Cloudflare Workers.** Use a Node sidecar. (MASS)
