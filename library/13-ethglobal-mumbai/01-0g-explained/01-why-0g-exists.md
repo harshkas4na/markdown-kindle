@@ -1,5 +1,7 @@
 # 1. Why 0G Exists: Nobody Lets an AI Look at Their Screen
 
+![Asha at her laptop](img/art-tutor.jpg "Asha, a second-week engineer, and a helper that can see her screen without anyone else seeing it")
+
 > [!STORY] Asha's second week
 > Asha is in her second week as an engineer at a payments company in Lower Parel. Her team lead asks her to verify a contract on Etherscan, then file a ticket in the internal admin panel, then change a setting in the bank partner's portal. Three tools she has never used. Each one has forty buttons. She is stuck on the first one.
 >

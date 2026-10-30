@@ -1,5 +1,7 @@
 # 19. The 36 Hours, Decided Before the Clock Starts
 
+![Hackathon night](img/art-hackathon-night.jpg "Thursday night in Mumbai: the clock is running and the plan is already made")
+
 > [!STORY] The cricket captain's plan at the toss
 > A good captain does not decide at the 40th over who bowls the death overs. He decided it the night before, with the team, when he was calm. At the 40th over, with the crowd screaming, he just follows the plan, and the only thinking left is the thinking nobody could have done in advance.
 

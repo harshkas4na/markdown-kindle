@@ -19,6 +19,8 @@ Their mandate comes from the EF Board itself, published on 13 March 2026, and it
 
 ## CROPS, letter by letter, with what each one means for a real app
 
+![CROPS: four promises](img/gpt-crops-pillars.jpg "Censorship resistant, Open source, Private, Secure: the four promises the EF judges")
+
 | Letter | The question it asks | A typical way apps fail it |
 |---|---|---|
 | **C** censorship resistant | If you (the builder), your domain, your server or your RPC provider go away or refuse a user, does the app still work? | the frontend only lives on one domain; the backend is a single server |

@@ -1,5 +1,7 @@
 # 6. The Checkpoint: laya, the Model That Answers in Percentages
 
+![The constable at the junction](img/art-constable.jpg "Go, wait or stop, and how sure he is: the constable is laya")
+
 > [!STORY] The constable at Hutatma Chowk
 > At a busy junction near Flora Fountain, a traffic constable stands on a small box. He does not give speeches. Cars arrive and he makes one of three gestures: go, wait, or stop. Ask him why and he could tell you, but his job is the gesture, and he makes it in a fraction of a second.
 >
@@ -27,6 +29,8 @@ It sends back **typed answers, each with a calibrated probability**. Three quest
 "Calibrated" is the important word. A calibrated 0.9 means that across many such answers, it is right about nine times in ten. That turns a feeling ("the AI seems sure") into a number you can put a rule on.
 
 ![How a laya call works](img/fig-decisions.svg "Figure 4. A situation and typed questions in; typed answers with probabilities out; a rule in our code decides")
+
+![laya decides: point, ask or hold](img/gpt-laya-gauge.jpg "The gate as a gauge: hold below 0.5, ask up to 0.8, point above. Real numbers from our first laya call")
 
 ## The facts
 

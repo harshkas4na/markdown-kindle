@@ -1,5 +1,7 @@
 # 7. The Archive That Keeps Fingerprints: 0G Storage
 
+![The land records office](img/art-records-office.jpg "Every deed is known by its fingerprint, and the fingerprint is in a public register")
+
 > [!STORY] The land records office
 > In the land records office in Fort, every deed is stored in a steel almirah, but nobody looks deeds up by name. Each deed was given a unique number the day it was filed, computed from its contents, and the number is written in a public register. If anyone changes a single word of a deed, its number no longer matches the register, and the change is caught at once.
 >
@@ -15,6 +17,8 @@ That is **0G Storage**. Every file is known by a **Merkle root**: a 32-byte fing
 - **The key-value layer**: mutable "streams" of keys and values, built by replaying log entries. Good for live state that changes. **Nobody in the corpus used it.** The catch, measured on 30 October: reading values needs a KV node, and the one in 0G's docs did not answer. Using KV means running our own node.
 
 ![How a file goes into 0G Storage](img/fig-storage.svg "Figure 5. Encrypt on the laptop, fingerprint locally, upload in the background, keep the fingerprint")
+
+![How a file goes into 0G Storage, as a picture](img/gpt-storage-steps.jpg "Episode log, encrypt on the laptop, Merkle root, upload in the background; the root goes on 0G Chain")
 
 ## The facts that matter
 

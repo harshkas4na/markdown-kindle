@@ -1,5 +1,7 @@
 # 3. Sealed Compute: The Kitchen With Glass Walls
 
+![The glass kitchen](img/art-glass-kitchen.jpg "The kitchen with glass walls: everyone can watch, nobody can open the door, and dishes leave sealed")
+
 > [!STORY] The kitchen nobody can enter
 > Picture a kitchen in the middle of Crawford Market, with walls made of glass. You can see in. You can see the cook, the stove, the shelf of ingredients. What you cannot do is open the door. Nobody can: not the owner of the building, not the market inspector, not the cook's boss. The only things that pass in and out go through a small brass slot.
 >
@@ -29,12 +31,16 @@ The attestation is the clever part. The chip measures the code it is running and
 
 ## The dabbawala and the sealed tiffin: one request, five hops
 
+![The dabbawala](img/art-dabbawala.jpg "The dabbawala carries the tiffin; he knows where it goes, how heavy it is and when, not what is inside")
+
 > [!STORY] The dabbawala
 > Every lunchtime, Mumbai's dabbawalas carry two hundred thousand tiffins across the city. A dabbawala knows a lot about the tiffin on his head: its colour code, which station it goes to, roughly how heavy it is, and what time it must arrive. He does not know what is inside. It is sealed, and he does not have the key. He delivers it anyway, perfectly.
 
 0G's router is the dabbawala. When you send a **Private** request, it travels in five hops:
 
 ![The five hops of a Private request](img/fig-sealed-flow.svg "Figure 2. An end-to-end encrypted Private request (0GM-1.0, GLM-5.3): readable only inside the two enclaves")
+
+![One sealed request, five hops](img/gpt-five-hops.jpg "The same journey as a picture: browser, gateway enclave, the router carrying a sealed box, the model enclave, a signed answer")
 
 1. **Your browser to the Gateway TEE.** An ordinary HTTPS connection, except that it ends inside an enclave, not on a normal server.
 2. **The Gateway TEE seals your request** to the key of the specific provider enclave that will run the model. It has checked that provider's attestation first.
@@ -85,6 +91,8 @@ On 30 October 2026 the web catalog showed **68 Verified models and 9 Private one
 
 > [!STORY] Two kinds of dabbawala
 > Some tiffins leave your house locked with a key only the kitchen has. The dabbawala carries a box he cannot open. Other tiffins leave closed but not locked: the dabbawala could lift the lid. He is honest, his company publishes a promise that no dabbawala ever looks or keeps a crumb, and nobody has caught one cheating. But that is a promise, not a lock.
+
+![Locked tiffin or closed tiffin](img/gpt-locked-or-closed-tiffin.jpg "Left: end-to-end encrypted, the router carries a box it cannot open. Right: sealed model, open trip")
 
 The five-hop picture above is the **locked tiffin**: 0G calls it **Encrypted Transit**, it launched in October 2026, and the request crosses the router as ciphertext all the way to the provider's enclave. On the catalog it is the extra **E2EE** badge.
 

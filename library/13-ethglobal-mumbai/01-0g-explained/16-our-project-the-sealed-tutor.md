@@ -1,5 +1,7 @@
 # 16. Our Project: The Tutor That Points and Keeps Your Secrets
 
+![The tutor at work](img/art-tutor.jpg "A pointer of light that knows which button you need, and a lock that says nobody else is watching")
+
 > [!STORY] Friday afternoon at the 0G booth
 > A judge walks up. You don't start with blockchains. You open Etherscan's "Verify & Publish" page, hold a key and say: "How do I verify my contract?" Four seconds later a soft glowing pointer slides across the screen and stops on the right tab, and a calm voice says "Open Contract, then this button". You click. It points at the next field.
 >
