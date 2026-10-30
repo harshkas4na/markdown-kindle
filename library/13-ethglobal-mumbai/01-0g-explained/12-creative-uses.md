@@ -35,7 +35,7 @@ Judges reward the corner of their own product that nobody else found. Our projec
 > The Physical AI track says "0G is the brain, not the spinal cord: motion stays on the device". Everyone reads that as robots. A pointer that moves across your screen is motion. The screen is the body. That framing is ours, and it is the line for the 0G booth.
 
 > [!PROJECT] laya as the tutor's conscience
-> Every other "safe-stop" in the corpus is a timeout or a heuristic. Ours is a calibrated probability from a sealed model, with a rule a judge can read: act above 0.8, ask between 0.5 and 0.8, hold below. The refusal is logged with its request id. A judge can watch the tutor say "I won't guess" and then open the proof.
+> Every other "safe-stop" in the corpus is a timeout or a heuristic. Ours is a calibrated probability from a sealed model, with a rule a judge can read: point when laya and the brain agree at 0.45 or more, ask when they disagree, and never point when laya says none of these fits. The refusal is logged with its request id. A judge can watch the tutor say "I won't guess" and then open the proof.
 
 > [!PROJECT] Vela as a redactor, before anything leaves the laptop
 > Vela 2.0 answers "span" questions: it marks the characters in a text that are, say, personal information. If the screen outline contains a customer's name or an account number, a Vela pass could mark it, and the tutor could replace it with a placeholder before the brain sees it. Even the sealed model never sees the name. This is a stretch goal, and a strong sentence for the CROPS track.

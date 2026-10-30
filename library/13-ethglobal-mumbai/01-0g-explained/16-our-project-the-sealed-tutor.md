@@ -54,9 +54,9 @@ The rule that organises everything is 0G's own sentence: **0G is the brain, not 
 1. **Hear.** The clip is transcribed on the laptop (or by 0G Whisper, if switched on).
 2. **See.** The outline is compiled (in parallel with step 1, chapter 18 explains why).
 3. **Think.** 0GM-1.0 gets the question and the outline and returns an explanation plus a target.
-4. **Check.** laya is asked: is pointing at that target the right move, which of the top candidates, and how clear was the question? Above 0.8, act. Between 0.5 and 0.8, ask. Below, or on any failure, hold.
+4. **Check.** laya is asked which of the top candidates the request is about, or none of them. If it names the same element as 0GM-1.0 with a probability of at least 0.45, act. If they disagree, ask. If laya says none, ask in words. On any failure, hold.
 5. **Point.** The pointer glides and the voice explains.
-6. **Log.** One line: the request ids, the decision, the probability, the target, a hash of the outline, and the provider's signature fetched in the background within its 20-minute window. Encrypted on the laptop, uploaded to 0G Storage in the background.
+6. **Log.** One line: the request ids, the decision, the probability, the target, a hash of the outline, and the provider's signature, fetched in the background within its 20-minute window (it takes about 130 milliseconds). Encrypted on the laptop, uploaded to 0G Storage in the background.
 
 ## Which piece of 0G does which job
 

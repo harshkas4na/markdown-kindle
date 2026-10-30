@@ -30,7 +30,7 @@ It sends back **typed answers, each with a calibrated probability**. Three quest
 
 ![How a laya call works](img/fig-decisions.svg "Figure 4. A situation and typed questions in; typed answers with probabilities out; a rule in our code decides")
 
-![laya decides: point, ask or hold](img/gpt-laya-gauge.jpg "The gate as a gauge: hold below 0.5, ask up to 0.8, point above. Real numbers from our first laya call")
+![laya decides: point, ask or hold](img/gpt-laya-gauge.jpg "The first design, as a gauge: hold below 0.5, ask up to 0.8, point above. The lab replaced these numbers; see what it measured, below")
 
 ## The facts
 
@@ -46,7 +46,7 @@ It sends back **typed answers, each with a calibrated probability**. Three quest
 
 The model page's own example is a customer-support message: which department, how urgent, is the customer threatening to cancel. Ours is a screen and a question.
 
-**What comes back is not documented by 0G.** laya says it has the same request and response shape as Jev, TypeSafe's decision model, whose documented answer looks like this: an `answers` object with one entry per question; a `choice` answer carries the chosen option, a `confidence` and a `probabilities` map; a `noul` answer is simply the probability that the answer is yes. Treat that as a guide until the lab prints a real laya response.
+**What comes back is not documented by 0G.** laya says it has the same request and response shape as Jev, TypeSafe's decision model, whose documented answer looks like this: an `answers` object with one entry per question; a `choice` answer carries the chosen option, a `confidence` and a `probabilities` map; a `noul` answer is simply the probability that the answer is yes. The lab printed a real laya response on 30 October, and it has exactly that shape. A `choice` answer gives a probability for every option, and each answer also carries an `answer_confidence` and an `action.act_probability`.
 
 ## Why the checkpoint is the heart of our project
 
@@ -54,20 +54,21 @@ The Physical AI track has one rule that disqualifies teams: **a safe-stop fallba
 
 laya gives us a safe-stop that is a rule rather than a guess:
 
-- **p of "act" at or above 0.80**: move the pointer and explain.
-- **between 0.50 and 0.80**: ask. "Do you mean this blue button?"
-- **below 0.50, or 0G unreachable, or a timeout**: hold still, and say so.
+- **laya names an element with a probability of 0.45 or more, and 0GM-1.0 points at the same one**: move the pointer and explain.
+- **laya names an element, but 0GM-1.0 points somewhere else**: ask. "This one, or that one?"
+- **laya answers "none of these", or its probability is below 0.45**: ask what they want, in words, with no pointer.
+- **0G unreachable, or a timeout**: hold still, and say so.
 
 Every one of those outcomes is logged with laya's request id and the probability. A judge can open the log and see that the tutor refused to guess at 0.41. That is the moment of consequence, sealed and checkable, which is what every Lisbon winner had.
 
 > [!PROJECT]
-> After the brain picks a target (say element b7, "Verify & Publish"), the tutor asks laya three questions in one call: **act** (noul: is pointing at b7 the right move for what the user asked?), **target** (choice: b7, b3, or none), **clarity** (score: was the question vague, okay or clear?). The state is about a hundred tokens: a short paraphrase of the question, the page title, and the two or three candidate elements with their labels. Never names, numbers or anything private, because laya's requests are not end to end encrypted. The gate in our code turns the probabilities into point, ask or hold.
+> While the brain reads the whole outline, the tutor asks laya one question: **target**, a choice between the few candidate elements whose labels best match the question, plus an explicit option, "none: no listed element does what the user asked". The state is about a hundred tokens: a short paraphrase of the question, the page title, and the candidates with their labels. Never names, numbers or anything private, because laya's requests are not end to end encrypted. The gate in our code turns the probabilities into point, ask or hold.
 
 > [!GOTCHA]
 > 512 tokens is small. Do not send laya the whole page outline. Send the question and the shortlist the brain already picked. If the state is cut off, the probabilities are about the wrong situation.
 
-> [!TRY] For the lab
-> Write ten situations: five where the right button is obvious, five where the question is vague ("make it work"). Check that the obvious ones come back above 0.8 and the vague ones below. If the probabilities do not separate, the gate needs different questions, and we learn that now, not on Friday.
+> [!NOTE] What the lab measured, 30 October
+> Twenty requests on Etherscan's verify page: ten clear ones ("where does the 0x address go") and ten vague ones ("help", "is my contract safe?"). With the "none" option in the choice, laya picked the right element for nine of the ten clear requests, and "none" for nine of the ten vague ones. The single rule "point when laya names an element at 0.45 or more" was right nineteen times in twenty. The margin is thin: the weakest right answer scored 0.47 and the one vague leak scored 0.41, which is why the brain has to agree as well. Two things did not work. A yes-or-no question, "does the request name one concrete action?", scored low on everything and highest on "do it for me", so it is gone. And the first design's line of 0.8 would have refused five of the nine right answers. Every call took about a second, cost nothing, and came back verified.
 
 > [!LINKS]
 > [laya on 0G](https://pc.0g.ai/models/laya) · [Vela 2.0 9B](https://pc.0g.ai/models) (in the Decisions tab) · [The Mumbai Physical AI track](https://ethglobal.com/events/mumbai/prizes/0g)

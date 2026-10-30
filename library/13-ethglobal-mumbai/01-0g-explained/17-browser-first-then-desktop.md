@@ -32,6 +32,9 @@ page: Etherscan - Verify & Publish Contract Source Code
 
 **When the outline is not enough** (a chart, a canvas, an image, a PDF), the content script can capture a screenshot of the visible tab and send it to 0GM-1.0, the one Private model with eyes. That is the exception, not the default, because the default path never sends pixels anywhere.
 
+> [!NOTE] What the lab measured, 30 October
+> Asked for raw coordinates on a screenshot, 0GM-1.0 landed inside the target once in eight tries. With numbered tags drawn on the screenshot at elements we already know about, it picked the right tag five times in six, but only at full size: at half size it could not read the tags at all. And it took four to eleven seconds. So the fallback never asks for coordinates. It draws numbered marks on boxes we already have (from the page, the accessibility tree or on-device text recognition), keeps each tag clear of other labels, and shows "looking at the screen" while it waits.
+
 ## The desktop path (stretch)
 
 Three macOS pieces do the same job outside the browser:
