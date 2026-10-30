@@ -2130,6 +2130,7 @@ function renderToc(b){
   <div class="toc-actions">
     <button id="tocListen" data-listen="${esc(resume.id)}" title="Open ${esc(resume.title)} and start reading it aloud">🎧 Listen</button>
     ${b.podcast&&!share?`<button id="tocPodcast" title="This book as a podcast — follow it in Apple Podcasts or any podcast app">🎙 Podcast</button>`:""}
+    ${bookHasStudio(b)&&canSaveAudio()?`<button id="tocSaveAudio" title="Download every chapter of this audiobook to this device, so it plays with no signal">⬇ Save audio</button>`:""}
   </div>
   <p class="upnext">${p>=.95?"Start over · ":"Up next · "}${esc(resume.title)}</p>
   ${p>0&&p<.95&&b.chapters.length>1?`<button class="secondary" data-ch="${esc(CHAPTERS[b.chapters[0]].id)}">Read from the beginning</button>`:""}`;
@@ -2211,6 +2212,10 @@ function renderToc(b){
     pendingListen=true;nav(chHash(e.currentTarget.dataset.listen));
   });
   if($("tocPodcast"))$("tocPodcast").addEventListener("click",()=>podcastMenu(b));
+  if($("tocSaveAudio")){const btn=$("tocSaveAudio");
+    if(audioSaving===b.id)btn.textContent="⬇ Saving…";
+    else audioSavedCount(b).then(([n,t])=>{if(btn.isConnected&&audioSaving!==b.id&&n>=t)btn.textContent="✓ Audio saved";});
+    btn.addEventListener("click",()=>saveBookAudio(b,btn));}
   if($("tocQk"))$("tocQk").addEventListener("click",qkOpen);
   if($("tocShare"))$("tocShare").addEventListener("click",()=>copyShare("#s/b/"+encodeURIComponent(b.id),$("tocShare")));
   if($("tocMore"))$("tocMore").addEventListener("click",()=>bookMenu(b));
@@ -3122,6 +3127,48 @@ function studioWarm(i){
   stWarmed.add(n.u);
   studioMap(i).catch(()=>{});
   fetch(n.u).then(r=>r.ok&&r.arrayBuffer()).catch(()=>stWarmed.delete(n.u));
+}
+/* save a whole book's studio audio for offline: every chapter's .m4a and timing map
+   goes into the offline cache, which the service worker serves audio from */
+let audioSaving="";
+function canSaveAudio(){return "caches" in window&&/^https?:$/.test(location.protocol);}
+function studioUrls(b){
+  return b.chapters.map(i=>NARRATED[CHAPTERS[i].id]).filter(Boolean)
+    .flatMap(n=>[n.u,n.m]).map(u=>new URL(u,location.href).href);
+}
+async function audioSavedCount(b){
+  const urls=studioUrls(b);
+  try{const c=await caches.open(OFFLINE_CACHE);let n=0;
+    for(const u of urls)if(await c.match(u))n++;
+    return [n,urls.length];
+  }catch(e){return [0,urls.length];}
+}
+async function saveBookAudio(b,btn){
+  if(audioSaving)return;
+  if(!navigator.onLine){toast("You're offline. Connect to save the audio");return;}
+  audioSaving=b.id;
+  const urls=studioUrls(b), want=new Set(urls);
+  let done=0, failed=0;
+  const show=()=>{if(btn&&btn.isConnected)btn.textContent=`⬇ Saving ${Math.round(done/urls.length*100)}%`;};
+  show();
+  try{
+    if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+    const c=await caches.open(OFFLINE_CACHE);
+    // drop this book's older recordings (a different ?v=) so they don't take space
+    const dirs=new Set(urls.map(u=>u.split("?")[0].replace(/[^/]+$/,"")));
+    for(const k of await c.keys())
+      if(!want.has(k.url)&&[...dirs].some(d=>k.url.startsWith(d)))await c.delete(k);
+    const q=urls.slice();
+    const worker=async()=>{while(q.length){const u=q.shift();
+      try{if(!(await c.match(u))){const r=await fetch(u,{cache:"reload"});if(!r.ok)throw new Error(r.status);await c.put(u,r);}}
+      catch(e){failed++;}
+      done++;show();}};
+    await Promise.all([worker(),worker()]); // two at a time: quick, and gentle on a phone connection
+  }catch(e){failed=failed||1;}
+  audioSaving="";
+  if(btn&&btn.isConnected)btn.textContent=failed?"⬇ Save audio":"✓ Audio saved";
+  toast(failed?`${failed} file${failed>1?"s":""} didn't download. Tap Save audio to try again`
+              :`Audiobook saved: ${b.chapters.filter(i=>NARRATED[CHAPTERS[i].id]).length} chapters play offline now`);
 }
 function studioFail(from,err){
   console.error("studio",err);

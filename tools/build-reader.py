@@ -540,7 +540,10 @@ def build():
             idx = read_json(os.path.join(audio_dir, slug, "index.json"))
             for e in (idx or {}).get("chapters", []):
                 if os.path.exists(os.path.join(audio_dir, slug, e["file"])):
-                    narrated[e["id"]] = {"u": f"audio/{slug}/{e['file']}", "m": f"audio/{slug}/{e['map']}",
+                    # ?v= changes whenever the recording does, so a phone that saved the old
+                    # file (the service worker serves audio cache-first) fetches the new one
+                    v = f"{e.get('hash', '')}{e.get('bytes', '')}"
+                    narrated[e["id"]] = {"u": f"audio/{slug}/{e['file']}?v={v}", "m": f"audio/{slug}/{e['map']}?v={v}",
                                          "d": e["dur"], "l": e.get("label", "Studio")}
     if narrated:
         hours = sum(v["d"] for v in narrated.values()) / 3600

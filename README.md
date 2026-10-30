@@ -415,6 +415,12 @@ that fixes exactly that:
 no connection (e.g. on a plane). Tap the pill again any time to refresh the cached
 copy. On phones you can also "Add to Home Screen" to launch it like a native app.
 
+That saves text and figures, not studio audio (a few MB a chapter). A book with a
+studio audiobook gets **⬇ Save audio** on its contents page, next to Listen: it
+downloads every chapter's `.m4a` and timing map into the same offline cache, two
+at a time, and flips to **✓ Audio saved**. Audio links carry `?v=<hash+bytes>`, so a
+re-recorded chapter is fetched fresh, and Save audio clears the book's older copies.
+
 When you rebuild after changing content, online visitors get the fresh page
 automatically (network-first). If you ever change `sw.js` itself, bump
 `OFFLINE_CACHE` in `tools/build-reader.py` so stale caches are discarded on the
