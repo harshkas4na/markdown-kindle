@@ -312,6 +312,11 @@ def main():
             entries.append({"id": ch["id"], "n": k, "title": ch["title"], "file": base + ".m4a", "map": base + ".json",
                             "dur": round(dur, 1), "hash": h, "voice": voice, "label": label,
                             "bytes": os.path.getsize(m4a)})
+            # Save after every chapter, so an interrupted run (a restart, a crash) resumes here.
+            seen = {e["id"] for e in entries}
+            so_far = sorted(entries + [c for c in prev.values() if c["id"] not in seen], key=lambda e: e.get("n", 0))
+            with open(os.path.join(d, "index.json"), "w", encoding="utf-8") as fh:
+                json.dump({"book": book_id, "chapters": so_far}, fh, indent=1)
             print(f"    {dur/60:.1f} min of audio in {work/60:.1f} min  ({work/max(dur,1):.2f}× real time, "
                   f"{os.path.getsize(m4a)//1024} KB)")
         for f in os.listdir(d):
