@@ -45,6 +45,29 @@ missing image files, lists nested deeper than one level, and an oversized
 superscripts. The Python EPUB path still drops images — import on the Home
 screen (or a phone) keeps small figures.
 
+**Figures, diagrams and callouts** (for books that teach):
+
+```markdown
+![alt text](img/diagram.svg "Figure 2. This becomes the caption")
+
+> [!STORY] The dabbawala
+> A labelled box. Types: STORY, PROJECT ("In our project"), GOTCHA, NOTE,
+> TIP, TRY, WHY, LINKS (anything else shows its own name).
+```
+
+- An image alone on its line is a figure; its quoted title becomes the caption
+  (captions are not read aloud). Keep images in a folder next to the chapters
+  (e.g. `img/`); folders with no `.md` are ignored as assets.
+- **Tap a figure** for a full-screen view; tap again or ＋ for 2× and 3×, ✕ or
+  Esc to close. Diagrams stay readable at phone width.
+- Diagrams work best as SVG with their own light background, so they read the
+  same in every theme. `library/13-ethglobal-mumbai/01-0g-explained/img/` has
+  examples.
+- A callout's label is a paragraph, so Listen and studio narration read it
+  ("Story: The dabbawala") before the body.
+- **Save whole library for offline** caches every chapter's figures, not only
+  the ones on screen.
+
 ## How content is structured (READ THIS BEFORE ADDING ANYTHING)
 
 ```

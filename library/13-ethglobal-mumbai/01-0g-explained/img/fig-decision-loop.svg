@@ -1,0 +1,44 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1180 560' width='1180' height='560' font-family="-apple-system, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<rect x='0' y='0' width='1180' height='560' rx='18' fill='#fffdf8'/>
+<text x='28' y='44' font-size='24' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>One turn of the loop</text>
+<text x='28' y='72' font-size='15' fill='#6f665c' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>What happens between &quot;where do I click?&quot; and the pointer moving. Target: under ~8 seconds.</text>
+<rect x='28' y='110' width='170' height='110' rx='12' fill='#e5eefb' stroke='#3f7bd6' stroke-width='2'/>
+<text x='113.0' y='138' font-size='19' fill='#2b2620' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>1 hear</text>
+<text x='113.0' y='163' font-size='13' fill='#2b2620' font-weight='400' text-anchor='middle' xml:space='preserve' style='white-space:pre'>mic → whisper.cpp</text>
+<defs><marker id='m12263' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='198' y1='165' x2='220' y2='165' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m12263)'/>
+<rect x='220' y='110' width='170' height='110' rx='12' fill='#e5eefb' stroke='#3f7bd6' stroke-width='2'/>
+<text x='305.0' y='138' font-size='19' fill='#2b2620' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>2 see</text>
+<text x='305.0' y='163' font-size='13' fill='#2b2620' font-weight='400' text-anchor='middle' xml:space='preserve' style='white-space:pre'>page → outline (ids)</text>
+<defs><marker id='m27820' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='390' y1='165' x2='412' y2='165' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m27820)'/>
+<rect x='412' y='110' width='170' height='110' rx='12' fill='#e3f2e9' stroke='#2e8b57' stroke-width='2'/>
+<text x='497.0' y='138' font-size='19' fill='#2b2620' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>3 think</text>
+<text x='497.0' y='163' font-size='13' fill='#2b2620' font-weight='400' text-anchor='middle' xml:space='preserve' style='white-space:pre'>0GM-1.0 picks a target</text>
+<defs><marker id='m85803' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='582' y1='165' x2='604' y2='165' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m85803)'/>
+<rect x='604' y='110' width='170' height='110' rx='12' fill='#e3f2e9' stroke='#2e8b57' stroke-width='2'/>
+<text x='689.0' y='138' font-size='19' fill='#2b2620' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>4 check</text>
+<text x='689.0' y='163' font-size='13' fill='#2b2620' font-weight='400' text-anchor='middle' xml:space='preserve' style='white-space:pre'>laya: act, ask, or hold</text>
+<defs><marker id='m97349' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='774' y1='165' x2='796' y2='165' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m97349)'/>
+<rect x='796' y='110' width='170' height='110' rx='12' fill='#e5eefb' stroke='#3f7bd6' stroke-width='2'/>
+<text x='881.0' y='138' font-size='19' fill='#2b2620' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>5 point</text>
+<text x='881.0' y='163' font-size='13' fill='#2b2620' font-weight='400' text-anchor='middle' xml:space='preserve' style='white-space:pre'>pointer glides, voice</text>
+<defs><marker id='m81034' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='966' y1='165' x2='988' y2='165' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m81034)'/>
+<rect x='988' y='110' width='170' height='110' rx='12' fill='#efe5fb' stroke='#8a4fd3' stroke-width='2'/>
+<text x='1073.0' y='138' font-size='19' fill='#2b2620' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>6 log</text>
+<text x='1073.0' y='163' font-size='13' fill='#2b2620' font-weight='400' text-anchor='middle' xml:space='preserve' style='white-space:pre'>request ids → Storage</text>
+<rect x='386' y='268' width='406' height='118' rx='12' fill='#f8e3e0' stroke='#c4473a' stroke-width='2'/>
+<text x='402' y='296' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>safe-stop branch</text>
+<text x='402' y='318' font-size='14' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>0G unreachable, timeout, or p &lt; 0.5:</text>
+<text x='402' y='337' font-size='14' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>pointer freezes, voice says</text>
+<text x='402' y='356' font-size='14' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>&quot;I won&#x27;t guess&quot;, log the stop</text>
+<defs><marker id='p99530' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto'><path d='M0,0 L10,5 L0,10 z' fill='#c4473a'/></marker></defs>
+<path d='M 689 220 L 689 262' fill='none' stroke='#c4473a' stroke-width='2.2' marker-end='url(#p99530)'/>
+<rect x='28' y='420' width='1124' height='104' rx='12' fill='#efebe5' stroke='#6f665c' stroke-width='2' stroke-dasharray='7 5'/>
+<text x='48' y='452' font-size='15' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Where the time goes (to measure in the lab):</text>
+<text x='48' y='480' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>local transcription &lt; 1 s  ·  0GM-1.0 ~2 s in private mode (0G&#x27;s Floaty)  ·  laya is a small encoder  ·  Storage is off the clock</text>
+<text x='48' y='506' font-size='14' fill='#c4473a' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Numbers here are expectations, not measurements. The lab replaces them.</text>
+</svg>

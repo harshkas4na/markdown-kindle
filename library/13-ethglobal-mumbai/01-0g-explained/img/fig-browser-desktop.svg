@@ -1,0 +1,28 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1180 520' width='1180' height='520' font-family="-apple-system, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<rect x='0' y='0' width='1180' height='520' rx='18' fill='#fffdf8'/>
+<text x='28' y='44' font-size='24' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Two ways to turn a screen into text the brain can read</text>
+<text x='28' y='72' font-size='15' fill='#6f665c' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Both end in the same outline, so the 0G half of the project does not care which one ran.</text>
+<rect x='28' y='100' width='520' height='260' rx='12' fill='#e5eefb' stroke='#3f7bd6' stroke-width='2'/>
+<text x='44' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Browser (build first)</text>
+<text x='44' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Chrome extension reads the page&#x27;s DOM</text>
+<text x='44' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>every clickable element gets a short id</text>
+<text x='44' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>[b7] button &quot;Verify &amp; Publish&quot;</text>
+<text x='44' y='213' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>exact coordinates, no vision needed</text>
+<text x='44' y='234' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>proven in screen-tutor: 525 elements</text>
+<text x='44' y='255' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>became 296 lines</text>
+<rect x='632' y='100' width='520' height='260' rx='12' fill='#efe5fb' stroke='#8a4fd3' stroke-width='2'/>
+<text x='648' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Desktop (stretch)</text>
+<text x='648' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>macOS Accessibility (AX) tree for</text>
+<text x='648' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>native apps: buttons, menus, fields</text>
+<text x='648' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Apple Vision OCR for what AX misses</text>
+<text x='648' y='213' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>a click-through overlay window</text>
+<text x='648' y='234' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>draws the pointer over any app</text>
+<text x='648' y='255' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>needs Accessibility + Screen permissions</text>
+<defs><marker id='m47602' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='288' y1='360' x2='520' y2='410' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m47602)'/>
+<defs><marker id='m60786' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='892' y1='360' x2='660' y2='410' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m60786)'/>
+<rect x='400' y='414' width='380' height='80' rx='12' fill='#e3f2e9' stroke='#2e8b57' stroke-width='2'/>
+<text x='590.0' y='442' font-size='17' fill='#2b2620' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>the same outline</text>
+<text x='590.0' y='464' font-size='15' fill='#2b2620' font-weight='400' text-anchor='middle' xml:space='preserve' style='white-space:pre'>ids + labels + positions</text>
+</svg>

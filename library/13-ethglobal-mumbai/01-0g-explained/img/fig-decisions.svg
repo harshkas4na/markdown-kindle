@@ -1,0 +1,31 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1180 450' width='1180' height='450' font-family="-apple-system, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<rect x='0' y='0' width='1180' height='450' rx='18' fill='#fffdf8'/>
+<text x='28' y='44' font-size='24' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>laya: a model that answers with numbers, not words</text>
+<text x='28' y='72' font-size='15' fill='#6f665c' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>POST /v1/decisions. You send a situation and typed questions; you get typed answers, each with a calibrated probability.</text>
+<rect x='28' y='100' width='330' height='170' rx='12' fill='#e5eefb' stroke='#3f7bd6' stroke-width='2'/>
+<text x='44' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>state (your situation)</text>
+<text x='44' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>User said: &quot;where do I</text>
+<text x='44' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>verify my contract?&quot;</text>
+<text x='44' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Screen: Etherscan, tab</text>
+<text x='44' y='213' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>&quot;Contract&quot; open, button</text>
+<text x='44' y='234' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>#b7 &quot;Verify &amp; Publish&quot;</text>
+<defs><marker id='m25510' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='358' y1='185' x2='400' y2='185' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m25510)'/>
+<rect x='404' y='100' width='360' height='170' rx='12' fill='#f6ead9' stroke='#b3762f' stroke-width='2'/>
+<text x='420' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>questions (typed)</text>
+<text x='420' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>act      noul: &quot;Is pointing at</text>
+<text x='420' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>         #b7 the right move?&quot;</text>
+<text x='420' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>target   choice: b7 / b3 / none</text>
+<text x='420' y='213' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>clarity  score: vague, ok, clear</text>
+<defs><marker id='m1485' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='764' y1='185' x2='806' y2='185' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m1485)'/>
+<rect x='810' y='100' width='342' height='170' rx='12' fill='#e3f2e9' stroke='#2e8b57' stroke-width='2'/>
+<text x='826' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>answers + probability</text>
+<text x='826' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>act      yes   p = 0.93</text>
+<text x='826' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>target   b7    p = 0.88</text>
+<text x='826' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>clarity  clear p = 0.81</text>
+<rect x='28' y='302' width='1124' height='116' rx='12' fill='#efebe5' stroke='#6f665c' stroke-width='2' stroke-dasharray='7 5'/>
+<text x='48' y='334' font-size='16' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>The gate in our code:</text>
+<text x='48' y='364' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>if act.p ≥ 0.80 → move the pointer.    if 0.50 ≤ p &lt; 0.80 → ask &quot;do you mean this one?&quot;    if p &lt; 0.50 or 0G is down → hold still.</text>
+<text x='48' y='392' font-size='15' fill='#6f665c' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>A probability makes the safe-stop a rule you can show a judge, not a vibe.  Input is free; context is 512 tokens, so keep the state short.</text>
+</svg>

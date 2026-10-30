@@ -1,0 +1,38 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1100 520' width='1100' height='520' font-family="-apple-system, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<rect x='0' y='0' width='1100' height='520' rx='18' fill='#fffdf8'/>
+<text x='28' y='44' font-size='24' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Three trust modes on the same router</text>
+<text x='28' y='72' font-size='15' fill='#6f665c' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>The badge on each model tells you how much is proven. Our tutor uses only Private.</text>
+<rect x='30' y='100' width='336' height='384' rx='12' fill='#efebe5' stroke='#6f665c' stroke-width='2'/>
+<text x='46' y='128' font-size='20' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Public</text>
+<text x='46' y='155' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Who can read your prompt?</text>
+<text x='46' y='176' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  the provider (normal cloud AI)</text>
+<text x='46' y='197' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'></text>
+<text x='46' y='218' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>What is proven?</text>
+<text x='46' y='239' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  nothing beyond the bill</text>
+<text x='46' y='260' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'></text>
+<text x='46' y='281' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Examples</text>
+<text x='46' y='302' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  GPT, Gemini, Claude here</text>
+<rect x='386' y='100' width='336' height='384' rx='12' fill='#f6ead9' stroke='#b3762f' stroke-width='2'/>
+<text x='402' y='128' font-size='20' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Verified (TeeTLS)</text>
+<text x='402' y='155' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Who can read your prompt?</text>
+<text x='402' y='176' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  the provider</text>
+<text x='402' y='197' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'></text>
+<text x='402' y='218' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>What is proven?</text>
+<text x='402' y='239' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  the route: which provider</text>
+<text x='402' y='260' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  answered, signed</text>
+<text x='402' y='281' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Examples</text>
+<text x='402' y='302' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  68 models, e.g. Qwen3-VL</text>
+<rect x='742' y='100' width='336' height='384' rx='12' fill='#e3f2e9' stroke='#2e8b57' stroke-width='2'/>
+<text x='758' y='128' font-size='20' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Private (TeeML)</text>
+<text x='758' y='155' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Who can read your prompt?</text>
+<text x='758' y='176' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  the enclave only, if E2EE;</text>
+<text x='758' y='197' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  else also the router, in memory</text>
+<text x='758' y='218' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>What is proven?</text>
+<text x='758' y='239' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  it ran inside an attested</text>
+<text x='758' y='260' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  enclave that signed it</text>
+<text x='758' y='281' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Examples (9 in all)</text>
+<text x='758' y='302' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  E2EE: 0GM-1.0, GLM-5.3</text>
+<text x='758' y='323' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>  not E2EE: Whisper, laya, Vela</text>
+<rect x='756' y='448' width='327' height='24' rx='12.0' fill='#e3f2e9' stroke='#2e8b57' stroke-width='1.5'/>
+<text x='919.5' y='462' font-size='12' fill='#2e8b57' font-weight='700' text-anchor='middle' xml:space='preserve' style='white-space:pre'>header: X-0G-Provider-Trust-Mode: private</text>
+</svg>

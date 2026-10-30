@@ -556,6 +556,26 @@ html[data-theme="gray"] .toc-hero-bg{opacity:.35;}
   border-radius:8px; break-inside:avoid; -webkit-column-break-inside:avoid;}
 .md figure{margin:0 0 1em;}
 .md figcaption,.md .imgcap{font-size:.8em; color:var(--muted); text-align:center; margin:-.5em 0 1em;}
+.md figure img{cursor:zoom-in;}
+/* callouts: > [!STORY] Title  (also PROJECT, GOTCHA, NOTE, TIP, LINKS, WHY, TRY) */
+.md .callout{--co:var(--accent); margin:0 0 1.1em; padding:.7em .95em .15em; border-radius:10px;
+  border-left:3px solid var(--co); background:color-mix(in srgb,var(--co) 8%,transparent);}
+.md .callout.c-project{--co:#3f7bd6;}
+.md .callout.c-gotcha{--co:#c4473a;}
+.md .callout.c-note,.md .callout.c-tip,.md .callout.c-try{--co:#2e8b57;}
+.md .callout.c-links{--co:var(--muted);}
+.md .callout p{text-align:left; hyphens:manual; -webkit-hyphens:manual;}
+.md .callout .co-h{font-size:.74em; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  margin:0 0 .5em; color:var(--co);}
+/* full-screen figure viewer (tap a figure) */
+#figOverlay{position:fixed; inset:0; z-index:9999; background:rgba(14,12,10,.95); display:flex; flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+#figOverlay .fo-bar{display:flex; align-items:center; gap:8px; padding:10px 12px; color:#eee; font:14px/1.35 -apple-system,system-ui,sans-serif;}
+#figOverlay .fo-cap{flex:1; opacity:.85;}
+#figOverlay button{min-width:44px; min-height:44px; border-radius:22px; border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08); color:#fff; font-size:18px;}
+#figOverlay .fo-scroll{flex:1; overflow:auto; -webkit-overflow-scrolling:touch; text-align:center;}
+#figOverlay img{width:100%; height:auto; display:inline-block; vertical-align:top; background:#fffdf8;}
 .md sup{font-size:.7em; line-height:0; vertical-align:super;}
 .md del{opacity:.65;}
 .md .task{list-style:none; margin-left:-1.2em;}
@@ -1108,6 +1128,8 @@ function inline(s){
   s=s.replace(/\u0001(\d+)\u0001/g,(m,i)=>lits[+i]);
   return s;
 }
+const CALLOUT_LABELS={story:"Story",project:"In our project",gotcha:"Gotcha",note:"Note",tip:"Tip",
+  links:"Links",why:"Why it matters",try:"Try it"};
 function mdToHtml(md){
   const lines=md.replace(/\r/g,"").split("\n");
   let out=[],i=0;
@@ -1125,9 +1147,17 @@ function mdToHtml(md){
     if(/^<!--[\s\S]*?-->$/.test(t)){i++;continue;}                   // importer markers / comments
     let h=t.match(/^(#{1,6})\s+(.*?)\s*#*$/);
     if(h){flushP(pbuf);const l=h[1].length;out.push(`<h${l}>`+inline(h[2])+`</h${l}>`);i++;continue;}
-    if(/^!\[[^\]]*\]\([^)]+\)\s*$/.test(t)){flushP(pbuf);out.push(`<figure>${inline(t)}</figure>`);i++;continue;}
+    if(/^!\[[^\]]*\]\([^)]+\)\s*$/.test(t)){flushP(pbuf);
+      // a standalone image is a figure; its "title" becomes the caption
+      const fm=t.match(/^!\[[^\]]*\]\([^)\s]+\s+"([^"]*)"\)\s*$/);
+      out.push(`<figure>${inline(t)}${fm?`<figcaption>${inline(fm[1])}</figcaption>`:""}</figure>`);i++;continue;}
     if(/^>/.test(t)){flushP(pbuf);let q=[];
       while(i<lines.length&&/^\s*>/.test(lines[i])){q.push(lines[i].replace(/^\s*>\s?/,""));i++;}
+      const co=q[0]&&q[0].match(/^\[!([A-Za-z]+)\]\s*(.*)$/);
+      if(co){ // > [!STORY] Title  →  a labelled callout box; the label is a paragraph, so Listen reads it
+        const ty=co[1].toLowerCase(), lab=CALLOUT_LABELS[ty]||(co[1][0].toUpperCase()+co[1].slice(1).toLowerCase());
+        out.push(`<aside class="callout c-${esc(ty)}"><p class="co-h">${inline(co[2]?lab+": "+co[2]:lab)}</p>`
+          +mdToHtml(q.slice(1).join("\n"))+"</aside>");continue;}
       out.push("<blockquote>"+mdToHtml(q.join("\n"))+"</blockquote>");continue;}
     if(/^\|/.test(t)){flushP(pbuf);let rows=[];
       while(i<lines.length&&/^\s*\|/.test(lines[i])){rows.push(lines[i].trim());i++;}
@@ -5144,7 +5174,29 @@ function guardClick(e){
   if(sel&&sel.toString().length>0)return false;
   return true;
 }
+/* tap a figure: full screen, tap again (or ＋) to zoom 2× / 3× — diagrams are unreadable at phone width */
+function openFig(img){
+  const ov=document.createElement("div");ov.id="figOverlay";
+  ov.innerHTML=`<div class="fo-bar"><span class="fo-cap"></span><button class="fo-z" aria-label="Zoom">＋</button>`
+    +`<button class="fo-x" aria-label="Close">✕</button></div><div class="fo-scroll"><img alt=""></div>`;
+  const fc=img.closest("figure")&&img.closest("figure").querySelector("figcaption");
+  ov.querySelector(".fo-cap").textContent=fc?fc.textContent:(img.alt||"");
+  const im=ov.querySelector("img");im.src=img.currentSrc||img.src;im.alt=img.alt||"";
+  let z=1;
+  const zoom=()=>{z=z>=3?1:z+1;im.style.width=(100*z)+"%";ov.querySelector(".fo-z").textContent=z>=3?"－":"＋";};
+  const onKey=e=>{if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();close();}};
+  const close=()=>{ov.remove();document.removeEventListener("keydown",onKey,true);};
+  ov.querySelector(".fo-z").addEventListener("click",e=>{e.stopPropagation();zoom();});
+  im.addEventListener("click",e=>{e.stopPropagation();zoom();});
+  ov.querySelector(".fo-x").addEventListener("click",e=>{e.stopPropagation();close();});
+  ov.addEventListener("click",e=>{if(e.target===ov||e.target.classList.contains("fo-scroll"))close();});
+  ["touchstart","touchmove","touchend","pointerup","wheel"].forEach(t=>ov.addEventListener(t,e=>e.stopPropagation(),{passive:true}));
+  document.addEventListener("keydown",onKey,true);
+  document.body.appendChild(ov);
+}
 $("pageArea").addEventListener("click",e=>{
+  const fim=e.target.closest(".md figure img");
+  if(fim&&!(window.getSelection()&&window.getSelection().toString())){openFig(fim);return;}
   const ce=e.target.closest("[data-ce]");
   if(ce){
     const a=ce.dataset.ce;
@@ -5369,7 +5421,7 @@ document.addEventListener("keydown",e=>{
 let wheelLock=0;
 document.addEventListener("wheel",e=>{
   if(reader.classList.contains("hidden")||S.mode==="scroll")return;
-  if(e.target.closest("#aaPanel,#aiPanel,#qkOverlay,#helpOverlay,#voiceHelp,#sheet,#ttsBar,.tblwrap,pre"))return;
+  if(e.target.closest("#aaPanel,#aiPanel,#qkOverlay,#helpOverlay,#voiceHelp,#sheet,#ttsBar,#figOverlay,.tblwrap,pre"))return;
   e.preventDefault();
   const now=Date.now();if(now-wheelLock<380)return;
   const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
@@ -5521,9 +5573,12 @@ async function offlineSave(){
     // {cache:"reload"} bypasses the HTTP cache so we store a fresh copy.
     await Promise.allSettled(["./","./index.html","./manifest.webmanifest"]
       .map(u=>c.add(new Request(u,{cache:"reload"}))));
-    const imgs=[...document.querySelectorAll("img[src]")]
-      .map(i=>i.getAttribute("src"))
-      .filter(s=>s&&!/^(data:|blob:|https?:)/i.test(s));
+    // every chapter's figures, not only the ones on screen: a diagram you
+    // haven't reached yet must still be there with no connection
+    const srcs=[...document.querySelectorAll("img[src]")].map(i=>i.getAttribute("src"));
+    const imgRe=/!\[[^\]]*\]\(([^)\s]+)/g;
+    CHAPTERS.forEach(c=>{let m;imgRe.lastIndex=0;while((m=imgRe.exec(c.md||"")))srcs.push(m[1]);});
+    const imgs=srcs.filter(s=>s&&!/^(data:|blob:|https?:)/i.test(s));
     await Promise.allSettled([...new Set(imgs)].map(u=>c.add(new Request(u,{cache:"reload"}))));
     offlineReady=true;
   }catch(e){offlineReady=false;}

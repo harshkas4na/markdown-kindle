@@ -1,0 +1,43 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1180 470' width='1180' height='470' font-family="-apple-system, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<rect x='0' y='0' width='1180' height='470' rx='18' fill='#fffdf8'/>
+<text x='28' y='44' font-size='24' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>0G Storage: a fingerprint for every file</text>
+<text x='28' y='72' font-size='15' fill='#6f665c' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>Encrypt on your device, fingerprint it, upload in the background, keep only the fingerprint.</text>
+<rect x='28' y='100' width='260' height='150' rx='12' fill='#e5eefb' stroke='#3f7bd6' stroke-width='2'/>
+<text x='44' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>episode log</text>
+<text x='44' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>one line per decision:</text>
+<text x='44' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>request id, decision,</text>
+<text x='44' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>probability, target</text>
+<defs><marker id='m60157' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='288' y1='175' x2='320' y2='175' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m60157)'/>
+<rect x='320' y='100' width='260' height='150' rx='12' fill='#e3f2e9' stroke='#2e8b57' stroke-width='2'/>
+<text x='336' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>encrypt locally</text>
+<text x='336' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>AES-256 or ECIES</text>
+<text x='336' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>the key never leaves</text>
+<text x='336' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>the laptop</text>
+<defs><marker id='m72560' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='580' y1='175' x2='612' y2='175' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m72560)'/>
+<rect x='612' y='100' width='260' height='150' rx='12' fill='#f6ead9' stroke='#b3762f' stroke-width='2'/>
+<text x='628' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Merkle root</text>
+<text x='628' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>a 32-byte fingerprint</text>
+<text x='628' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>of the encrypted file</text>
+<text x='628' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>computed locally</text>
+<defs><marker id='m35296' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='8' markerHeight='8' orient='auto-start-reverse'><path d='M0,0 L10,5 L0,10 z' fill='#2b2620'/></marker></defs>
+<line x1='872' y1='175' x2='904' y2='175' stroke='#2b2620' stroke-width='2.2' marker-end='url(#m35296)'/>
+<rect x='904' y='100' width='260' height='150' rx='12' fill='#efe5fb' stroke='#8a4fd3' stroke-width='2'/>
+<text x='920' y='128' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>upload (slow)</text>
+<text x='920' y='150' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>storage nodes keep it</text>
+<text x='920' y='171' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>can take many minutes</text>
+<text x='920' y='192' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>never on the hot path</text>
+<rect x='28' y='282' width='560' height='160' rx='12' fill='#efe5fb' stroke='#8a4fd3' stroke-width='2'/>
+<text x='44' y='310' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Log layer</text>
+<text x='44' y='332' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>append-only files, addressed by root hash</text>
+<text x='44' y='353' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>good for: episode logs, datasets,</text>
+<text x='44' y='374' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>model weights, anything you archive</text>
+<text x='44' y='395' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>read back with the root + your key</text>
+<rect x='612' y='282' width='540' height='160' rx='12' fill='#efe5fb' stroke='#8a4fd3' stroke-width='2'/>
+<text x='628' y='310' font-size='17' fill='#2b2620' font-weight='700' text-anchor='start' xml:space='preserve' style='white-space:pre'>Key-Value layer</text>
+<text x='628' y='332' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>live state that changes</text>
+<text x='628' y='353' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>good for: memory, settings, counters</text>
+<text x='628' y='374' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>a wrong key does not throw: it returns</text>
+<text x='628' y='395' font-size='15' fill='#2b2620' font-weight='400' text-anchor='start' xml:space='preserve' style='white-space:pre'>ciphertext silently (check the header)</text>
+</svg>
