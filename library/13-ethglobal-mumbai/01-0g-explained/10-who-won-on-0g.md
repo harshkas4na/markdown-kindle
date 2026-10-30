@@ -50,6 +50,8 @@ They wrote all of it down in a "0G reality check" document with measured numbers
 
 **What it is.** A public, verifiable track record for crypto influencers. Each public call becomes a structured signal priced against real exchange history. Losing calls stay visible, in red.
 
+![KOLlateral](img/shot-kollateral.jpg "KOLlateral: the accountability layer for crypto influencers, 3rd in Best AI Product on 0G")
+
 **How it used 0G.** Only Compute, through the router, with `verify_tee` and the Private header. The model extracts each call (asset, direction, target, confidence) and boils rambling posts down to a thesis. They called the sealed inference "the part we cannot fake".
 
 > [!PROJECT]
@@ -57,9 +59,13 @@ They wrote all of it down in a "0G reality check" document with measured numbers
 
 ## Lisbon 2026, Best Infrastructure and Tooling (10 entries, 3 winners)
 
+![AEGIS](img/shot-aegis.jpg "AEGIS: protected wallets for AI agents that move money, with its user-flow diagram")
+
 **AEGIS** puts an AI agent that moves money inside a 2-of-3 Safe, where AEGIS co-signs only actions inside the user's written policy. It minted an Agentic ID on Galileo with the agent's metadata uploaded to Storage. **Its key finding:** the testnet router's chat ids could not be resolved at the provider's signature endpoint (`chat_id_not_found`), which they called a bug in the testnet router, so they used the Direct broker for verification. It won with its co-signer service still a skeleton, and said so.
 
 **Superpose** is an AI risk manager for a shared-collateral position on 1inch Aqua. Every agent episode and its reasoning is uploaded to Storage as a replayable "learning lineage". Its phrase is worth stealing: **"AI proposes, the guard disposes."** The AI advises, a contract enforces.
+
+![Lortnoc Tahc](img/shot-lortnoc-tahc.jpg "Lortnoc Tahc: hide real messages inside ordinary Telegram chats")
 
 **Lortnoc Tahc** ("chat control" backwards) is a Chrome extension that turns your real Telegram message into innocent small talk before sending, and back again for the one reader who should see it. It used 0G in the strangest way in the corpus: as **a sealed judge of which cover sentence sounds most natural**. The model only ever sees the public cover text. Its trap: the Direct path's ledger needs 3 0G to start, while the faucet gives 0.1 a day, so they got a top-up at the 0G booth.
 

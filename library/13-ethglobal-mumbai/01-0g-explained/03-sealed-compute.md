@@ -34,7 +34,7 @@ The attestation is the clever part. The chip measures the code it is running and
 
 0G's router is the dabbawala. When you send a **Private** request, it travels in five hops:
 
-![The five hops of a Private request](img/fig-sealed-flow.svg "Figure 2. Your words are readable only inside the two enclaves. The router carries a sealed envelope")
+![The five hops of a Private request](img/fig-sealed-flow.svg "Figure 2. An end-to-end encrypted Private request (0GM-1.0, GLM-5.3): readable only inside the two enclaves")
 
 1. **Your browser to the Gateway TEE.** An ordinary HTTPS connection, except that it ends inside an enclave, not on a normal server.
 2. **The Gateway TEE seals your request** to the key of the specific provider enclave that will run the model. It has checked that provider's attestation first.

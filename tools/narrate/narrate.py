@@ -131,8 +131,28 @@ class Engine:
         return out
 
 
+NUMBER_WORDS = {w: str(i) for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten".split())}
+
+
 def norm_words(s):
-    return re.sub(r"[^a-z0-9' ]+", " ", s.lower().replace("’", "'")).split()
+    """Words for comparing a chunk's text with what Whisper heard. Both sides go
+    through the same steps, so spelled-out acronyms ("A I", "U H I") and spoken
+    numbers ("zero G" for 0G) don't count as errors and force needless retakes."""
+    toks = re.sub(r"[^a-z0-9' ]+", " ", s.lower().replace("’", "'")).split()
+    toks = [NUMBER_WORDS.get(t, t) for t in toks]
+    out, run = [], ""
+    for t in toks:                      # join runs of single letters/digits: a i -> ai, 0 g -> 0g
+        if len(t) == 1:
+            run += t
+            continue
+        if run:
+            out.append(run)
+            run = ""
+        out.append(t)
+    if run:
+        out.append(run)
+    return ["0g" if t == "og" else t for t in out]   # Whisper writes the 0G token as "OG"
 
 
 class Checker:

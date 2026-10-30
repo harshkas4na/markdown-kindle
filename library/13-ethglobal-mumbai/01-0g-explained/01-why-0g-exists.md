@@ -23,7 +23,7 @@ For a chat about recipes none of this matters. For anything private (a medical n
 
 0G's bet is that you can keep the convenience of a cloud AI while removing the "take our word for it". Three ideas do the work, and the next chapters give each one its own story:
 
-- **Run the model inside sealed hardware.** A TEE (trusted execution environment) is a part of a processor that keeps its memory encrypted even from the machine's owner. The model runs inside it. The cloud host cannot read your request. 0G cannot read it either. Chapter 3.
+- **Run the model inside sealed hardware.** A TEE (trusted execution environment) is a part of a processor that keeps its memory encrypted even from the machine's owner. The model runs inside it. The cloud host cannot read your request, and for the models 0G encrypts end to end, 0G cannot read it either. Chapter 3 explains which ones.
 - **Make the hardware sign what it did.** The enclave signs each answer with a key that only exists inside it, and the chip itself vouches for which code is running. You can check the signature later. Chapter 9.
 - **Write the evidence down where nobody can quietly change it.** Logs and fingerprints go to 0G Storage, and the fingerprints can be anchored on 0G Chain. Chapters 7 and 8.
 

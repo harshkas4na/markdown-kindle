@@ -9,6 +9,8 @@ Losers teach more than winners, because they show the idea the room keeps buildi
 
 ## Memory as the pitch
 
+![dMemo](img/shot-dmemo.jpg "dMemo: private memory for AI agents, encrypted to your wallet, stored on 0G Storage. It did not place")
+
 - **dMemo** (above): superb plumbing, no decision, no live link.
 - **Kimayyy**: one persistent public AI that everyone talks to in the same shared context, with snapshots on Storage and a registry on the chain. A thought experiment with no user job.
 - **BetterHalf.ai** (New Delhi): a personal agent with user-controlled memory, spread across three networks.
@@ -27,14 +29,20 @@ Losers teach more than winners, because they show the idea the room keeps buildi
 
 These three matter most, because they are near what we are building.
 
+![Reboleira](img/shot-reboleira.jpg "Reboleira: a Chrome extension that rebuilds any page around you. Our closest neighbour; it did not place")
+
 **Reboleira** (Lisbon) is a **Chrome extension that rebuilds any web page around the reader**: simplified, translated, re-levelled, with every link and button still wired to the real element. It extracts a semantic graph of the page, sends it to a TEE-sealed model on 0G, and draws the answer in an overlay. The reader's profile is encrypted and stored on 0G Storage. **It did not place.** It was built by the same GitHub account that won 1st with 0run. The coach won and the extension did not.
 
 > [!PROJECT] How we differ from Reboleira
 > Reboleira changes the page. The tutor leaves the page alone and **teaches you to use it**: it hears a question, points at the real button, explains while you click, and refuses to guess when unsure. Reboleira has no decision checkpoint, no voice, no episode log of decisions and no live link. The tutor's sealed decision (laya's act or hold) is visible in every turn. And our demo uses a real, private-looking screen, so the reason for sealing is felt rather than explained.
 
+![DoomTax](img/shot-doomtax.jpg "DoomTax: a sealed AI coach decides whether you kept your intention")
+
 **DoomTax** (Lisbon) is a personal focus app: state what you will do, stake a little, submit evidence, and a sealed AI coach decides whether you kept your word. Sealed verdict, money moves, still no place. It ran as a World mini-app with no access to the computer, so its "evidence" was something the user pasted. **A tutor that actually sees the screen has the evidence DoomTax lacked.**
 
 **Goggles** (New Delhi) is the only desktop screen-watcher in the corpus: a Mac service that looks at every screenshot and renames the file sensibly, "privately". Its write-up was two paragraphs and named no 0G model. It placed nowhere.
+
+![Shrimpy](img/shot-shrimpy.jpg "Shrimpy: an AI journal encrypted in your browser, reflections in a TEE. It won Sui's prize, not 0G's")
 
 **Shrimpy** (Lisbon) is the cousin to watch. A private AI journal: write or speak, three agents reflect on the entry inside a TEE using Private mode on 0G, and the entry is encrypted and stored. Voice came from a small Whisper running in the browser, not sealed Whisper on 0G. **It won Sui's prize, not 0G's.** Its honest line about the TEE is the best sentence in the corpus: it protects you from the provider, not from physics. We will borrow that honesty.
 
