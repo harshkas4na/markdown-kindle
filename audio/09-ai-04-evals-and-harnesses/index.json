@@ -60,6 +60,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4904421
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/05-how-many-examples-and-when-a-difference-is-real.md",
+   "n": 6,
+   "title": "How Many Examples, and When a Difference Is Real",
+   "file": "06-how-many-examples-and-when-a-difference-is-real.m4a",
+   "map": "06-how-many-examples-and-when-a-difference-is-real.json",
+   "dur": 741.5,
+   "hash": "6a2245a3ca44c761",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5540840
   }
  ]
 }
