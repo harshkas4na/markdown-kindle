@@ -132,6 +132,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5372568
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/11-what-you-can-now-honestly-say.md",
+   "n": 12,
+   "title": "What You Can Now Honestly Say",
+   "file": "12-what-you-can-now-honestly-say.m4a",
+   "map": "12-what-you-can-now-honestly-say.json",
+   "dur": 501.7,
+   "hash": "bed3ee3928f761c3",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3737923
   }
  ]
 }
