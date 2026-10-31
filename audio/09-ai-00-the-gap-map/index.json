@@ -24,6 +24,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4743712
+  },
+  {
+   "id": "library/09-ai/00-the-gap-map/02-what-you-actually-have.md",
+   "n": 3,
+   "title": "What You Actually Have",
+   "file": "03-what-you-actually-have.m4a",
+   "map": "03-what-you-actually-have.json",
+   "dur": 788.4,
+   "hash": "ecb839ad5a606b1e",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5880898
   }
  ]
 }
