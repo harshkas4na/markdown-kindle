@@ -12,6 +12,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3517165
+  },
+  {
+   "id": "library/09-ai/00-the-gap-map/01-what-the-applications-actually-asked-for.md",
+   "n": 2,
+   "title": "What the Applications Actually Asked For",
+   "file": "02-what-the-applications-actually-asked-for.m4a",
+   "map": "02-what-the-applications-actually-asked-for.json",
+   "dur": 639.0,
+   "hash": "493b30157574c7f5",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4743712
   }
  ]
 }
