@@ -36,6 +36,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5118458
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/03-scorers-deterministic-first.md",
+   "n": 4,
+   "title": "Scorers, Deterministic First",
+   "file": "04-scorers-deterministic-first.m4a",
+   "map": "04-scorers-deterministic-first.json",
+   "dur": 633.6,
+   "hash": "e5f8d933fa04144b",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4729771
   }
  ]
 }
