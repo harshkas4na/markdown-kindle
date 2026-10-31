@@ -24,6 +24,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4053415
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/02-building-the-golden-set.md",
+   "n": 3,
+   "title": "Building the Golden Set",
+   "file": "03-building-the-golden-set.m4a",
+   "map": "03-building-the-golden-set.json",
+   "dur": 688.7,
+   "hash": "410107b58a88f516",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5118458
   }
  ]
 }
