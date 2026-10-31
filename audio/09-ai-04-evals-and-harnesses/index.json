@@ -84,6 +84,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4326357
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/07-the-harness-and-the-regression-gate.md",
+   "n": 8,
+   "title": "The Harness and the Regression Gate",
+   "file": "08-the-harness-and-the-regression-gate.m4a",
+   "map": "08-the-harness-and-the-regression-gate.json",
+   "dur": 507.9,
+   "hash": "23a7b376e7954df6",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3784118
   }
  ]
 }
