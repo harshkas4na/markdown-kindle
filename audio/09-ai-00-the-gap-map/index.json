@@ -36,6 +36,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5880898
+  },
+  {
+   "id": "library/09-ai/00-the-gap-map/03-the-honest-gap-scripts.md",
+   "n": 4,
+   "title": "The Honest-Gap Scripts",
+   "file": "04-the-honest-gap-scripts.m4a",
+   "map": "04-the-honest-gap-scripts.json",
+   "dur": 738.7,
+   "hash": "7924b9f653a45b92",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5508469
   }
  ]
 }
