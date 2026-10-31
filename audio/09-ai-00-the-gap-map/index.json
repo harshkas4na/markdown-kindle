@@ -60,6 +60,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4767211
+  },
+  {
+   "id": "library/09-ai/00-the-gap-map/05-the-question-bank.md",
+   "n": 6,
+   "title": "The Question Bank",
+   "file": "06-the-question-bank.m4a",
+   "map": "06-the-question-bank.json",
+   "dur": 754.2,
+   "hash": "b69f6368d8439e20",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5570145
   }
  ]
 }
