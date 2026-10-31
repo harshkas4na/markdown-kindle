@@ -12,6 +12,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3867233
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/01-what-an-agent-actually-is.md",
+   "n": 2,
+   "title": "What an Agent Actually Is",
+   "file": "02-what-an-agent-actually-is.m4a",
+   "map": "02-what-an-agent-actually-is.json",
+   "dur": 587.3,
+   "hash": "bf9207f8258a0501",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4381314
   }
  ]
 }
