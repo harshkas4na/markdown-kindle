@@ -50,7 +50,8 @@ MODELS = {
     "qwen-design": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-8bit",
     "chatterbox": "mlx-community/chatterbox-turbo-fp16",
 }
-BATCH = 6            # chunks per forward pass (Qwen batch_generate scales almost linearly)
+BATCH = 10           # chunks per forward pass (Qwen batch_generate scales almost linearly); --batch overrides
+POOL = 40            # chunks gathered from consecutive chapters before sorting by length and rendering
 GAP = {2: 0.55, 1: 0.22, 0: 0.08}   # silence after a chunk: paragraph end / sentence end / none
 # Every chunk is listened back to with Whisper and compared with its text; a
 # chunk whose words differ too much (a dropped clause, an added "ahem" — the
@@ -188,22 +189,21 @@ def trim(a, sr, thresh=0.004, keep=0.06):
     return a[max(0, idx[0] - k): min(len(a), idx[-1] + k)]
 
 
-def render_chapter(eng, ch, m4a, tmap, checker):
-    import numpy as np, soundfile as sf
-    chunks = [c for c in ch["chunks"] if c["text"]]
-    pieces, times, t = [], [], 0.0
-    t0 = time.time()
-    remade = doubtful = 0
-    for i in range(0, len(chunks), BATCH):
-        batch = chunks[i:i + BATCH]
-        audios = [trim(a, eng.sr) for a in eng.speak([c["text"] for c in batch])]
+def synth_pool(eng, items, checker):
+    """items: [(key, chunk)] from one or more chapters. Renders them sorted by length (so a
+    batch holds similar-length lines and nothing waits on one long sentence), listens back,
+    retakes the bad ones. Returns {key: audio}."""
+    items = sorted(items, key=lambda it: len(it[1]["text"]))
+    out, remade, doubtful, t0 = {}, 0, 0, time.time()
+    for i in range(0, len(items), BATCH):
+        batch = items[i:i + BATCH]
+        audios = [trim(a, eng.sr) for a in eng.speak([c["text"] for _, c in batch])]
         if checker:
-            for k, (c, a) in enumerate(zip(batch, audios)):
+            for k, ((key, c), a) in enumerate(zip(batch, audios)):
                 n, total, heard = checker.errors(c["text"], a, eng.sr)
                 if VERBOSE:
                     print(f"\n    [{n}/{total}] {c['text'][:60]!r} -> {heard.strip()[:60]!r}")
-                best = (n, a)
-                tries = 0
+                best, tries = (n, a), 0
                 while not checker.ok(n, total) and tries < RETRIES:
                     tries += 1
                     a2 = trim(eng.speak([c["text"]], temperature=0.6)[0], eng.sr)
@@ -218,17 +218,28 @@ def render_chapter(eng, ch, m4a, tmap, checker):
                         doubtful += 1
                         print(f"\n    ? still off after {tries} retries: {c['text'][:70]!r}")
                 audios[k] = best[1]
-        for c, a in zip(batch, audios):
-            gap = np.zeros(int(eng.sr * GAP.get(c["brk"], 0.08)), dtype=np.float32)
-            times.append([c["s"], c["e"], round(t, 3), round(t + len(a) / eng.sr, 3)])
-            pieces += [a, gap]
-            t += (len(a) + len(gap)) / eng.sr
-        done = min(i + BATCH, len(chunks))
-        print(f"\r    {done}/{len(chunks)} chunks · {t/60:.1f} min of audio · {time.time()-t0:.0f} s"
+        for (key, _), a in zip(batch, audios):
+            out[key] = a
+        done = min(i + BATCH, len(items))
+        print(f"\r    {done}/{len(items)} chunks · {time.time()-t0:.0f} s"
               + (f" · {remade} remade" if remade else ""), end="", flush=True)
     print()
     if doubtful:
-        print(f"    ! {doubtful} chunk(s) still didn't match their text — listen to this chapter")
+        print(f"    ! {doubtful} chunk(s) still didn't match their text — listen to the chapter(s) above")
+    return out
+
+
+def finish_chapter(eng, ch, audio_of, m4a, tmap):
+    """Join a chapter's rendered chunks (audio_of: {chunk index: audio}) into one m4a + timing map."""
+    import numpy as np, soundfile as sf
+    chunks = [(j, c) for j, c in enumerate(ch["chunks"]) if c["text"]]
+    pieces, times, t = [], [], 0.0
+    for j, c in chunks:
+        a = audio_of[j]
+        gap = np.zeros(int(eng.sr * GAP.get(c["brk"], 0.08)), dtype=np.float32)
+        times.append([c["s"], c["e"], round(t, 3), round(t + len(a) / eng.sr, 3)])
+        pieces += [a, gap]
+        t += (len(a) + len(gap)) / eng.sr
     audio = np.concatenate(pieces) if pieces else np.zeros(eng.sr, dtype=np.float32)
     peak = float(np.max(np.abs(audio))) or 1.0
     audio = audio * min(1.0, 0.89 / peak)
@@ -240,7 +251,35 @@ def render_chapter(eng, ch, m4a, tmap, checker):
     dur = len(audio) / eng.sr
     with open(tmap, "w", encoding="utf-8") as fh:
         json.dump({"v": 1, "dur": round(dur, 3), "words": ch["words"], "chunks": times}, fh, separators=(",", ":"))
-    return dur, time.time() - t0
+    return dur
+
+
+def publish(slug):
+    """--publish: build the reader and push, so finished chapters are playable on the phone while the rest renders."""
+    def run(*cmd):
+        return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    r = run("python3", "tools/build-reader.py")
+    if r.returncode:
+        print("    publish: build failed —", (r.stderr or r.stdout).strip()[-200:])
+        return
+    run("git", "add", "audio", "index.html")
+    if run("git", "diff", "--cached", "--quiet").returncode == 0:
+        return
+    run("git", "commit", "-m", f"audio({slug}): new chapters, rendered so far")
+    p = run("git", "pull", "--rebase", "--autostash", "-q")
+    if p.returncode:
+        # CI rebuilds index.html on every push, so it conflicts: it is generated, so build it again
+        # on top of the pulled library/ and carry on
+        run("python3", "tools/build-reader.py")
+        run("git", "add", "index.html")
+        p = subprocess.run(["git", "rebase", "--continue"], cwd=ROOT, capture_output=True, text=True,
+                           env={**os.environ, "GIT_EDITOR": "true"})
+        if p.returncode:
+            run("git", "rebase", "--abort")
+            print("    publish: could not merge with the remote — " + p.stderr.strip()[-200:])
+            return
+    p = run("git", "push", "-q")
+    print("    published" if p.returncode == 0 else "    publish: push failed — " + p.stderr.strip()[-200:])
 
 
 def parse_range(spec, n):
@@ -254,6 +293,7 @@ def parse_range(spec, n):
 
 
 def main():
+    global VERBOSE, BATCH, STT
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("books", nargs="*", help="<section>/<book> ids; default: books with \"narrate\": true")
     ap.add_argument("--voice", default=None, help=" | ".join(VOICES))
@@ -261,9 +301,17 @@ def main():
     ap.add_argument("--force", action="store_true", help="make everything again")
     ap.add_argument("--no-check", action="store_true", help="skip the Whisper listen-back check (faster, riskier)")
     ap.add_argument("--verbose", action="store_true", help="print what Whisper heard for every chunk")
+    ap.add_argument("--stt", default=None, help="Whisper model for the listen-back check (default: large-v3-turbo; "
+                    "e.g. mlx-community/whisper-small-asr-fp16 is faster)")
+    ap.add_argument("--batch", type=int, default=None, help=f"chunks per forward pass (default {BATCH})")
+    ap.add_argument("--publish", action="store_true",
+                    help="after each chapter: build the reader, commit and push, so it is playable while the rest renders")
     args = ap.parse_args()
-    global VERBOSE
     VERBOSE = args.verbose
+    if args.stt:
+        STT = args.stt
+    if args.batch:
+        BATCH = args.batch
     checker = None if args.no_check else Checker()
 
     todo = [(b, args.voice) for b in args.books] if args.books else opted_in()
@@ -288,11 +336,26 @@ def main():
         label = VOICES[voice]["label"]
         print(f"\n{book['title']} — {len(book['chapters'])} chapters · voice {label} → audio/{slug}/")
         entries, keep = [], {"index.json"}
+
+        def hash_of(ch):
+            return hashlib.sha256((MODELS[VOICES[voice]["engine"]] + "|" + voice + "|v2\n" +
+                                   "\n".join(c["text"] for c in ch["chunks"])).encode()).hexdigest()[:16]
+
+        def is_fresh(ch):
+            o = prev.get(ch["id"])
+            return bool(o and os.path.exists(os.path.join(d, o["file"])) and os.path.exists(os.path.join(d, o["map"]))
+                        and o["hash"] == hash_of(ch))
+
+        # chapters that need rendering, in reading order; consecutive ones are rendered together
+        # (short chapters share batches) but each is saved as soon as its own audio is done
+        need = [k for k, ch in enumerate(book["chapters"], 1) if k in want and (args.force or not is_fresh(ch))]
+        ready = {}          # chapter number -> {chunk index: audio}
+        pool_secs = {}      # chapter number -> share of the pool's work time
+
         for k, ch in enumerate(book["chapters"], 1):
             base = f"{k:02d}-{slugify(ch['title'])}"
             m4a, tmap = os.path.join(d, base + ".m4a"), os.path.join(d, base + ".json")
-            h = hashlib.sha256((MODELS[VOICES[voice]["engine"]] + "|" + voice + "|v2\n" +
-                                "\n".join(c["text"] for c in ch["chunks"])).encode()).hexdigest()[:16]
+            h = hash_of(ch)
             old = prev.get(ch["id"])
             have = old and os.path.exists(os.path.join(d, old["file"])) and os.path.exists(os.path.join(d, old["map"]))
             fresh = have and old["hash"] == h
@@ -308,7 +371,25 @@ def main():
                 print(f"  = {base}.m4a")
                 continue
             print(f"  + {base}  ({ch['words']} words)")
-            dur, work = render_chapter(eng, ch, m4a, tmap, checker)
+            t_start = time.time()
+            if k not in ready:
+                group, n = [], 0
+                for j in need:
+                    if j < k:
+                        continue
+                    cj = [c for c in book["chapters"][j - 1]["chunks"] if c["text"]]
+                    if group and n + len(cj) > POOL:
+                        break
+                    group.append(j)
+                    n += len(cj)
+                if len(group) > 1:
+                    print(f"    (rendering chapters {group[0]}–{group[-1]} together for fuller batches)")
+                items = [((j, i), c) for j in group for i, c in enumerate(book["chapters"][j - 1]["chunks"]) if c["text"]]
+                got = synth_pool(eng, items, checker)
+                for j in group:
+                    ready[j] = {i: a for (jj, i), a in got.items() if jj == j}
+            dur = finish_chapter(eng, ch, ready.pop(k), m4a, tmap)
+            work = time.time() - t_start
             entries.append({"id": ch["id"], "n": k, "title": ch["title"], "file": base + ".m4a", "map": base + ".json",
                             "dur": round(dur, 1), "hash": h, "voice": voice, "label": label,
                             "bytes": os.path.getsize(m4a)})
@@ -317,8 +398,9 @@ def main():
             so_far = sorted(entries + [c for c in prev.values() if c["id"] not in seen], key=lambda e: e.get("n", 0))
             with open(os.path.join(d, "index.json"), "w", encoding="utf-8") as fh:
                 json.dump({"book": book_id, "chapters": so_far}, fh, indent=1)
-            print(f"    {dur/60:.1f} min of audio in {work/60:.1f} min  ({work/max(dur,1):.2f}× real time, "
-                  f"{os.path.getsize(m4a)//1024} KB)")
+            print(f"    {dur/60:.1f} min of audio ({os.path.getsize(m4a)//1024} KB)")
+            if args.publish:
+                publish(slug)
         for f in os.listdir(d):
             if f not in keep:
                 os.unlink(os.path.join(d, f))
