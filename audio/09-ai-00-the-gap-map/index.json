@@ -48,6 +48,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5508469
+  },
+  {
+   "id": "library/09-ai/00-the-gap-map/04-the-study-order.md",
+   "n": 5,
+   "title": "The Study Order",
+   "file": "05-the-study-order.m4a",
+   "map": "05-the-study-order.json",
+   "dur": 636.5,
+   "hash": "385aeb82ecc81040",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4767211
   }
  ]
 }
