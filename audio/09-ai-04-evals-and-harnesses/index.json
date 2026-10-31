@@ -108,6 +108,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 6170849
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/09-evaluating-agents-and-trajectories.md",
+   "n": 10,
+   "title": "Evaluating Agents and Trajectories",
+   "file": "10-evaluating-agents-and-trajectories.m4a",
+   "map": "10-evaluating-agents-and-trajectories.json",
+   "dur": 731.9,
+   "hash": "235e408cab78d438",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5465187
   }
  ]
 }
