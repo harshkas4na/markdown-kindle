@@ -36,6 +36,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 6192547
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/03-context-windows-and-what-fills-them.md",
+   "n": 4,
+   "title": "Context Windows and What Fills Them",
+   "file": "04-context-windows-and-what-fills-them.m4a",
+   "map": "04-context-windows-and-what-fills-them.json",
+   "dur": 759.2,
+   "hash": "c70f663c05827fbb",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5696489
   }
  ]
 }
