@@ -168,6 +168,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4947669
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/14-what-you-can-now-honestly-say.md",
+   "n": 15,
+   "title": "What You Can Now Honestly Say",
+   "file": "15-what-you-can-now-honestly-say.m4a",
+   "map": "15-what-you-can-now-honestly-say.json",
+   "dur": 598.4,
+   "hash": "9ffba9f9f2de86b1",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4470971
   }
  ]
 }
