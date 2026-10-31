@@ -144,6 +144,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4163866
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/12-tooling.md",
+   "n": 13,
+   "title": "Tooling: What to Build and What to Buy",
+   "file": "13-tooling-what-to-build-and-what-to-buy.m4a",
+   "map": "13-tooling-what-to-build-and-what-to-buy.json",
+   "dur": 507.9,
+   "hash": "8411e5dc954c7978",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3788009
   }
  ]
 }
