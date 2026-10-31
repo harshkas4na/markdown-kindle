@@ -72,6 +72,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5540840
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/06-slices-and-the-aggregate-lie.md",
+   "n": 7,
+   "title": "Slices, and the Aggregate That Lies",
+   "file": "07-slices-and-the-aggregate-that-lies.m4a",
+   "map": "07-slices-and-the-aggregate-that-lies.json",
+   "dur": 581.9,
+   "hash": "e7c48a4e783a5427",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4326357
   }
  ]
 }
