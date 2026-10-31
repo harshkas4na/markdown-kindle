@@ -156,6 +156,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3788009
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/13-the-first-ninety-days.md",
+   "n": 14,
+   "title": "The First Ninety Days",
+   "file": "14-the-first-ninety-days.m4a",
+   "map": "14-the-first-ninety-days.json",
+   "dur": 664.6,
+   "hash": "76491bb015c58567",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4947669
   }
  ]
 }
