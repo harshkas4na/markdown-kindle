@@ -48,6 +48,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5283279
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/04-the-loop-and-its-controls.md",
+   "n": 5,
+   "title": "The Loop and Its Controls",
+   "file": "05-the-loop-and-its-controls.m4a",
+   "map": "05-the-loop-and-its-controls.json",
+   "dur": 565.3,
+   "hash": "025a4684057141fd",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4239325
   }
  ]
 }
