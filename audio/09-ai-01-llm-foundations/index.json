@@ -84,6 +84,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4916296
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/07-prompting-as-engineering.md",
+   "n": 8,
+   "title": "Prompting as Engineering",
+   "file": "08-prompting-as-engineering.m4a",
+   "map": "08-prompting-as-engineering.json",
+   "dur": 712.8,
+   "hash": "8288aaf2fc4a8e2e",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5325025
   }
  ]
 }
