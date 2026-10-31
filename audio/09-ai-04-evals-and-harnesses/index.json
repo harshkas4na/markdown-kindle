@@ -48,6 +48,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4729771
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/04-llm-as-judge.md",
+   "n": 5,
+   "title": "LLM-as-Judge",
+   "file": "05-llm-as-judge.m4a",
+   "map": "05-llm-as-judge.json",
+   "dur": 660.1,
+   "hash": "2a9928c54fc9402a",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4904421
   }
  ]
 }
