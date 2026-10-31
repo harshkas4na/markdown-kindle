@@ -12,6 +12,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3963773
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/01-why-evals-are-the-bar.md",
+   "n": 2,
+   "title": "Why Evals Are the Bar",
+   "file": "02-why-evals-are-the-bar.m4a",
+   "map": "02-why-evals-are-the-bar.json",
+   "dur": 540.9,
+   "hash": "d7a0fb350f32ecb7",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4053415
   }
  ]
 }
