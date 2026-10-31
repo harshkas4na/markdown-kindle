@@ -12,6 +12,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5879018
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/01-tokens-and-the-tokenizer.md",
+   "n": 2,
+   "title": "Tokens and the Tokeniser",
+   "file": "02-tokens-and-the-tokeniser.m4a",
+   "map": "02-tokens-and-the-tokeniser.json",
+   "dur": 693.5,
+   "hash": "f91a6806585d7f04",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5160196
   }
  ]
 }
