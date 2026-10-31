@@ -96,6 +96,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5325025
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/08-cost-and-latency-arithmetic.md",
+   "n": 9,
+   "title": "Cost and Latency Arithmetic",
+   "file": "09-cost-and-latency-arithmetic.m4a",
+   "map": "09-cost-and-latency-arithmetic.json",
+   "dur": 743.6,
+   "hash": "73f7ccd738dd714e",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5548404
   }
  ]
 }
