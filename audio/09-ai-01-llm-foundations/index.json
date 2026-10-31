@@ -48,6 +48,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5696489
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/04-sampling-and-determinism.md",
+   "n": 5,
+   "title": "Sampling and Determinism",
+   "file": "05-sampling-and-determinism.m4a",
+   "map": "05-sampling-and-determinism.json",
+   "dur": 735.2,
+   "hash": "cdc5eec96f00de5b",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5505902
   }
  ]
 }
