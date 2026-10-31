@@ -24,6 +24,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5160196
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/02-what-the-model-actually-does.md",
+   "n": 3,
+   "title": "What the Model Actually Does",
+   "file": "03-what-the-model-actually-does.m4a",
+   "map": "03-what-the-model-actually-does.json",
+   "dur": 829.4,
+   "hash": "a4d02e0fd2e3cbee",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 6192547
   }
  ]
 }
