@@ -120,6 +120,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5465187
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/10-online-evaluation-and-ab-tests.md",
+   "n": 11,
+   "title": "Online Evaluation and A/B Tests",
+   "file": "11-online-evaluation-and-a-b-tests.m4a",
+   "map": "11-online-evaluation-and-a-b-tests.json",
+   "dur": 648.1,
+   "hash": "ccf603b6c8a709b8",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4806309
   }
  ]
 }
