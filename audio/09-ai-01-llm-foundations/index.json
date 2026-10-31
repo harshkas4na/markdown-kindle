@@ -1,0 +1,17 @@
+{
+ "book": "09-ai/01-llm-foundations",
+ "chapters": [
+  {
+   "id": "library/09-ai/01-llm-foundations/00-the-whole-story-in-ten-minutes.md",
+   "n": 1,
+   "title": "The Whole Story in Ten Minutes",
+   "file": "01-the-whole-story-in-ten-minutes.m4a",
+   "map": "01-the-whole-story-in-ten-minutes.json",
+   "dur": 784.3,
+   "hash": "2156048032c430fc",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5879018
+  }
+ ]
+}
