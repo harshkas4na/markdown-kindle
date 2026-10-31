@@ -24,6 +24,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4381314
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/02-tool-calling-from-scratch.md",
+   "n": 3,
+   "title": "Tool Calling from Scratch",
+   "file": "03-tool-calling-from-scratch.m4a",
+   "map": "03-tool-calling-from-scratch.json",
+   "dur": 411.1,
+   "hash": "1c6523aab8e14174",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3069295
   }
  ]
 }
