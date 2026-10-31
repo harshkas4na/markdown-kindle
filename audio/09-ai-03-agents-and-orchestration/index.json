@@ -36,6 +36,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3069295
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/03-designing-tools.md",
+   "n": 4,
+   "title": "Designing Tools",
+   "file": "04-designing-tools.m4a",
+   "map": "04-designing-tools.json",
+   "dur": 709.4,
+   "hash": "318520ac1093849c",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5283279
   }
  ]
 }
