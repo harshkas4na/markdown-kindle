@@ -108,6 +108,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5548404
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/09-choosing-a-model.md",
+   "n": 10,
+   "title": "Choosing a Model",
+   "file": "10-choosing-a-model.m4a",
+   "map": "10-choosing-a-model.json",
+   "dur": 550.9,
+   "hash": "6a615da6baa9f404",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4107782
   }
  ]
 }
