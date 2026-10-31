@@ -50,14 +50,14 @@ MODELS = {
     "qwen-design": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-8bit",
     "chatterbox": "mlx-community/chatterbox-turbo-fp16",
 }
-BATCH = 10           # chunks per forward pass (Qwen batch_generate scales almost linearly); --batch overrides
-POOL = 40            # chunks gathered from consecutive chapters before sorting by length and rendering
+BATCH = 24           # chunks per forward pass (Qwen batch_generate scales almost linearly); --batch overrides
+POOL = 48            # chunks gathered from consecutive chapters before sorting by length and rendering
 GAP = {2: 0.55, 1: 0.22, 0: 0.08}   # silence after a chunk: paragraph end / sentence end / none
 # Every chunk is listened back to with Whisper and compared with its text; a
 # chunk whose words differ too much (a dropped clause, an added "ahem" — the
 # big models do this now and then) is made again, up to RETRIES times.
 STT = "mlx-community/whisper-large-v3-turbo-asr-fp16"
-RETRIES = 2
+RETRIES = 1
 VERBOSE = False
 
 
@@ -174,9 +174,10 @@ class Checker:
         n = sum(max(i2 - i1, j2 - j1) for tag, i1, i2, j1, j2 in sm.get_opcodes() if tag != "equal")
         return n, len(r), heard
 
-    def ok(self, n, total):
-        # one homophone or a name is fine; a missing clause or added sound is not
-        return n <= max(1, round(0.08 * total))
+    def ok(self, n, total, text=""):
+        # one homophone or a name is fine; a missing clause or added sound is not. Lines with
+        # digits get more room: Whisper writes "1,536" or "1M" differently than the text does.
+        return n <= max(1, round((0.2 if re.search(r"\d", text) else 0.08) * total))
 
 
 def trim(a, sr, thresh=0.004, keep=0.06):
@@ -192,40 +193,49 @@ def trim(a, sr, thresh=0.004, keep=0.06):
 def synth_pool(eng, items, checker):
     """items: [(key, chunk)] from one or more chapters. Renders them sorted by length (so a
     batch holds similar-length lines and nothing waits on one long sentence), listens back,
-    retakes the bad ones. Returns {key: audio}."""
+    and retakes the bad ones — all together in batches, since one chunk alone costs about as
+    much as a whole batch. Returns {key: audio}."""
     items = sorted(items, key=lambda it: len(it[1]["text"]))
-    out, remade, doubtful, t0 = {}, 0, 0, time.time()
+    out, t0 = {}, time.time()
     for i in range(0, len(items), BATCH):
         batch = items[i:i + BATCH]
-        audios = [trim(a, eng.sr) for a in eng.speak([c["text"] for _, c in batch])]
-        if checker:
-            for k, ((key, c), a) in enumerate(zip(batch, audios)):
+        for (key, _), a in zip(batch, eng.speak([c["text"] for _, c in batch])):
+            out[key] = trim(a, eng.sr)
+        print(f"\r    {min(i + BATCH, len(items))}/{len(items)} chunks · {time.time()-t0:.0f} s", end="", flush=True)
+    print()
+    if not checker:
+        return out
+    best, bad = {}, []          # key -> (errors, total); keys still failing
+    for key, c in items:
+        n, total, heard = checker.errors(c["text"], out[key], eng.sr)
+        if VERBOSE:
+            print(f"    [{n}/{total}] {c['text'][:60]!r} -> {heard.strip()[:60]!r}")
+        best[key] = (n, total)
+        if not checker.ok(n, total, c["text"]):
+            bad.append((key, c))
+    remade = len(bad)
+    for rnd in range(1, RETRIES + 1):
+        if not bad:
+            break
+        print(f"    retaking {len(bad)} chunk(s), round {rnd} · {time.time()-t0:.0f} s", flush=True)
+        still = []
+        for i in range(0, len(bad), BATCH):
+            batch = bad[i:i + BATCH]
+            for (key, c), a in zip(batch, eng.speak([c["text"] for _, c in batch], temperature=0.6)):
+                a = trim(a, eng.sr)
                 n, total, heard = checker.errors(c["text"], a, eng.sr)
                 if VERBOSE:
-                    print(f"\n    [{n}/{total}] {c['text'][:60]!r} -> {heard.strip()[:60]!r}")
-                best, tries = (n, a), 0
-                while not checker.ok(n, total) and tries < RETRIES:
-                    tries += 1
-                    a2 = trim(eng.speak([c["text"]], temperature=0.6)[0], eng.sr)
-                    n, total, heard2 = checker.errors(c["text"], a2, eng.sr)
-                    if VERBOSE:
-                        print(f"    retry {tries}: [{n}/{total}] -> {heard2.strip()[:60]!r}")
-                    if n < best[0]:
-                        best = (n, a2)
-                if tries:
-                    remade += 1
-                    if not checker.ok(best[0], total):
-                        doubtful += 1
-                        print(f"\n    ? still off after {tries} retries: {c['text'][:70]!r}")
-                audios[k] = best[1]
-        for (key, _), a in zip(batch, audios):
-            out[key] = a
-        done = min(i + BATCH, len(items))
-        print(f"\r    {done}/{len(items)} chunks · {time.time()-t0:.0f} s"
-              + (f" · {remade} remade" if remade else ""), end="", flush=True)
-    print()
-    if doubtful:
-        print(f"    ! {doubtful} chunk(s) still didn't match their text — listen to the chapter(s) above")
+                    print(f"    retry {rnd}: [{n}/{total}] -> {heard.strip()[:60]!r}")
+                if n < best[key][0]:
+                    best[key], out[key] = (n, total), a
+                if not checker.ok(*best[key], c["text"]):
+                    still.append((key, c))
+        bad = still
+    for key, c in bad:
+        print(f"    ? still off after {RETRIES} retakes: {c['text'][:70]!r}")
+    if bad:
+        print(f"    ! {len(bad)} chunk(s) still didn't match their text — listen to the chapter(s) above")
+    print(f"    {remade} retaken · {time.time()-t0:.0f} s in all")
     return out
 
 
