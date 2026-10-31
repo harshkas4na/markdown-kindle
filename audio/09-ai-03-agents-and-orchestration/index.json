@@ -1,0 +1,17 @@
+{
+ "book": "09-ai/03-agents-and-orchestration",
+ "chapters": [
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/00-the-whole-story-in-ten-minutes.md",
+   "n": 1,
+   "title": "The Whole Story in Ten Minutes",
+   "file": "01-the-whole-story-in-ten-minutes.m4a",
+   "map": "01-the-whole-story-in-ten-minutes.json",
+   "dur": 520.3,
+   "hash": "30b74d2a215c80ed",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3867233
+  }
+ ]
+}
