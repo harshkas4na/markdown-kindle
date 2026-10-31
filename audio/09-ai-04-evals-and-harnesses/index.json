@@ -132,6 +132,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4806309
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/11-drift-and-maintaining-the-set.md",
+   "n": 12,
+   "title": "Drift, and Maintaining the Set",
+   "file": "12-drift-and-maintaining-the-set.m4a",
+   "map": "12-drift-and-maintaining-the-set.json",
+   "dur": 558.7,
+   "hash": "753de8dd40cbc5d7",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4163866
   }
  ]
 }
