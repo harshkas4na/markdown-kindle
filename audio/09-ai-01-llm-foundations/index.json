@@ -60,6 +60,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5505902
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/05-embeddings.md",
+   "n": 6,
+   "title": "Embeddings",
+   "file": "06-embeddings.m4a",
+   "map": "06-embeddings.json",
+   "dur": 841.4,
+   "hash": "6c8a1c4e711c4822",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 6306489
   }
  ]
 }
