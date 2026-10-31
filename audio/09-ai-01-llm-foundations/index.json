@@ -72,6 +72,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 6306489
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/06-structured-output.md",
+   "n": 7,
+   "title": "Structured Output",
+   "file": "07-structured-output.m4a",
+   "map": "07-structured-output.json",
+   "dur": 657.5,
+   "hash": "cb08d113432b89e8",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4916296
   }
  ]
 }
