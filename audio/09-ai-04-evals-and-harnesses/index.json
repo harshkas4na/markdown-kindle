@@ -96,6 +96,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3784118
+  },
+  {
+   "id": "library/09-ai/04-evals-and-harnesses/08-evaluating-rag.md",
+   "n": 9,
+   "title": "Evaluating RAG",
+   "file": "09-evaluating-rag.m4a",
+   "map": "09-evaluating-rag.json",
+   "dur": 833.5,
+   "hash": "150bc5a7531121c1",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 6170849
   }
  ]
 }
