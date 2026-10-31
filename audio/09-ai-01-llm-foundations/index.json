@@ -120,6 +120,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4107782
+  },
+  {
+   "id": "library/09-ai/01-llm-foundations/10-failure-modes.md",
+   "n": 11,
+   "title": "Failure Modes",
+   "file": "11-failure-modes.m4a",
+   "map": "11-failure-modes.json",
+   "dur": 719.7,
+   "hash": "ff8878bb8ae2ec6d",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5372568
   }
  ]
 }
