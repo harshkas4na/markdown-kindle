@@ -1,0 +1,17 @@
+{
+ "book": "09-ai/00-the-gap-map",
+ "chapters": [
+  {
+   "id": "library/09-ai/00-the-gap-map/00-what-this-shelf-is.md",
+   "n": 1,
+   "title": "What This Shelf Is",
+   "file": "01-what-this-shelf-is.m4a",
+   "map": "01-what-this-shelf-is.json",
+   "dur": 470.2,
+   "hash": "0d006af70d348354",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3517165
+  }
+ ]
+}

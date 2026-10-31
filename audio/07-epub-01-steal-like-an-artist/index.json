@@ -1,0 +1,173 @@
+{
+ "book": "07-epub/01-steal-like-an-artist",
+ "chapters": [
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/01-contents.md",
+   "n": 1,
+   "title": "Contents",
+   "file": "01-contents.m4a",
+   "map": "01-contents.json",
+   "dur": 119.7,
+   "hash": "5e6786a47e663c55",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 891440
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/02-1-steal-like-an-artist.md",
+   "n": 2,
+   "title": "1. Steal Like an Artist.",
+   "file": "02-1-steal-like-an-artist.m4a",
+   "map": "02-1-steal-like-an-artist.json",
+   "dur": 602.9,
+   "hash": "8b66b88d66cc7bc0",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4459887
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/03-2-don-t-wait-until-you-know-who-you-are-to-get-started.md",
+   "n": 3,
+   "title": "2. Don\u2019t Wait Until You Know Who You Are to Get Started.",
+   "file": "03-2-dont-wait-until-you-know-who-you-are-to-get-started.m4a",
+   "map": "03-2-dont-wait-until-you-know-who-you-are-to-get-started.json",
+   "dur": 601.4,
+   "hash": "b8f2f07f608719ad",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4482816
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/04-3-write-the-book-you-want-to-read.md",
+   "n": 4,
+   "title": "3. Write the Book You Want to Read.",
+   "file": "04-3-write-the-book-you-want-to-read.m4a",
+   "map": "04-3-write-the-book-you-want-to-read.json",
+   "dur": 239.4,
+   "hash": "6abcced3fbb8e9d4",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 1779815
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/05-4-use-your-hands.md",
+   "n": 5,
+   "title": "4. Use Your Hands.",
+   "file": "05-4-use-your-hands.m4a",
+   "map": "05-4-use-your-hands.json",
+   "dur": 448.1,
+   "hash": "d9fb51a0dd736fc0",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3344287
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/06-5-side-projects-and-hobbies-are-important.md",
+   "n": 6,
+   "title": "5. Side Projects and Hobbies Are Important.",
+   "file": "06-5-side-projects-and-hobbies-are-important.m4a",
+   "map": "06-5-side-projects-and-hobbies-are-important.json",
+   "dur": 267.0,
+   "hash": "977bcbf95838c5c5",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 1999557
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/07-6-the-secret-do-good-work-and-share-it-with-people.md",
+   "n": 7,
+   "title": "6. The Secret: Do Good Work and Share It with People.",
+   "file": "07-6-the-secret-do-good-work-and-share-it-with-people.m4a",
+   "map": "07-6-the-secret-do-good-work-and-share-it-with-people.json",
+   "dur": 375.3,
+   "hash": "8db2cd1a4792a6c0",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 2796903
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/08-7-geography-is-no-longer-our-master.md",
+   "n": 8,
+   "title": "7. Geography Is No Longer Our Master.",
+   "file": "08-7-geography-is-no-longer-our-master.m4a",
+   "map": "08-7-geography-is-no-longer-our-master.json",
+   "dur": 395.1,
+   "hash": "01c7139ef9c80933",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 2934821
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/09-8-be-nice-the-world-is-a-small-town.md",
+   "n": 9,
+   "title": "8. Be Nice. (The World Is a Small Town.)",
+   "file": "09-8-be-nice-the-world-is-a-small-town.m4a",
+   "map": "09-8-be-nice-the-world-is-a-small-town.json",
+   "dur": 402.9,
+   "hash": "f933fb33294c539b",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3017521
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/10-9-be-boring-it-s-the-only-way-to-get-work-done.md",
+   "n": 10,
+   "title": "9. Be Boring. (It\u2019s the Only Way to Get Work Done.)",
+   "file": "10-9-be-boring-its-the-only-way-to-get-work-done.m4a",
+   "map": "10-9-be-boring-its-the-only-way-to-get-work-done.json",
+   "dur": 527.8,
+   "hash": "fb6b30f5dbb8262b",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3933989
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/11-10-creativity-is-subtraction.md",
+   "n": 11,
+   "title": "10. Creativity Is Subtraction.",
+   "file": "11-10-creativity-is-subtraction.m4a",
+   "map": "11-10-creativity-is-subtraction.json",
+   "dur": 172.6,
+   "hash": "cdf6ab6c5adea1d1",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 1273552
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/12-conclusion.md",
+   "n": 12,
+   "title": "Conclusion",
+   "file": "12-conclusion.m4a",
+   "map": "12-conclusion.json",
+   "dur": 66.6,
+   "hash": "b543cc933aeb54d2",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 485172
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/13-copyright.md",
+   "n": 13,
+   "title": "Copyright",
+   "file": "13-copyright.m4a",
+   "map": "13-copyright.json",
+   "dur": 61.2,
+   "hash": "c2012351eac06f97",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 455567
+  },
+  {
+   "id": "library/07-epub/01-steal-like-an-artist/14-document-outline.md",
+   "n": 14,
+   "title": "Document Outline",
+   "file": "14-document-outline.m4a",
+   "map": "14-document-outline.json",
+   "dur": 54.7,
+   "hash": "102ea0fbfe8f802a",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 399302
+  }
+ ]
+}
