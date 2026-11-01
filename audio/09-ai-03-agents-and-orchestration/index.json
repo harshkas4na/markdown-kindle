@@ -84,6 +84,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4260438
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/07-langchain-what-it-is-and-isnt.md",
+   "n": 8,
+   "title": "LangChain: What It Is and Isn't",
+   "file": "08-langchain-what-it-is-and-isn-t.m4a",
+   "map": "08-langchain-what-it-is-and-isn-t.json",
+   "dur": 624.1,
+   "hash": "305a9fab31505791",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4644409
   }
  ]
 }
