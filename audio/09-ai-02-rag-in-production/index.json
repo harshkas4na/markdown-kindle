@@ -36,6 +36,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5215306
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/03-chunking.md",
+   "n": 4,
+   "title": "Chunking",
+   "file": "04-chunking.m4a",
+   "map": "04-chunking.json",
+   "dur": 608.2,
+   "hash": "8c4e38ff4a2a4d7b",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4550802
   }
  ]
 }
