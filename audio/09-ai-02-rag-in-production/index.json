@@ -144,6 +144,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 6087131
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/12-advanced-patterns.md",
+   "n": 13,
+   "title": "Advanced Patterns",
+   "file": "13-advanced-patterns.m4a",
+   "map": "13-advanced-patterns.json",
+   "dur": 695.1,
+   "hash": "870e3681253ed031",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5210472
   }
  ]
 }
