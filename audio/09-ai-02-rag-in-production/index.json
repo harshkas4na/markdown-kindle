@@ -132,6 +132,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4322614
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/11-evaluating-retrieval.md",
+   "n": 12,
+   "title": "Evaluating Retrieval",
+   "file": "12-evaluating-retrieval.m4a",
+   "map": "12-evaluating-retrieval.json",
+   "dur": 817.6,
+   "hash": "31df1e36bba55bf4",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 6087131
   }
  ]
 }
