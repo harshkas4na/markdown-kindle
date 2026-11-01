@@ -48,6 +48,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4550802
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/04-embedding-models-in-practice.md",
+   "n": 5,
+   "title": "Embedding Models in Practice",
+   "file": "05-embedding-models-in-practice.m4a",
+   "map": "05-embedding-models-in-practice.json",
+   "dur": 619.9,
+   "hash": "cb040170534fef7a",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4615867
   }
  ]
 }
