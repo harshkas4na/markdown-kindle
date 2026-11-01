@@ -132,6 +132,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4830020
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/11-mcp.md",
+   "n": 12,
+   "title": "MCP: The Model Context Protocol",
+   "file": "12-mcp-the-model-context-protocol.m4a",
+   "map": "12-mcp-the-model-context-protocol.json",
+   "dur": 635.1,
+   "hash": "a436d806c22ee5ae",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4739252
   }
  ]
 }
