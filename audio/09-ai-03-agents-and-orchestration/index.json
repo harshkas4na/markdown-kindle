@@ -156,6 +156,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4750200
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/13-what-you-can-now-honestly-say.md",
+   "n": 14,
+   "title": "What You Can Now Honestly Say",
+   "file": "14-what-you-can-now-honestly-say.m4a",
+   "map": "14-what-you-can-now-honestly-say.json",
+   "dur": 621.7,
+   "hash": "660bced4893a552c",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4626093
   }
  ]
 }
