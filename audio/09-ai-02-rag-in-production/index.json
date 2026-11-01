@@ -60,6 +60,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4615867
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/05-vector-indexes-and-ann.md",
+   "n": 6,
+   "title": "Vector Indexes and Approximate Search",
+   "file": "06-vector-indexes-and-approximate-search.m4a",
+   "map": "06-vector-indexes-and-approximate-search.json",
+   "dur": 685.4,
+   "hash": "e24a89471376ebd5",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5109704
   }
  ]
 }
