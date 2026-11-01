@@ -24,6 +24,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3903529
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/02-ingestion-and-parsing.md",
+   "n": 3,
+   "title": "Ingestion and Parsing",
+   "file": "03-ingestion-and-parsing.m4a",
+   "map": "03-ingestion-and-parsing.json",
+   "dur": 696.0,
+   "hash": "9d19dbd4e2a6ce08",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5215306
   }
  ]
 }
