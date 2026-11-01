@@ -96,6 +96,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4832062
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/08-reranking.md",
+   "n": 9,
+   "title": "Reranking",
+   "file": "09-reranking.m4a",
+   "map": "09-reranking.json",
+   "dur": 632.0,
+   "hash": "e12921e0f0f5da6d",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4719158
   }
  ]
 }
