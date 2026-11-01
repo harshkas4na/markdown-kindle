@@ -168,6 +168,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5089320
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/14-what-you-can-now-honestly-say.md",
+   "n": 15,
+   "title": "What You Can Now Honestly Say",
+   "file": "15-what-you-can-now-honestly-say.m4a",
+   "map": "15-what-you-can-now-honestly-say.json",
+   "dur": 564.2,
+   "hash": "84780e4eaff71e92",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4189357
   }
  ]
 }
