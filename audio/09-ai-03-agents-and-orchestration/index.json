@@ -72,6 +72,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4324871
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/06-state-and-memory.md",
+   "n": 7,
+   "title": "State and Memory",
+   "file": "07-state-and-memory.m4a",
+   "map": "07-state-and-memory.json",
+   "dur": 573.2,
+   "hash": "7c375ea71e6b6dc9",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4260438
   }
  ]
 }
