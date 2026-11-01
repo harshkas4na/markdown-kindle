@@ -144,6 +144,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4739252
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/12-debugging-an-agent-run.md",
+   "n": 13,
+   "title": "Debugging an Agent Run",
+   "file": "13-debugging-an-agent-run.m4a",
+   "map": "13-debugging-an-agent-run.json",
+   "dur": 641.0,
+   "hash": "f3c5e013a548dc75",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4750200
   }
  ]
 }
