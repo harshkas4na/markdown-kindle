@@ -84,6 +84,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4543787
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/07-hybrid-search-and-fusion.md",
+   "n": 8,
+   "title": "Hybrid Search and Fusion",
+   "file": "08-hybrid-search-and-fusion.m4a",
+   "map": "08-hybrid-search-and-fusion.json",
+   "dur": 650.8,
+   "hash": "cbd65b0fa9041bcc",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4832062
   }
  ]
 }
