@@ -12,6 +12,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4358158
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/01-the-pipeline-end-to-end.md",
+   "n": 2,
+   "title": "The Pipeline End to End",
+   "file": "02-the-pipeline-end-to-end.m4a",
+   "map": "02-the-pipeline-end-to-end.json",
+   "dur": 523.2,
+   "hash": "75e84a3b911ba892",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3903529
   }
  ]
 }
