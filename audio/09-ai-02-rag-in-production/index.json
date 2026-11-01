@@ -108,6 +108,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4719158
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/09-query-transformation.md",
+   "n": 10,
+   "title": "Query Transformation",
+   "file": "10-query-transformation.m4a",
+   "map": "10-query-transformation.json",
+   "dur": 640.3,
+   "hash": "83db8728e350e6dc",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4755056
   }
  ]
 }
