@@ -72,6 +72,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5109704
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/06-pgvector-and-the-alternatives.md",
+   "n": 7,
+   "title": "pgvector and the Alternatives",
+   "file": "07-pgvector-and-the-alternatives.m4a",
+   "map": "07-pgvector-and-the-alternatives.json",
+   "dur": 608.7,
+   "hash": "bcfb0f60f9329ce7",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4543787
   }
  ]
 }
