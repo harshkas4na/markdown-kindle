@@ -1,0 +1,17 @@
+{
+ "book": "09-ai/02-rag-in-production",
+ "chapters": [
+  {
+   "id": "library/09-ai/02-rag-in-production/00-the-whole-story-in-ten-minutes.md",
+   "n": 1,
+   "title": "The Whole Story in Ten Minutes",
+   "file": "01-the-whole-story-in-ten-minutes.m4a",
+   "map": "01-the-whole-story-in-ten-minutes.json",
+   "dur": 589.8,
+   "hash": "39baf46d11eca1b7",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4358158
+  }
+ ]
+}
