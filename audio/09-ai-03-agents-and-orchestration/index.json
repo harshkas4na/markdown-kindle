@@ -120,6 +120,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5356263
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/10-multi-agent-systems.md",
+   "n": 11,
+   "title": "Multi-Agent Systems",
+   "file": "11-multi-agent-systems.m4a",
+   "map": "11-multi-agent-systems.json",
+   "dur": 647.3,
+   "hash": "dbb0e33644ec05b1",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4830020
   }
  ]
 }
