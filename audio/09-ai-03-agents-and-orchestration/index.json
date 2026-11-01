@@ -96,6 +96,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4644409
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/08-langgraph.md",
+   "n": 9,
+   "title": "LangGraph",
+   "file": "09-langgraph.m4a",
+   "map": "09-langgraph.json",
+   "dur": 535.5,
+   "hash": "729e4d512a61aac7",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 3985697
   }
  ]
 }
