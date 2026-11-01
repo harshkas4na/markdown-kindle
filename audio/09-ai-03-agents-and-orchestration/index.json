@@ -60,6 +60,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4239325
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/05-planning-patterns.md",
+   "n": 6,
+   "title": "Planning Patterns",
+   "file": "06-planning-patterns.m4a",
+   "map": "06-planning-patterns.json",
+   "dur": 579.2,
+   "hash": "101dea532d850f26",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4324871
   }
  ]
 }
