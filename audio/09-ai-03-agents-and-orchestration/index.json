@@ -108,6 +108,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 3985697
+  },
+  {
+   "id": "library/09-ai/03-agents-and-orchestration/09-human-in-the-loop.md",
+   "n": 10,
+   "title": "Human-in-the-Loop",
+   "file": "10-human-in-the-loop.m4a",
+   "map": "10-human-in-the-loop.json",
+   "dur": 718.4,
+   "hash": "35407f135eea55fd",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5356263
   }
  ]
 }
