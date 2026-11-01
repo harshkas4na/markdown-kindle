@@ -120,6 +120,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 4755056
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/10-context-assembly-and-citations.md",
+   "n": 11,
+   "title": "Context Assembly and Citations",
+   "file": "11-context-assembly-and-citations.m4a",
+   "map": "11-context-assembly-and-citations.json",
+   "dur": 579.2,
+   "hash": "fb471c407601b8dc",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 4322614
   }
  ]
 }
