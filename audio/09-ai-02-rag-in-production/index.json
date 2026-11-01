@@ -156,6 +156,18 @@
    "voice": "ryan",
    "label": "Ryan",
    "bytes": 5210472
+  },
+  {
+   "id": "library/09-ai/02-rag-in-production/13-freshness-permissions-and-multi-tenancy.md",
+   "n": 14,
+   "title": "Freshness, Permissions and Multi-Tenancy",
+   "file": "14-freshness-permissions-and-multi-tenancy.m4a",
+   "map": "14-freshness-permissions-and-multi-tenancy.json",
+   "dur": 682.8,
+   "hash": "3b6ee5a6d0cd3f51",
+   "voice": "ryan",
+   "label": "Ryan",
+   "bytes": 5089320
   }
  ]
 }
