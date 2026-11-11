@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="330" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">Five questions, in order, before you dig into code</text>
+<g font-size="14" fill="#222">
+<circle cx="50" cy="75" r="18" fill="#2563eb"/><text x="50" y="81" fill="#fff" text-anchor="middle" font-weight="700">1</text><text x="85" y="72" font-weight="700">Am I reading the right source system?</text><text x="85" y="90" font-size="12" fill="#555">GreyOrange: two Salesforce orgs</text>
+<circle cx="50" cy="135" r="18" fill="#2563eb"/><text x="50" y="141" fill="#fff" text-anchor="middle" font-weight="700">2</text><text x="85" y="132" font-weight="700">Is the feed alive?</text><text x="85" y="150" font-size="12" fill="#555">Showpad: six silent weeks, green pipeline</text>
+<circle cx="50" cy="195" r="18" fill="#2563eb"/><text x="50" y="201" fill="#fff" text-anchor="middle" font-weight="700">3</text><text x="85" y="192" font-weight="700">Do two pipelines disagree?</text><text x="85" y="210" font-size="12" fill="#555">445 movers: FunnelStory closed, BigQuery open</text>
+<circle cx="50" cy="255" r="18" fill="#2563eb"/><text x="50" y="261" fill="#fff" text-anchor="middle" font-weight="700">4</text><text x="85" y="252" font-weight="700">Can the number explain itself?</text><text x="85" y="270" font-size="12" fill="#555">Trellix: score 22 on a confirmed renewal</text>
+<circle cx="440" cy="75" r="18" fill="#dc2626"/><text x="440" y="81" fill="#fff" text-anchor="middle" font-weight="700">5</text><text x="475" y="72" font-weight="700">Did we just break something visible?</text><text x="475" y="90" font-size="12" fill="#555">a purge that blanked assignees</text>
+</g>
+<text x="440" y="150" font-size="13" fill="#222">Earlier version you built yourself:</text>
+<text x="440" y="172" font-size="14" fill="#1e3a8a" font-weight="700">on, then alive, then why, then whose fault</text>
+</svg>

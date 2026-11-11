@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="400" fill="#f7f5ef"/>
+<text x="400" y="28" text-anchor="middle" font-size="19" font-weight="700" fill="#222">The alert agent, one milestone, every day at 10:00 IST</text>
+<g font-size="13" fill="#222" text-anchor="middle">
+<rect x="20" y="50" width="170" height="70" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text x="105" y="76" font-weight="700">Read milestone</text><text x="105" y="96">from ClickUp</text>
+<rect x="215" y="50" width="170" height="70" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/><text x="300" y="72" font-weight="700">Skip if</text><text x="300" y="90" font-size="12">finished, no due date,</text><text x="300" y="106" font-size="12">no Slack channel, PRJ task</text>
+<rect x="410" y="50" width="170" height="70" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text x="495" y="76" font-weight="700">Match to a stage</text><text x="495" y="96">FSD, UAT, HAT...</text>
+<rect x="605" y="50" width="175" height="70" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="692" y="76" font-weight="700">Is it late?</text><text x="692" y="96" font-size="12">3+ days later than baseline</text>
+</g>
+<g stroke="#555" stroke-width="3" fill="none"><path d="M192 85 L213 85"/><path d="M387 85 L408 85"/><path d="M582 85 L603 85"/><path d="M692 122 L692 160"/></g>
+<g font-size="13" fill="#222" text-anchor="middle">
+<rect x="520" y="160" width="260" height="70" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="650" y="186" font-weight="700">Root rule</text><text x="650" y="206" font-size="12">is the milestone before it also late?</text>
+<rect x="520" y="265" width="120" height="55" rx="10" fill="#e5e7eb" stroke="#6b7280" stroke-width="2"/><text x="580" y="289" font-weight="700">YES: skip</text><text x="580" y="306" font-size="12">knock-on</text>
+<rect x="660" y="265" width="120" height="55" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/><text x="720" y="289" font-weight="700">NO: alert</text><text x="720" y="306" font-size="12">it is the root</text>
+</g>
+<g stroke="#555" stroke-width="3" fill="none"><path d="M600 232 L580 263"/><path d="M700 232 L720 263"/></g>
+<g font-size="12" fill="#222"><text x="20" y="170" font-weight="700">Rules</text>
+<text x="20" y="192">Moved later: alert at 3+ days past baseline, then</text><text x="20" y="208">again per further day later. Earlier never alerts.</text>
+<text x="20" y="230">Overdue: 3 days open past due, one alert.</text>
+<text x="20" y="252">Channel: milestone Project label matches the</text><text x="20" y="268">Slack Channel List (not PRJ code).</text>
+<text x="20" y="290">Save state first, then send. A failed send never repeats.</text>
+<text x="20" y="320" font-weight="700" fill="#166534">Result: 213 alerts in 33 days became 79.</text></g>
+<text x="400" y="385" text-anchor="middle" font-size="12" fill="#555">Known gap: completed milestones are skipped, so PRJ10173 HAT counted as its own root.</text>
+</svg>

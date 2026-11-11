@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="330" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">Work is not value</text>
+<g font-size="14" fill="#222">
+<rect x="40" y="250" width="720" height="48" fill="#e5e7eb" stroke="#6b7280"/><text x="56" y="272" font-weight="700">1 It ran</text><text x="56" y="289" font-size="12">flow run rows. Free, means nothing alone.   MEASURABLE</text>
+<rect x="100" y="190" width="660" height="48" fill="#fef9c3" stroke="#ca8a04"/><text x="116" y="212" font-weight="700">2 It reached someone, who opened it</text><text x="116" y="229" font-size="12">opens and clicks. A rough proxy for now.   MEASURABLE, NOT IN THE API</text>
+<rect x="160" y="130" width="600" height="48" fill="#dcfce7" stroke="#16a34a"/><text x="176" y="152" font-weight="700">3 A human acted on it</text><text x="176" y="169" font-size="12">task closed by a user. Today: 22 agent tasks, 0 closed.</text>
+<rect x="220" y="70" width="540" height="48" fill="#bbf7d0" stroke="#15803d" stroke-width="2"/><text x="236" y="92" font-weight="700">4 The business changed</text><text x="236" y="109" font-size="12">renewed, score moved, account saved. No way to measure today.</text>
+</g>
+<text x="400" y="320" text-anchor="middle" font-size="12" fill="#555">Say which rung you are reporting. Say what you cannot see.</text>
+</svg>

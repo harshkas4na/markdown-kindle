@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="420" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">Tone and consequence are different axes</text>
+<rect x="110" y="50" width="640" height="330" fill="#fff" stroke="#999"/>
+<line x1="430" y1="50" x2="430" y2="380" stroke="#bbb" stroke-dasharray="4 4"/>
+<line x1="110" y1="215" x2="750" y2="215" stroke="#bbb" stroke-dasharray="4 4"/>
+<g font-size="12" fill="#444" text-anchor="middle">
+<text x="130" y="402">-1 anger</text><text x="270" y="402">-0.5 concern</text><text x="430" y="402">0 factual</text><text x="590" y="402">0.5 satisfied</text><text x="730" y="402">1 delight</text>
+<text x="400" y="418" font-weight="700">SENTIMENT (tone of the message)</text>
+</g>
+<g font-size="12" fill="#444" text-anchor="end">
+<text x="104" y="66">+10</text><text x="104" y="219">0</text><text x="104" y="378">-10</text>
+</g>
+<text x="40" y="215" font-size="12" font-weight="700" fill="#444" transform="rotate(-90 40 215)" text-anchor="middle">IMPACT (effect on the account)</text>
+<circle cx="270" cy="372" r="10" fill="#dc2626"/>
+<text x="285" y="357" font-size="13" fill="#991b1b" font-weight="700">"Thank you... my CEO wants us to evaluate other vendors"</text>
+<text x="285" y="341" font-size="12" fill="#991b1b">polite, mildly negative tone, impact -10</text>
+<circle cx="590" cy="78" r="10" fill="#16a34a"/>
+<text x="590" y="62" font-size="13" fill="#166534" text-anchor="middle" font-weight="700">"Add 50 more seats"  +10</text>
+<circle cx="130" cy="180" r="10" fill="#d97706"/>
+<text x="148" y="170" font-size="12" fill="#92400e">angry rant about a small bug, low impact</text>
+<circle cx="430" cy="215" r="8" fill="#6b7280"/>
+<text x="446" y="210" font-size="12" fill="#444">neutral status update</text>
+</svg>

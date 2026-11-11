@@ -28,7 +28,3 @@ __pycache__/
 # Studio narration scratch files (tools/narrate/narrate.py)
 /audio/*/*.tmp.wav
 /tools/narrate/.venv/
-
-# FunnelStory book: client-confidential (NDA). Never commit or push.
-/library/14-funnelstory/
-/audio/14-funnelstory*/

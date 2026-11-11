@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="280" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">A needle mover's five states</text>
+<g font-size="14" text-anchor="middle" fill="#222">
+<rect x="20" y="80" width="130" height="60" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/><text x="85" y="116" font-weight="700">Open</text>
+<rect x="175" y="80" width="130" height="60" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="240" y="116" font-weight="700">In Review</text>
+<rect x="330" y="80" width="130" height="60" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="395" y="116" font-weight="700">Action Taken</text>
+<rect x="485" y="80" width="130" height="60" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text x="550" y="116" font-weight="700">Monitoring</text>
+<rect x="640" y="80" width="140" height="60" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/><text x="710" y="116" font-weight="700">Resolved</text>
+</g>
+<g stroke="#555" stroke-width="3" fill="none"><path d="M152 110 L173 110"/><path d="M307 110 L328 110"/><path d="M462 110 L483 110"/><path d="M617 110 L638 110"/></g>
+<rect x="20" y="180" width="760" height="56" rx="10" fill="#e5e7eb" stroke="#6b7280"/>
+<text x="400" y="204" font-size="14" text-anchor="middle" fill="#222" font-weight="700">At 90 days CloseStale() closes any still open</text>
+<text x="400" y="224" font-size="12" text-anchor="middle" fill="#444">Bug: it forgot updated_at, so BigQuery stayed open (445 rows)</text>
+<text x="400" y="262" font-size="12" text-anchor="middle" fill="#555">Each state maps to underlying open or closed. Every change leaves a timeline event. Assignments and comments are the customer's.</text>
+</svg>

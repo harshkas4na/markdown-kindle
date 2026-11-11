@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="360" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">How close to the person? The closer, the more it gets used.</text>
+<g font-size="13" fill="#222">
+<rect x="40" y="55" width="720" height="30" fill="#fee2e2" stroke="#dc2626"/><text x="52" y="75">FunnelStory screens. Needs a login they may never have.</text>
+<rect x="70" y="95" width="660" height="30" fill="#ffedd5" stroke="#ea580c"/><text x="82" y="115">Tasks inside FunnelStory. Still needs the login.</text>
+<rect x="100" y="135" width="600" height="30" fill="#fef3c7" stroke="#d97706"/><text x="112" y="155">Dashboards, shared links. Good for their own customer (Aviz).</text>
+<rect x="130" y="175" width="540" height="30" fill="#fef9c3" stroke="#ca8a04"/><text x="142" y="195">Email and Slack. Reaches them. Opened is not the same as read.</text>
+<rect x="160" y="215" width="480" height="30" fill="#ecfccb" stroke="#65a30d"/><text x="172" y="235">PPTX and HTML documents. What a review actually consumes.</text>
+<rect x="190" y="255" width="420" height="30" fill="#dcfce7" stroke="#16a34a"/><text x="202" y="275">CRM writeback. A property on the record they already use.</text>
+<rect x="220" y="295" width="360" height="40" fill="#bbf7d0" stroke="#15803d" stroke-width="2"/><text x="232" y="313" font-weight="700">Inside their own tool</text><text x="232" y="328" font-size="12">a data app embedded in a ClickUp task</text>
+</g>
+</svg>

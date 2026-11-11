@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="360" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">Hash the join key into 16 buckets</text>
+<g font-size="13" fill="#222">
+<rect x="20" y="55" width="360" height="130" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="200" y="80" text-anchor="middle" font-weight="700" fill="#7f1d1d">Without buckets</text>
+<text x="200" y="106" text-anchor="middle">SQLite nested loop: for each left row...</text>
+<text x="200" y="128" text-anchor="middle">ask Postgres once per row</text>
+<text x="200" y="158" text-anchor="middle" font-weight="700">1,000 rows = 1,000 round trips</text>
+<rect x="420" y="55" width="360" height="130" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="600" y="80" text-anchor="middle" font-weight="700" fill="#14532d">With buckets (probe mode)</text>
+<text x="600" y="106" text-anchor="middle">bucket = md5(key)[0] % 16</text>
+<text x="600" y="128" text-anchor="middle">fetch the whole bucket once, cache it</text>
+<text x="600" y="158" text-anchor="middle" font-weight="700">at most 16 queries, SQLite filters locally</text>
+</g>
+<g>
+<rect x="40" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="60" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">0</text>
+<rect x="86" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="106" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">1</text>
+<rect x="132" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="152" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">2</text>
+<rect x="178" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="198" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">3</text>
+<rect x="224" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="244" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">4</text>
+<rect x="270" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="290" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">5</text>
+<rect x="316" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="336" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">6</text>
+<rect x="362" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="382" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">7</text>
+<rect x="408" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="428" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">8</text>
+<rect x="454" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="474" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">9</text>
+<rect x="500" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="520" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">10</text>
+<rect x="546" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="566" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">11</text>
+<rect x="592" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="612" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">12</text>
+<rect x="638" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="658" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">13</text>
+<rect x="684" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="704" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">14</text>
+<rect x="730" y="220" width="40" height="40" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="750" y="245" font-size="12" text-anchor="middle" fill="#1e3a8a">15</text>
+</g>
+<text x="400" y="290" text-anchor="middle" font-size="13" fill="#222">Scan mode (no equality on the key): read all 16. Probe fetches do not push the equality down, so later probes hit the cache.</text>
+<text x="400" y="320" text-anchor="middle" font-size="12" fill="#555">Reference implementation: conversation_accounts</text>
+</svg>

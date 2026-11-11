@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="330" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">One account, one moment, four answers</text>
+<g font-size="13" fill="#222" text-anchor="middle">
+<rect x="20" y="55" width="180" height="150" rx="10" fill="#fff" stroke="#6b7280" stroke-width="2"/><text x="110" y="82" font-weight="700">Dossier</text><text x="110" y="108">"no conversations"</text><text x="110" y="150" font-size="12" fill="#b91c1c">window was 3 Jul to 1 Aug</text><text x="110" y="168" font-size="12" fill="#b91c1c">caught up to 30 Aug</text>
+<rect x="215" y="55" width="180" height="150" rx="10" fill="#fff" stroke="#6b7280" stroke-width="2"/><text x="305" y="82" font-weight="700">Needle mover</text><text x="305" y="108">2 members, 3 contacts</text><text x="305" y="150" font-size="12" fill="#b91c1c">snapshot taken 28 Aug</text>
+<rect x="410" y="55" width="180" height="150" rx="10" fill="#fff" stroke="#6b7280" stroke-width="2"/><text x="500" y="82" font-weight="700">Relationship map</text><text x="500" y="108">blank</text><text x="500" y="150" font-size="12" fill="#b91c1c">12 weeks reprocessed 28 Aug</text><text x="500" y="168" font-size="12" fill="#b91c1c">after a model change</text>
+<rect x="605" y="55" width="175" height="150" rx="10" fill="#fff" stroke="#6b7280" stroke-width="2"/><text x="692" y="82" font-weight="700">Conversations tab</text><text x="692" y="108">full of tickets</text><text x="692" y="150" font-size="12" fill="#b91c1c">reads the raw ingest</text>
+</g>
+<rect x="20" y="235" width="760" height="62" rx="10" fill="#fee2e2" stroke="#dc2626"/>
+<text x="400" y="262" font-size="14" text-anchor="middle" fill="#7f1d1d" font-weight="700">Nobody could say if it was code or process.</text>
+<text x="400" y="284" font-size="13" text-anchor="middle" fill="#7f1d1d">Standing requirement (Vivek): "both need to be consistent".</text>
+</svg>

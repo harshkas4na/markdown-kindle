@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="340" fill="#f7f5ef"/>
+<text x="400" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#222">Get, Set, Go</text>
+<g font-size="14" fill="#222">
+<rect x="30" y="60" width="230" height="230" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="145" y="90" text-anchor="middle" font-size="18" font-weight="700" fill="#1e3a8a">GET</text>
+<text x="145" y="112" text-anchor="middle">Intelligence layer</text>
+<text x="145" y="145" text-anchor="middle" font-size="13">Customer Intelligence Graph</text>
+<text x="145" y="168" text-anchor="middle" font-size="13">Predictions, needle movers</text>
+<text x="145" y="191" text-anchor="middle" font-size="13">Cohorts, journey, forecast</text>
+<text x="145" y="214" text-anchor="middle" font-size="13">Dossier (memory)</text>
+<text x="145" y="270" text-anchor="middle" font-size="12" fill="#1e3a8a">what is true about the account</text>
+<rect x="285" y="60" width="230" height="230" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="400" y="90" text-anchor="middle" font-size="18" font-weight="700" fill="#92400e">SET</text>
+<text x="400" y="112" text-anchor="middle">Agent and automation layer</text>
+<text x="400" y="145" text-anchor="middle" font-size="13">AI agents (flows)</text>
+<text x="400" y="168" text-anchor="middle" font-size="13">Workflows, triggers</text>
+<text x="400" y="191" text-anchor="middle" font-size="13">Outcome-Based Agents</text>
+<text x="400" y="214" text-anchor="middle" font-size="13" font-weight="700">You build here</text>
+<text x="400" y="270" text-anchor="middle" font-size="12" fill="#92400e">what should happen next</text>
+<rect x="540" y="60" width="230" height="230" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="655" y="90" text-anchor="middle" font-size="18" font-weight="700" fill="#166534">GO</text>
+<text x="655" y="112" text-anchor="middle">UX and AX layer</text>
+<text x="655" y="145" text-anchor="middle" font-size="13">FunnelStory screens</text>
+<text x="655" y="168" text-anchor="middle" font-size="13">Slack, CRM, ClickUp, email</text>
+<text x="655" y="191" text-anchor="middle" font-size="13">Claude and Cursor (AX)</text>
+<text x="655" y="214" text-anchor="middle" font-size="13">Data apps, decks</text>
+<text x="655" y="270" text-anchor="middle" font-size="12" fill="#166534">where a person sees it</text>
+</g>
+<g stroke="#555" stroke-width="3" fill="none"><path d="M262 175 L283 175"/><path d="M517 175 L538 175"/></g>
+<text x="400" y="320" text-anchor="middle" font-size="13" fill="#555">Data flows left to right. Customers' systems stay the source of truth.</text>
+</svg>

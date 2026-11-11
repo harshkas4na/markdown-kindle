@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="300" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">The score starts at 50. Everything moves it from there.</text>
+<line x1="60" y1="150" x2="740" y2="150" stroke="#444" stroke-width="3"/>
+<g font-size="12" fill="#444" text-anchor="middle"><text x="60" y="175">0</text><text x="400" y="175">50 (origin)</text><text x="740" y="175">100</text></g>
+<line x1="400" y1="130" x2="400" y2="170" stroke="#444" stroke-width="3"/>
+<rect x="400" y="95" width="215" height="28" fill="#86efac" stroke="#16a34a"/><text x="507" y="114" font-size="13" text-anchor="middle" fill="#14532d">Products added +31.8</text>
+<rect x="570" y="215" width="46" height="28" fill="#fca5a5" stroke="#dc2626"/><text x="560" y="234" font-size="13" text-anchor="end" fill="#7f1d1d">Needle movers -6.8</text>
+<circle cx="574" cy="150" r="12" fill="#2563eb"/>
+<text x="574" y="195" font-size="14" text-anchor="middle" font-weight="700" fill="#1e3a8a">score 76</text>
+<text x="400" y="278" text-anchor="middle" font-size="12" fill="#555">Example from Preetam's prototype. Say "what moved it", not "what it is".</text>
+</svg>

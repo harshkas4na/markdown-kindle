@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" font-family="Helvetica, Arial, sans-serif">
+<rect width="800" height="300" fill="#f7f5ef"/>
+<text x="400" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#222">The draft gate</text>
+<g font-size="13" fill="#222" text-anchor="middle">
+<rect x="20" y="60" width="150" height="90" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text x="95" y="90" font-weight="700">Build</text><text x="95" y="112">draft: true</text><text x="95" y="130">trigger_config: null</text>
+<rect x="200" y="60" width="150" height="90" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text x="275" y="90" font-weight="700">Test mode</text><text x="275" y="112">real output,</text><text x="275" y="130">no external writes</text>
+<rect x="380" y="60" width="150" height="90" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text x="455" y="90" font-weight="700">You read it</text><text x="455" y="112">the actual</text><text x="455" y="130">numbers</text>
+<rect x="560" y="60" width="220" height="90" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="670" y="90" font-weight="700">Customer says yes</text><text x="670" y="112">to this specific artifact</text><text x="670" y="130">(not the one before it)</text>
+</g>
+<g stroke="#555" stroke-width="3" fill="none"><path d="M172 105 L198 105"/><path d="M352 105 L378 105"/><path d="M532 105 L558 105"/></g>
+<rect x="560" y="180" width="220" height="60" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="670" y="206" font-size="13" text-anchor="middle" font-weight="700" fill="#14532d">Your explicit word:</text><text x="670" y="226" font-size="13" text-anchor="middle" fill="#14532d">activate, and only then</text>
+<path d="M670 152 L670 178" stroke="#555" stroke-width="3" fill="none"/>
+<g font-size="12" fill="#b91c1c"><text x="20" y="190" font-weight="700">Never without asking:</text><text x="20" y="210">1 activate, publish, schedule</text><text x="20" y="228">2 any non-GET write to a customer workspace</text><text x="20" y="246">3 anything that leaves the building</text></g>
+<text x="400" y="282" text-anchor="middle" font-size="12" fill="#555">"I needed to activate it to see if it worked" is never true.</text>
+</svg>
